@@ -1,8 +1,9 @@
 // app/client/dashboard/home/page.tsx
 "use client"; // Обязательно, так как будут интерактивные элементы или эффекты
 
-import React from "react";
+import React, { useEffect, useState } from "react"; // Импортируем useEffect и useState
 import Link from "next/link";
+import Image from "next/image"; // Импортируем Image для карточек
 import {
     FaShieldAlt,
     FaTools,
@@ -10,48 +11,47 @@ import {
     FaTruck,
     FaUsers,
     FaTag,
-} from "react-icons/fa"; // Добавим новые иконки
+} from "react-icons/fa";
+
+// Интерфейс для продукта - убедитесь, что он соответствует вашей структуре данных
+interface Product {
+  id: string;
+  name: string;
+  description: string | null;
+  price: string;
+  imageUrl: string | null;
+  category: string | null;
+  inStock: boolean;
+}
 
 export default function HomePage() {
-    const featuredProducts = [
-        {
-            id: 1,
-            name: "Современный Виниловый Забор",
-            image: "https://via.placeholder.com/400x300?text=Виниловый+Забор", // Замените на реальное изображение
-            price: "от $45/фут",
-            description:
-                "Идеальное решение для долговечности и минимального ухода. Стильный и прочный.",
-            link: "/client/dashboard/products/vinyl-fence", // Ссылка на конкретный продукт
-        },
-        {
-            id: 2,
-            name: "Классический Деревянный Забор",
-            image: "https://via.placeholder.com/400x300?text=Деревянный+Забор", // Замените на реальное изображение
-            price: "от $30/фут",
-            description:
-                "Натуральная красота и прочность. Добавьте уюта вашему участку.",
-            link: "/client/dashboard/products/wood-fence",
-        },
-        {
-            id: 3,
-            name: "Прочный Металлический Забор",
-            image: "https://via.placeholder.com/400x300?text=Металлический+Забор", // Замените на реальное изображение
-            price: "от $55/фут",
-            description:
-                "Максимальная безопасность и современный дизайн. Идеально для любого участка.",
-            link: "/client/dashboard/products/metal-fence",
-        },
-        {
-            id: 4,
-            name: "Декоративный Кованый Забор",
-            image: "https://via.placeholder.com/400x300?text=Кованый+Забор", // Замените на реальное изображение
-            price: "по запросу",
-            description:
-                "Элегантность и эксклюзивность. Создайте неповторимый образ вашего дома.",
-            link: "/client/dashboard/products/wrought-iron-fence",
-        },
-    ];
+    const [products, setProducts] = useState<Product[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
 
+    useEffect(() => {
+        async function fetchFeaturedProducts() {
+            setLoading(true);
+            setError(null);
+            try {
+                // Загружаем, например, 4 последних или рекомендуемых продукта
+                const response = await fetch('/api/products?_limit=4');
+                if (!response.ok) {
+                    throw new Error(`Ошибка HTTP! Статус: ${response.status}`);
+                }
+                const data = await response.json();
+                setProducts(data);
+            } catch (e: any) {
+                setError(e.message);
+            } finally {
+                setLoading(false);
+            }
+        }
+        fetchFeaturedProducts();
+    }, []); // Пустой массив зависимостей означает, что эффект запустится один раз при монтировании
+
+
+    // --- Начало JSX разметки ---
     return (
         <div className="bg-[var(--color-background)] text-[var(--color-text)] py-12 md:py-20">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -98,42 +98,71 @@ export default function HomePage() {
                     <h2 className="text-3xl md:text-4xl font-bold text-[var(--color-primary)] mb-10 text-center">
                         Наши Популярные Решения
                     </h2>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-                        {featuredProducts.map((product) => (
-                            <Link
-                                key={product.id}
-                                href={product.link}
-                                className="block group"
-                            >
+                    {loading && (
+                        <div className="text-center py-10">
+                            <p className="text-xl">Загрузка популярных продуктов...</p>
+                        </div>
+                    )}
+
+                    {error && (
+                        <div className="text-center py-10">
+                            <p className="text-xl text-red-600">Ошибка при загрузке продуктов: {error}</p>
+                        </div>
+                    )}
+
+                    {!loading && !error && products.length === 0 && (
+                        <div className="text-center py-10">
+                            <p className="text-2xl text-gray-600">Популярные продукты не найдены.</p>
+                        </div>
+                    )}
+
+                    {!loading && !error && products.length > 0 && (
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                            {products.map((product) => (
+                                // --- Начало кода ProductCard, повторённого здесь ---
                                 <div
-                                    className="bg-white rounded-lg shadow-lg overflow-hidden
-                            transform transition-transform duration-300 hover:-translate-y-2 hover:shadow-xl"
+                                    key={product.id}
+                                    className="bg-white rounded-lg shadow-lg overflow-hidden flex flex-col
+                                transform transition-transform duration-300 hover:-translate-y-2 hover:shadow-xl"
                                 >
-                                    {" "}
-                                    {/* Эффект поднятия */}
-                                    <img
-                                        src={product.image}
-                                        alt={product.name}
-                                        className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
-                                    />
-                                    <div className="p-5">
-                                        <h3 className="text-xl font-semibold text-[var(--color-primary)] mb-2 group-hover:text-[var(--color-accent)] transition-colors duration-200">
+                                    {product.imageUrl && (
+                                        <Image
+                                            src={product.imageUrl}
+                                            alt={product.name}
+                                            width={400}
+                                            height={300}
+                                            className="w-full h-48 object-cover"
+                                            priority
+                                        />
+                                    )}
+                                    <div className="p-5 flex flex-col flex-grow">
+                                        <h3 className="text-xl font-semibold text-[var(--color-primary)] mb-2 h-14 overflow-hidden line-clamp-2">
                                             {product.name}
                                         </h3>
-                                        <p className="text-base text-[var(--color-text)] mb-3">
-                                            {product.description}
+                                        <p className="text-base text-[var(--color-text)] mb-3 h-20 overflow-hidden line-clamp-3">
+                                            {product.description || 'Нет описания.'}
                                         </p>
-                                        <p className="text-lg font-bold text-[var(--color-accent)] mb-4">
-                                            {product.price}
+                                        <p className="text-lg font-bold text-[var(--color-accent)] mt-auto mb-4">
+                                            {`$${parseFloat(product.price).toFixed(2)}`}
                                         </p>
-                                        <button className="w-full bg-[var(--color-primary)] text-white py-2 rounded-md hover:bg-opacity-90 transition-colors duration-200">
-                                            Подробнее
-                                        </button>
+                                        <div className="flex justify-between items-center">
+                                            <span className={`text-sm font-semibold px-3 py-1 rounded-full ${product.inStock ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+                                                {product.inStock ? 'В наличии' : 'Нет в наличии'}
+                                            </span>
+                                            <Link
+                                                href={`/client/dashboard/products/${product.id}`}
+                                                className="bg-[var(--color-primary)] text-white py-2 px-4 rounded-md hover:bg-opacity-90 transition-colors duration-200 text-sm"
+                                            >
+                                                Подробнее
+                                            </Link>
+                                        </div>
                                     </div>
                                 </div>
-                            </Link>
-                        ))}
-                    </div>
+                                
+                            ))}
+                        </div>
+                    )}
+
                     <div className="text-center mt-12">
                         <Link
                             href="/client/dashboard/products"
