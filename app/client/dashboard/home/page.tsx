@@ -12,6 +12,7 @@ import {
     FaUsers,
     FaTag,
 } from "react-icons/fa";
+import { useCart } from "../../context/CartContext"; 
 
 // Интерфейс для продукта - убедитесь, что он соответствует вашей структуре данных
 interface Product {
@@ -28,6 +29,7 @@ export default function HomePage() {
     const [products, setProducts] = useState<Product[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const { addToCart } = useCart();
 
     useEffect(() => {
         async function fetchFeaturedProducts() {
@@ -100,19 +102,25 @@ export default function HomePage() {
                     </h2>
                     {loading && (
                         <div className="text-center py-10">
-                            <p className="text-xl">Загрузка популярных продуктов...</p>
+                            <p className="text-xl">
+                                Загрузка популярных продуктов...
+                            </p>
                         </div>
                     )}
 
                     {error && (
                         <div className="text-center py-10">
-                            <p className="text-xl text-red-600">Ошибка при загрузке продуктов: {error}</p>
+                            <p className="text-xl text-red-600">
+                                Ошибка при загрузке продуктов: {error}
+                            </p>
                         </div>
                     )}
 
                     {!loading && !error && products.length === 0 && (
                         <div className="text-center py-10">
-                            <p className="text-2xl text-gray-600">Популярные продукты не найдены.</p>
+                            <p className="text-2xl text-gray-600">
+                                Популярные продукты не найдены.
+                            </p>
                         </div>
                     )}
 
@@ -140,14 +148,25 @@ export default function HomePage() {
                                             {product.name}
                                         </h3>
                                         <p className="text-base text-[var(--color-text)] mb-3 h-20 overflow-hidden line-clamp-3">
-                                            {product.description || 'Нет описания.'}
+                                            {product.description ||
+                                                "Нет описания."}
                                         </p>
                                         <p className="text-lg font-bold text-[var(--color-accent)] mt-auto mb-4">
-                                            {`$${parseFloat(product.price).toFixed(2)}`}
+                                            {`$${parseFloat(
+                                                product.price
+                                            ).toFixed(2)}`}
                                         </p>
                                         <div className="flex justify-between items-center">
-                                            <span className={`text-sm font-semibold px-3 py-1 rounded-full ${product.inStock ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
-                                                {product.inStock ? 'В наличии' : 'Нет в наличии'}
+                                            <span
+                                                className={`text-sm font-semibold px-3 py-1 rounded-full ${
+                                                    product.inStock
+                                                        ? "bg-green-100 text-green-800"
+                                                        : "bg-red-100 text-red-800"
+                                                }`}
+                                            >
+                                                {product.inStock
+                                                    ? "В наличии"
+                                                    : "Нет в наличии"}
                                             </span>
                                             <Link
                                                 href={`/client/dashboard/products/${product.id}`}
@@ -155,10 +174,51 @@ export default function HomePage() {
                                             >
                                                 Подробнее
                                             </Link>
+                                            {/* Внутри products.map в home/page.tsx */}
+                                            <div
+                                                key={product.id}
+                                                className="bg-white rounded-lg shadow-lg overflow-hidden flex flex-col
+    transform transition-transform duration-300 hover:-translate-y-2 hover:shadow-xl"
+                                            >
+                                                {/* ... изображение, название, описание, цена ... */}
+                                                <div className="flex justify-between items-center">
+                                                    <span
+                                                        className={`text-sm font-semibold px-3 py-1 rounded-full ${
+                                                            product.inStock
+                                                                ? "bg-green-100 text-green-800"
+                                                                : "bg-red-100 text-red-800"
+                                                        }`}
+                                                    >
+                                                        {product.inStock
+                                                            ? "В наличии"
+                                                            : "Нет в наличии"}
+                                                    </span>
+                                                    <button
+                                                        onClick={() => {
+                                                            // Используйте анонимную функцию, чтобы вызывать addToCart с product
+                                                            addToCart(product);
+                                                            alert(
+                                                                `${product.name} добавлен в корзину!`
+                                                            );
+                                                        }}
+                                                        disabled={
+                                                            !product.inStock
+                                                        }
+                                                        className={`py-2 px-4 rounded-md transition-colors duration-200 text-sm ${
+                                                            product.inStock
+                                                                ? "bg-[var(--color-primary)] text-white hover:bg-opacity-90"
+                                                                : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                                                        }`}
+                                                    >
+                                                        {product.inStock
+                                                            ? "Добавить в корзину"
+                                                            : "Нет в наличии"}
+                                                    </button>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                                
                             ))}
                         </div>
                     )}

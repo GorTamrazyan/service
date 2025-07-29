@@ -4,7 +4,9 @@
 import React from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { useCart } from "../client/context/CartContext"; // <--- Импортируем useCart
 
+// Интерфейс для продукта - убедитесь, что он соответствует вашей структуре данных
 interface Product {
     id: string;
     name: string;
@@ -63,7 +65,7 @@ export default function ProductList({
                                 <ProductCard
                                     key={product.id}
                                     product={product}
-                                />
+                                /> // Используем ProductCard
                             ))}
                         </div>
                     </div>
@@ -71,7 +73,7 @@ export default function ProductList({
             ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
                     {products.map((product) => (
-                        <ProductCard key={product.id} product={product} />
+                        <ProductCard key={product.id} product={product} /> // Используем ProductCard
                     ))}
                 </div>
             )}
@@ -79,10 +81,14 @@ export default function ProductList({
     );
 }
 
-// =========================================================================
-// ОБНОВЛЁННЫЙ КОМПОНЕНТ ProductCard
-// =========================================================================
 function ProductCard({ product }: { product: Product }) {
+    const { addToCart } = useCart(); // <--- Используем хук useCart
+
+    const handleAddToCart = () => {
+        addToCart(product);
+        alert(`${product.name} добавлен в корзину!`); // Можно заменить на более красивое уведомление
+    };
+
     return (
         <div
             className="bg-white rounded-lg shadow-lg overflow-hidden flex flex-col
@@ -99,17 +105,12 @@ function ProductCard({ product }: { product: Product }) {
                 />
             )}
             <div className="p-5 flex flex-col flex-grow">
-                {" "}
-                {/* Добавляем flex-grow для заполнения доступного пространства */}
-                {/* Название продукта: фиксированная высота для 2-х строк, обрезание текста */}
                 <h3 className="text-xl font-semibold text-[var(--color-primary)] mb-2 h-14 overflow-hidden line-clamp-2">
                     {product.name}
                 </h3>
-                {/* Описание продукта: фиксированная высота для 3-х строк, обрезание текста */}
                 <p className="text-base text-[var(--color-text)] mb-3 h-20 overflow-hidden line-clamp-3">
                     {product.description || "Нет описания."}
                 </p>
-                {/* Цена: всегда внизу, за счет flex-grow на родительском блоке p-5 */}
                 <p className="text-lg font-bold text-[var(--color-accent)] mt-auto mb-4">
                     {`$${parseFloat(product.price).toFixed(2)}`}
                 </p>
@@ -123,12 +124,20 @@ function ProductCard({ product }: { product: Product }) {
                     >
                         {product.inStock ? "В наличии" : "Нет в наличии"}
                     </span>
-                    <Link
-                        href={`/client/dashboard/products/${product.id}`}
-                        className="bg-[var(--color-primary)] text-white py-2 px-4 rounded-md hover:bg-opacity-90 transition-colors duration-200 text-sm"
+                    {/* Кнопка "Добавить в корзину" */}
+                    <button
+                        onClick={handleAddToCart}
+                        disabled={!product.inStock} // Отключаем кнопку, если нет в наличии
+                        className={`py-2 px-4 rounded-md transition-colors duration-200 text-sm ${
+                            product.inStock
+                                ? "bg-[var(--color-primary)] text-white hover:bg-opacity-90"
+                                : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                        }`}
                     >
-                        Подробнее
-                    </Link>
+                        {product.inStock
+                            ? "Добавить в корзину"
+                            : "Нет в наличии"}
+                    </button>
                 </div>
             </div>
         </div>
