@@ -1,17 +1,22 @@
-// next.config.js
-import type { NextConfig } from "next";
-
-const nextConfig: NextConfig = {
-    /* config options here */
+/** @type {import('next').NextConfig} */
+const nextConfig = {
     images: {
-        domains: [
-            "via.placeholder.com", // <--- Add this line to allow placeholder images
-            // You can add other domains here when you use real image hosting, e.g.:
-            // 'your-cdn-domain.com',
-            // 'res.cloudinary.com',
-            // 's3.amazonaws.com',
+        remotePatterns: [
+            {
+                protocol: "https",
+                hostname: "via.placeholder.com",
+                port: "",
+                pathname: "/**", // Позволяет любые пути на этом домене
+            },
+            // Добавьте другие удаленные домены изображений, если они у вас есть (например, из Firebase Storage)
+            // {
+            //   protocol: 'https',
+            //   hostname: 'firebasestorage.googleapis.com',
+            //   port: '',
+            //   pathname: '/**',
+            // },
         ],
     },
 };
 
-export default nextConfig;
+module.exports = nextConfig;
