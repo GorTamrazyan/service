@@ -72,38 +72,64 @@ export default function CartPage() {
                                 <p className="text-gray-600">
                                     Цена: ${parseFloat(item.price).toFixed(2)}
                                 </p>
-                                <div className="flex items-center mt-2">
+                                <div className="flex items-center mt-2 gap-2">
                                     <label
                                         htmlFor={`quantity-${item.id}`}
                                         className="sr-only"
                                     >
                                         Количество
                                     </label>
-                                    <select
-                                        id={`quantity-${item.id}`}
-                                        value={item.quantity}
-                                        onChange={(e) =>
-                                            handleQuantityChange(
-                                                item.id,
-                                                e as React.ChangeEvent<HTMLSelectElement>
-                                            )
-                                        }
-                                        className="w-20 p-2 border border-gray-300 rounded-md text-sm mr-4 focus:ring-[var(--color-primary)] focus:border-[var(--color-primary)]"
-                                    >
-                                        {[...Array(10)].map(
-                                            (
-                                                _,
-                                                i // Ограничиваем до 10 для примера
-                                            ) => (
+                                    <div className="relative inline-block w-auto min-w-[5rem]">
+                                        {" "}
+                                        {/* Добавлена обертка для кастомной стрелки и ширины */}
+                                        <select
+                                            id={`quantity-${item.id}`}
+                                            value={item.quantity}
+                                            onChange={(e) =>
+                                                handleQuantityChange(
+                                                    item.id,
+                                                    e as React.ChangeEvent<HTMLSelectElement>
+                                                )
+                                            }
+                                            className="
+            block w-full
+            appearance-none focus:outline-none focus:ring-0 focus:border-0 // Отключаем стандартный вид и фокус
+            pl-3 pr-8 py-2 // Увеличиваем правый отступ для стрелки
+            text-base font-medium text-[var(--color-text)] // Стиль текста
+            bg-white // Белый фон
+            border border-gray-300 rounded-lg // Скругленные углы и граница
+            shadow-sm // Небольшая тень
+            cursor-pointer // Курсор-указатель
+            hover:border-[var(--color-accent)] // Изменение цвета границы при наведении
+            transition-all duration-200 ease-in-out // Плавные переходы
+        "
+                                        >
+                                            {[...Array(10)].map((_, i) => (
                                                 <option
                                                     key={i + 1}
                                                     value={i + 1}
                                                 >
                                                     {i + 1}
                                                 </option>
-                                            )
-                                        )}
-                                    </select>
+                                            ))}
+                                        </select>
+                                        {/* Кастомная стрелка для select */}
+                                        <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
+                                            <svg
+                                                className="h-5 w-5 text-gray-400"
+                                                xmlns="http://www.w3.org/2000/svg"
+                                                viewBox="0 0 20 20"
+                                                fill="currentColor"
+                                                aria-hidden="true"
+                                            >
+                                                <path
+                                                    fillRule="evenodd"
+                                                    d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+                                                    clipRule="evenodd"
+                                                />
+                                            </svg>
+                                        </div>
+                                    </div>
                                     <button
                                         onClick={() => removeFromCart(item.id)}
                                         className="text-red-600 hover:text-red-800 text-sm font-semibold transition-colors duration-200"

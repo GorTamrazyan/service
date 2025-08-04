@@ -1,9 +1,8 @@
 // app/client/dashboard/home/page.tsx
-"use client"; // Обязательно, так как будут интерактивные элементы или эффекты
+"use client";
 
-import React, { useEffect, useState } from "react"; // Импортируем useEffect и useState
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
-import Image from "next/image"; // Импортируем Image для карточек
 import {
     FaShieldAlt,
     FaTools,
@@ -11,65 +10,71 @@ import {
     FaTruck,
     FaUsers,
     FaTag,
+    FaSpinner,
 } from "react-icons/fa";
-import { useCart } from "../../context/CartContext"; 
 
-// Интерфейс для продукта - убедитесь, что он соответствует вашей структуре данных
+// ПРАВИЛЬНЫЙ импорт ProductCard из компонента ProductList
+import { ProductCard } from "../../../components/ProductList";
+
+// Интерфейс для продукта
 interface Product {
-  id: string;
-  name: string;
-  description: string | null;
-  price: string;
-  imageUrl: string | null;
-  category: string | null;
-  inStock: boolean;
+    id: string;
+    name: string;
+    description: string | null;
+    price: string;
+    imageUrl: string | null;
+    category: string | null;
+    inStock: boolean;
 }
 
 export default function HomePage() {
     const [products, setProducts] = useState<Product[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
-    const { addToCart } = useCart();
 
     useEffect(() => {
         async function fetchFeaturedProducts() {
             setLoading(true);
             setError(null);
             try {
-                // Загружаем, например, 4 последних или рекомендуемых продукта
-                const response = await fetch('/api/products?_limit=4');
+                // Загружаем популярные продукты из базы данных (максимум 4)
+                const response = await fetch(
+                    "/api/products?featured=true&_limit=4"
+                );
                 if (!response.ok) {
                     throw new Error(`Ошибка HTTP! Статус: ${response.status}`);
                 }
-                const data = await response.json();
+                const data: Product[] = await response.json();
                 setProducts(data);
             } catch (e: any) {
+                console.error("Ошибка загрузки продуктов:", e);
                 setError(e.message);
             } finally {
                 setLoading(false);
             }
         }
         fetchFeaturedProducts();
-    }, []); // Пустой массив зависимостей означает, что эффект запустится один раз при монтировании
+    }, []);
 
-
-    // --- Начало JSX разметки ---
     return (
         <div className="bg-[var(--color-background)] text-[var(--color-text)] py-12 md:py-20">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                {/* Секция приветствия и призыв к действию (Hero Section) */}
+                {/* Hero Section */}
                 <section className="text-center mb-16 md:mb-20 bg-[var(--color-primary)] text-white p-8 md:p-12 rounded-lg shadow-xl relative overflow-hidden">
                     <div
                         className="absolute inset-0 bg-cover bg-center opacity-30"
                         style={{
                             backgroundImage:
-                                "url('https://via.placeholder.com/1200x600?text=Фоновое+изображение+забора')",
+                                "url('/images/hero-background.jpg')",
                         }}
-                    ></div>{" "}
-                    {/* Замените на красивое фоновое изображение */}
+                    ></div>
                     <div className="relative z-10">
                         <h1 className="text-4xl md:text-6xl font-extrabold leading-tight mb-4">
-                            Добро пожаловать домой, [Имя Пользователя]!
+                            Добро пожаловать домой,{" "}
+                            <span className="text-[var(--color-accent)]">
+                                Уважаемый клиент
+                            </span>
+                            !
                         </h1>
                         <p className="text-xl md:text-2xl max-w-4xl mx-auto mb-8">
                             Ваш идеальный забор ждет вас. Откройте для себя нашу
@@ -84,7 +89,7 @@ export default function HomePage() {
                                 Посмотреть Все Заборы
                             </Link>
                             <Link
-                                href="/contact" // Или ссылка на форму быстрой оценки
+                                href="/contact"
                                 className="inline-block border-2 border-white hover:border-[var(--color-accent)] text-white hover:text-[var(--color-accent)] font-bold py-3 px-8 rounded-full text-lg transition-colors duration-300 shadow-lg"
                             >
                                 Получить Бесплатную Оценку
@@ -95,14 +100,16 @@ export default function HomePage() {
 
                 <hr className="border-[var(--color-accent)] my-12" />
 
-                {/* Секция "Выгодные Предложения" или "Рекомендуемые Продукты" */}
+                {/* Featured Products Section */}
                 <section className="mb-16 md:mb-20">
                     <h2 className="text-3xl md:text-4xl font-bold text-[var(--color-primary)] mb-10 text-center">
                         Наши Популярные Решения
                     </h2>
+
                     {loading && (
-                        <div className="text-center py-10">
-                            <p className="text-xl">
+                        <div className="flex justify-center items-center py-10">
+                            <FaSpinner className="animate-spin text-5xl text-[var(--color-accent)]" />
+                            <p className="ml-4 text-2xl text-[var(--color-primary)]">
                                 Загрузка популярных продуктов...
                             </p>
                         </div>
@@ -113,10 +120,14 @@ export default function HomePage() {
                             <p className="text-xl text-red-600">
                                 Ошибка при загрузке продуктов: {error}
                             </p>
+                            <p className="text-sm text-gray-500 mt-2">
+                                Попробуйте обновить страницу или свяжитесь с
+                                нами
+                            </p>
                         </div>
                     )}
 
-                    {!loading && !error && products.length === 0 && (
+                    {!loading && products.length === 0 && (
                         <div className="text-center py-10">
                             <p className="text-2xl text-gray-600">
                                 Популярные продукты не найдены.
@@ -124,101 +135,13 @@ export default function HomePage() {
                         </div>
                     )}
 
-                    {!loading && !error && products.length > 0 && (
+                    {products.length > 0 && (
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
                             {products.map((product) => (
-                                // --- Начало кода ProductCard, повторённого здесь ---
-                                <div
+                                <ProductCard
                                     key={product.id}
-                                    className="bg-white rounded-lg shadow-lg overflow-hidden flex flex-col
-                                transform transition-transform duration-300 hover:-translate-y-2 hover:shadow-xl"
-                                >
-                                    {product.imageUrl && (
-                                        <Image
-                                            src={product.imageUrl}
-                                            alt={product.name}
-                                            width={400}
-                                            height={300}
-                                            className="w-full h-48 object-cover"
-                                            priority
-                                        />
-                                    )}
-                                    <div className="p-5 flex flex-col flex-grow">
-                                        <h3 className="text-xl font-semibold text-[var(--color-primary)] mb-2 h-14 overflow-hidden line-clamp-2">
-                                            {product.name}
-                                        </h3>
-                                        <p className="text-base text-[var(--color-text)] mb-3 h-20 overflow-hidden line-clamp-3">
-                                            {product.description ||
-                                                "Нет описания."}
-                                        </p>
-                                        <p className="text-lg font-bold text-[var(--color-accent)] mt-auto mb-4">
-                                            {`$${parseFloat(
-                                                product.price
-                                            ).toFixed(2)}`}
-                                        </p>
-                                        <div className="flex justify-between items-center">
-                                            <span
-                                                className={`text-sm font-semibold px-3 py-1 rounded-full ${
-                                                    product.inStock
-                                                        ? "bg-green-100 text-green-800"
-                                                        : "bg-red-100 text-red-800"
-                                                }`}
-                                            >
-                                                {product.inStock
-                                                    ? "В наличии"
-                                                    : "Нет в наличии"}
-                                            </span>
-                                            <Link
-                                                href={`/client/dashboard/products/${product.id}`}
-                                                className="bg-[var(--color-primary)] text-white py-2 px-4 rounded-md hover:bg-opacity-90 transition-colors duration-200 text-sm"
-                                            >
-                                                Подробнее
-                                            </Link>
-                                            {/* Внутри products.map в home/page.tsx */}
-                                            <div
-                                                key={product.id}
-                                                className="bg-white rounded-lg shadow-lg overflow-hidden flex flex-col
-    transform transition-transform duration-300 hover:-translate-y-2 hover:shadow-xl"
-                                            >
-                                                {/* ... изображение, название, описание, цена ... */}
-                                                <div className="flex justify-between items-center">
-                                                    <span
-                                                        className={`text-sm font-semibold px-3 py-1 rounded-full ${
-                                                            product.inStock
-                                                                ? "bg-green-100 text-green-800"
-                                                                : "bg-red-100 text-red-800"
-                                                        }`}
-                                                    >
-                                                        {product.inStock
-                                                            ? "В наличии"
-                                                            : "Нет в наличии"}
-                                                    </span>
-                                                    <button
-                                                        onClick={() => {
-                                                            // Используйте анонимную функцию, чтобы вызывать addToCart с product
-                                                            addToCart(product);
-                                                            alert(
-                                                                `${product.name} добавлен в корзину!`
-                                                            );
-                                                        }}
-                                                        disabled={
-                                                            !product.inStock
-                                                        }
-                                                        className={`py-2 px-4 rounded-md transition-colors duration-200 text-sm ${
-                                                            product.inStock
-                                                                ? "bg-[var(--color-primary)] text-white hover:bg-opacity-90"
-                                                                : "bg-gray-300 text-gray-500 cursor-not-allowed"
-                                                        }`}
-                                                    >
-                                                        {product.inStock
-                                                            ? "Добавить в корзину"
-                                                            : "Нет в наличии"}
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
+                                    product={product}
+                                />
                             ))}
                         </div>
                     )}
@@ -235,12 +158,12 @@ export default function HomePage() {
 
                 <hr className="border-[var(--color-accent)] my-12" />
 
-                {/* Секция "Наши Преимущества" (или "Почему выбирают нас") */}
+                {/* Benefits Section */}
                 <section className="mb-16 md:mb-20 bg-white shadow-lg rounded-lg p-8 md:p-10">
                     <h2 className="text-3xl md:text-4xl font-bold text-[var(--color-primary)] mb-8 text-center">
                         Почему клиенты выбирают{" "}
                         <span className="text-[var(--color-accent)]">
-                            [Название Вашей Компании]
+                            нашу компанию
                         </span>
                     </h2>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -323,7 +246,7 @@ export default function HomePage() {
                     </div>
                 </section>
 
-                {/* Секция "Отзывы" (просто заголовок для примера, можно развернуть) */}
+                {/* Testimonials Section */}
                 <section className="mb-16 md:mb-20 text-center">
                     <h2 className="text-3xl md:text-4xl font-bold text-[var(--color-primary)] mb-6">
                         Что говорят наши клиенты
@@ -333,14 +256,14 @@ export default function HomePage() {
                         истории успеха.
                     </p>
                     <Link
-                        href="/client/dashboard/testimonials" // Ссылка на страницу с отзывами
+                        href="/client/dashboard/testimonials"
                         className="inline-block mt-6 bg-[var(--color-primary)] hover:bg-opacity-90 text-white font-bold py-3 px-8 rounded-full text-lg transition-colors duration-300 shadow-md"
                     >
                         Читать Отзывы
                     </Link>
                 </section>
 
-                {/* Финальный призыв к действию */}
+                {/* Final CTA Section */}
                 <section className="text-center bg-[var(--color-accent)] text-[var(--color-primary)] p-8 rounded-lg shadow-xl">
                     <h2 className="text-3xl md:text-4xl font-bold mb-4">
                         Начните свой проект уже сегодня!

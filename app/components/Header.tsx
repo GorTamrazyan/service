@@ -124,7 +124,7 @@ export default function Header() {
                         )}
                     </Link>
                     <Link
-                        href="/profile"
+                        href="/client/dashboard/profile"
                         aria-label="Профиль"
                         className="text-white hover:text-[var(--color-accent)] transition-colors duration-200"
                     >

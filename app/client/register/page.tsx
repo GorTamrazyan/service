@@ -3,7 +3,7 @@
 import { useState } from "react";
 import React from "react";
 // Отрегулируйте путь в соответствии с расположением вашего firebase.config.ts относительно этого файла
-import { auth } from "../../firebase.config";
+import { auth } from "../../lib/firebase/firebase";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import {
     GoogleAuthProvider,

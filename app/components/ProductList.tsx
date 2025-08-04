@@ -4,9 +4,9 @@
 import React from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { useCart } from "../client/context/CartContext"; // <--- Импортируем useCart
+import { useCart } from "../client/context/CartContext"; // Убедитесь, что путь правильный
 
-// Интерфейс для продукта - убедитесь, что он соответствует вашей структуре данных
+// Интерфейс для продукта
 interface Product {
     id: string;
     name: string;
@@ -20,9 +20,10 @@ interface Product {
 interface ProductListProps {
     products: Product[];
     showGroupedView: boolean;
-    selectedCategory: string;
+    selectedCategory?: string;
 }
 
+// Основной компонент ProductList
 export default function ProductList({
     products,
     showGroupedView,
@@ -65,7 +66,7 @@ export default function ProductList({
                                 <ProductCard
                                     key={product.id}
                                     product={product}
-                                /> // Используем ProductCard
+                                />
                             ))}
                         </div>
                     </div>
@@ -73,7 +74,7 @@ export default function ProductList({
             ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
                     {products.map((product) => (
-                        <ProductCard key={product.id} product={product} /> // Используем ProductCard
+                        <ProductCard key={product.id} product={product} />
                     ))}
                 </div>
             )}
@@ -81,63 +82,78 @@ export default function ProductList({
     );
 }
 
-function ProductCard({ product }: { product: Product }) {
-    const { addToCart } = useCart(); // <--- Используем хук useCart
+// Отдельный компонент ProductCard
+export function ProductCard({ product }: { product: Product }) {
+    const { addToCart } = useCart();
 
     const handleAddToCart = () => {
         addToCart(product);
-        alert(`${product.name} добавлен в корзину!`); // Можно заменить на более красивое уведомление
+        alert(`${product.name} добавлен в корзину!`);
     };
 
     return (
-        <div
-            className="bg-white rounded-lg shadow-lg overflow-hidden flex flex-col
-                 transform transition-transform duration-300 hover:-translate-y-2 hover:shadow-xl"
-        >
+        <div className="bg-white rounded-xl shadow-md overflow-hidden flex flex-col h-full transform transition-transform duration-300 hover:-translate-y-2 hover:shadow-xl border border-gray-100">
             {product.imageUrl && (
-                <Image
-                    src={product.imageUrl}
-                    alt={product.name}
-                    width={400}
-                    height={300}
-                    className="w-full h-48 object-cover"
-                    priority
-                />
+                <div className="relative w-full h-48 bg-gray-100 flex items-center justify-center overflow-hidden">
+                    <Image
+                        src={product.imageUrl}
+                        alt={product.name}
+                        width={400}
+                        height={300}
+                        className="w-full h-full object-cover transform transition-transform duration-300 hover:scale-105"
+                        priority
+                    />
+                </div>
             )}
             <div className="p-5 flex flex-col flex-grow">
-                <h3 className="text-xl font-semibold text-[var(--color-primary)] mb-2 h-14 overflow-hidden line-clamp-2">
+                <h3 className="text-xl font-bold text-[var(--color-primary)] mb-2 h-14 overflow-hidden line-clamp-2">
                     {product.name}
                 </h3>
-                <p className="text-base text-[var(--color-text)] mb-3 h-20 overflow-hidden line-clamp-3">
+                <p className="text-sm text-[var(--color-text)] mb-3 h-20 overflow-hidden line-clamp-3 leading-relaxed">
                     {product.description || "Нет описания."}
                 </p>
-                <p className="text-lg font-bold text-[var(--color-accent)] mt-auto mb-4">
-                    {`$${parseFloat(product.price).toFixed(2)}`}
-                </p>
-                <div className="flex justify-between items-center">
+                <div className="flex items-baseline mt-auto mb-4">
+                    <p className="text-2xl font-extrabold text-[var(--color-accent)]">
+                        {`$${parseFloat(product.price).toFixed(2)}`}
+                    </p>
+                </div>
+                <div className="flex justify-between items-center gap-2">
                     <span
-                        className={`text-sm font-semibold px-3 py-1 rounded-full ${
-                            product.inStock
-                                ? "bg-green-100 text-green-800"
-                                : "bg-red-100 text-red-800"
-                        }`}
+                        className={`text-xs font-semibold px-3 py-1 rounded-full border
+                            ${
+                                product.inStock
+                                    ? "bg-green-50 text-green-700 border-green-200"
+                                    : "bg-red-50 text-red-700 border-red-200"
+                            }
+                        `}
                     >
                         {product.inStock ? "В наличии" : "Нет в наличии"}
                     </span>
-                    {/* Кнопка "Добавить в корзину" */}
+                </div>
+                <div className="flex flex-col gap-2 mt-3">
                     <button
                         onClick={handleAddToCart}
-                        disabled={!product.inStock} // Отключаем кнопку, если нет в наличии
-                        className={`py-2 px-4 rounded-md transition-colors duration-200 text-sm ${
-                            product.inStock
-                                ? "bg-[var(--color-primary)] text-white hover:bg-opacity-90"
-                                : "bg-gray-300 text-gray-500 cursor-not-allowed"
-                        }`}
+                        disabled={!product.inStock}
+                        className={`
+                            py-2 px-4 rounded-full text-white font-semibold text-sm
+                            transition-all duration-200 ease-in-out transform hover:scale-105
+                            ${
+                                product.inStock
+                                    ? "bg-[var(--color-primary)] hover:bg-opacity-90 shadow-md hover:shadow-lg"
+                                    : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                            }
+                        `}
                     >
                         {product.inStock
                             ? "Добавить в корзину"
                             : "Нет в наличии"}
                     </button>
+                    <Link
+                        href={`/client/dashboard/products/${product.id}`}
+                        className="py-2 px-4 rounded-full text-[var(--color-primary)] font-semibold text-sm border border-[var(--color-primary)] hover:bg-[var(--color-primary)] hover:text-white transition-all duration-200 ease-in-out transform hover:scale-105 flex items-center justify-center text-center"
+                    >
+                        Подробнее
+                    </Link>
                 </div>
             </div>
         </div>
