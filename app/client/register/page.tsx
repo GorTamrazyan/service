@@ -2,7 +2,6 @@
 "use client";
 import { useState } from "react";
 import React from "react";
-// Отрегулируйте путь в соответствии с расположением вашего firebase.config.ts относительно этого файла
 import { auth } from "../../lib/firebase/firebase";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import {
@@ -13,7 +12,7 @@ import {
 import { FcGoogle } from "react-icons/fc";
 import { FaApple } from "react-icons/fa";
 import Link from "next/link";
-import { useRouter } from "next/navigation"; // Импортируем useRouter
+import { useRouter } from "next/navigation";
 
 export default function RegisterPage() {
     const [email, setEmail] = useState("");
@@ -21,7 +20,7 @@ export default function RegisterPage() {
     const [confirmPassword, setConfirmPassword] = useState("");
     const [error, setError] = useState("");
 
-    const router = useRouter(); // Инициализируем useRouter
+    const router = useRouter();
 
     const handleEmailPasswordSubmit = async (event: React.FormEvent) => {
         event.preventDefault();
@@ -41,8 +40,7 @@ export default function RegisterPage() {
             );
             const user = userCredential.user;
             console.log("Успешная регистрация через Email/Пароль:", user);
-            // Перенаправление на панель управления или домашнюю страницу после успешной регистрации
-            router.push("/client/dashboard/home"); // <--- ПЕРЕНАПРАВЛЕНИЕ ЗДЕСЬ
+            router.push("/client/dashboard/home");
         } catch (firebaseError: any) {
             setError(firebaseError.message);
             console.error(
@@ -62,8 +60,7 @@ export default function RegisterPage() {
             const result = await signInWithPopup(auth, provider);
             const user = result.user;
             console.log("Успешная регистрация через Google:", user);
-            // Перенаправление на панель управления или домашнюю страницу после успешной регистрации через Google
-            router.push("/client/dashboard/home"); // <--- ПЕРЕНАПРАВЛЕНИЕ ЗДЕСЬ
+            router.push("/client/dashboard/home");
         } catch (firebaseError: any) {
             setError(firebaseError.message);
             console.error("Ошибка регистрации через Google:", firebaseError);
@@ -76,8 +73,7 @@ export default function RegisterPage() {
             const result = await signInWithPopup(auth, provider);
             const user = result.user;
             console.log("Успешная регистрация через Apple/iCloud:", user);
-            // Перенаправление на панель управления или домашнюю страницу после успешной регистрации через Apple
-            router.push("/client/dashboard/home"); // <--- ПЕРЕНАПРАВЛЕНИЕ ЗДЕСЬ
+            router.push("/client/dashboard/home");
         } catch (firebaseError: any) {
             setError(firebaseError.message);
             console.error(
@@ -88,107 +84,167 @@ export default function RegisterPage() {
     };
 
     return (
-        <div
-            className="flex items-center justify-center min-h-screen"
-            style={{
-                backgroundImage: "url('/')",
-                backgroundSize: "cover",
-                backgroundPosition: "center",
-            }}
-        >
-            <div className="relative p-8 bg-white bg-opacity-90 rounded-2xl shadow-xl w-96 backdrop-filter backdrop-blur-lg">
-                <h2 className="text-3xl font-semibold text-center text-gray-900 mb-8">
-                    Регистрация
-                </h2>
-
-                <form
-                    onSubmit={handleEmailPasswordSubmit}
-                    className="space-y-4"
-                >
-                    <div>
-                        <input
-                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-700 placeholder-gray-500"
-                            id="email"
-                            type="email"
-                            placeholder="Email"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            required
-                        />
-                    </div>
-                    <div>
-                        <input
-                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-700 placeholder-gray-500"
-                            id="password"
-                            type="password"
-                            placeholder="Пароль"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            required
-                        />
-                    </div>
-                    <div>
-                        <input
-                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-700 placeholder-gray-500"
-                            id="confirmPassword"
-                            type="password"
-                            placeholder="Подтвердите пароль"
-                            value={confirmPassword}
-                            onChange={(e) => setConfirmPassword(e.target.value)}
-                            required
-                        />
-                    </div>
-
-                    {error && (
-                        <p className="text-red-500 text-sm text-center -mt-2">
-                            {error}
-                        </p>
-                    )}
-
-                    <button
-                        type="submit"
-                        className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 transition duration-200 ease-in-out font-medium"
-                    >
-                        Зарегистрироваться
-                    </button>
-                </form>
-
-                <div className="relative my-6">
-                    <div className="absolute inset-0 flex items-center">
-                        <div className="w-full border-t border-gray-300"></div>
-                    </div>
-                    <div className="relative flex justify-center text-sm text-gray-500 bg-white px-2">
-                        или
+        <div className="min-h-screen bg-gray-100 flex flex-col">
+            {/* Header with logo */}
+            <div className="bg-red-600 w-full py-6">
+                <div className="flex items-center justify-center">
+                    <div className="flex items-center space-x-4">
+                        {/* Fence icon */}
+                        <div className="text-yellow-400">
+                            <svg
+                                width="60"
+                                height="40"
+                                viewBox="0 0 60 40"
+                                fill="currentColor"
+                            >
+                                <rect x="8" y="8" width="6" height="24" />
+                                <rect x="18" y="8" width="6" height="24" />
+                                <rect x="28" y="8" width="6" height="24" />
+                                <rect x="38" y="8" width="6" height="24" />
+                                <rect x="4" y="12" width="44" height="4" />
+                                <rect x="4" y="20" width="44" height="4" />
+                                <polygon points="8,8 11,4 14,8" />
+                                <polygon points="18,8 21,4 24,8" />
+                                <polygon points="28,8 31,4 34,8" />
+                                <polygon points="38,8 41,4 44,8" />
+                            </svg>
+                        </div>
+                        <h1 className="text-4xl font-bold text-gray-800">
+                            ONIK'S VINYL
+                        </h1>
                     </div>
                 </div>
+            </div>
 
-                <div className="space-y-3">
-                    <button
-                        className="w-full flex items-center justify-center bg-white border border-gray-300 text-gray-700 py-3 px-4 rounded-lg shadow-sm hover:bg-gray-50 transition duration-200 ease-in-out"
-                        onClick={handleGoogleSignIn}
-                    >
-                        <FcGoogle className="w-5 h-5 mr-3" />
-                        Зарегистрироваться через Google
-                    </button>
-                    <button
-                        className="w-full flex items-center justify-center bg-white border border-gray-300 text-gray-700 py-3 px-4 rounded-lg shadow-sm hover:bg-gray-50 transition duration-200 ease-in-out"
-                        onClick={handleAppleSignIn}
-                    >
-                        <FaApple className="w-5 h-5 mr-3" />
-                        Зарегистрироваться через iCloud
-                    </button>
-                </div>
+            {/* Main content */}
+            <div className="flex-1 flex items-center justify-center px-4 py-12">
+                <div className="w-full max-w-md">
+                    {/* REGISTER title */}
+                    <div className="text-center mb-8">
+                        <h2 className="text-5xl font-bold text-gray-800 mb-8">
+                            REGISTER
+                        </h2>
+                    </div>
 
-                <div className="mt-6 text-center text-sm">
-                    <p className="text-gray-600">
-                        Уже есть аккаунт?{" "}
-                        <Link
-                            href="/client/sign-in"
-                            className="text-blue-600 hover:underline font-medium"
-                        >
-                            Войти
-                        </Link>
-                    </p>
+                    {/* Form */}
+                    <form
+                        onSubmit={handleEmailPasswordSubmit}
+                        className="space-y-6"
+                    >
+                        {/* Email field */}
+                        <div>
+                            <label
+                                htmlFor="email"
+                                className="block text-lg font-medium text-gray-700 mb-2"
+                            >
+                                Email
+                            </label>
+                            <input
+                                id="email"
+                                name="email"
+                                type="email"
+                                autoComplete="email"
+                                required
+                                className="w-full px-4 py-3 border-2 border-gray-800 rounded-lg bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-lg"
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                            />
+                        </div>
+
+                        {/* Password field */}
+                        <div>
+                            <label
+                                htmlFor="password"
+                                className="block text-lg font-medium text-gray-700 mb-2"
+                            >
+                                Password
+                            </label>
+                            <input
+                                id="password"
+                                name="password"
+                                type="password"
+                                autoComplete="new-password"
+                                required
+                                className="w-full px-4 py-3 border-2 border-gray-800 rounded-lg bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-lg"
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                            />
+                        </div>
+
+                        {/* Confirm Password field */}
+                        <div>
+                            <label
+                                htmlFor="confirmPassword"
+                                className="block text-lg font-medium text-gray-700 mb-2"
+                            >
+                                Confirm Password
+                            </label>
+                            <input
+                                id="confirmPassword"
+                                name="confirmPassword"
+                                type="password"
+                                autoComplete="new-password"
+                                required
+                                className="w-full px-4 py-3 border-2 border-gray-800 rounded-lg bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-lg"
+                                value={confirmPassword}
+                                onChange={(e) =>
+                                    setConfirmPassword(e.target.value)
+                                }
+                            />
+                        </div>
+
+                        {/* Error message */}
+                        {error && (
+                            <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-lg text-sm">
+                                {error}
+                            </div>
+                        )}
+
+                        {/* Register button */}
+                        <div className="pt-4">
+                            <button
+                                type="submit"
+                                className="w-full bg-yellow-500 hover:bg-yellow-600 text-gray-800 font-bold py-4 px-6 rounded-lg text-xl transition duration-150 ease-in-out"
+                            >
+                                REGISTER
+                            </button>
+                        </div>
+
+                        {/* Social login buttons */}
+                        <div className="space-y-3 pt-4 h-20 flex">
+                            <button
+                                type="button"
+                                onClick={handleGoogleSignIn}
+                                className="w-full flex items-center justify-center py-3 px-4 m-0 border-2 border-gray-300 rounded-lg bg-white hover:bg-gray-50 transition duration-150 ease-in-out"
+                            >
+                                <FcGoogle className="h-6 w-6 mr-3" />
+                                <span className="text-gray-700 font-medium">
+                                    Continue with Google
+                                </span>
+                            </button>
+
+                            <button
+                                type="button"
+                                onClick={handleAppleSignIn}
+                                className="w-full flex items-center justify-center py-3 px-4 border-2 border-gray-300 rounded-lg bg-white hover:bg-gray-50 transition duration-150 ease-in-out"
+                            >
+                                <FaApple className="h-6 w-6 mr-3 text-gray-800" />
+                                <span className="text-gray-700 font-medium">
+                                    Continue with Apple
+                                </span>
+                            </button>
+                        </div>
+
+                        {/* Sign in link */}
+                        <div className="text-center pt-6">
+                            <Link
+                                href="/client/sign-in"
+                                className="text-gray-700 hover:text-blue-600 transition duration-150 ease-in-out font-medium"
+                            >
+                                Already have an account? Sign in
+                            </Link>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>

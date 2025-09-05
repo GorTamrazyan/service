@@ -2,6 +2,7 @@
 "use client";
 import React, { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { FaSearch, FaShoppingCart, FaUserCircle } from "react-icons/fa";
 import { useCart } from "../client/context/CartContext"; // <--- Import useCart hook
@@ -52,7 +53,13 @@ export default function Header() {
                         href="/client/dashboard/home"
                         className="text-2xl font-bold text-white hover:text-[var(--color-accent)] transition-colors duration-200"
                     >
-                        Ваш Лого
+                        <Image
+                            src="/images/logo.png"
+                            alt="Логотип компании"
+                            width={45}
+                            height={20}
+                            priority={true}
+                        />
                     </Link>
                 </div>
 

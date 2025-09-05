@@ -65,7 +65,7 @@ export default function HomePage() {
                         className="absolute inset-0 bg-cover bg-center opacity-30"
                         style={{
                             backgroundImage:
-                                "url('/images/hero-background.jpg')",
+                                "url('/')",
                         }}
                     ></div>
                     <div className="relative z-10">
@@ -257,7 +257,7 @@ export default function HomePage() {
                     </p>
                     <Link
                         href="/client/dashboard/testimonials"
-                        className="inline-block mt-6 bg-[var(--color-primary)] hover:bg-opacity-90 text-white font-bold py-3 px-8 rounded-full text-lg transition-colors duration-300 shadow-md"
+                        className="inline-block mt-6 bg-[var(--color-primary)] hover:bg-opacity-90  text-white font-bold py-3 px-8 rounded-full text-lg transition-colors duration-300 shadow-md"
                     >
                         Читать Отзывы
                     </Link>

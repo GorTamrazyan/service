@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 :root {
-  --color-primary: #0F172A;        /* Глубокий синий */
+  --color-primary: #d20f0f;        /* Глубокий синий */
   --color-background: #F9FAFB;     /* Молочный белый */
   --color-accent: #D6AD60;         /* Золотистый */
   --color-text: #1F2937;           /* Графитово-серый */
