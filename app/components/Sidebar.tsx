@@ -1,11 +1,13 @@
 // app/client/components/Sidebar.tsx
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { auth } from "../lib/firebase/firebase"; // Путь к firebase.ts
+import { auth } from "../lib/firebase/firebase";
 import { useRouter } from "next/navigation";
+import { T } from "./T";
+import { User } from "firebase/auth";
 
 import {
     FaUserCircle,
@@ -13,11 +15,21 @@ import {
     FaMapMarkerAlt,
     FaCog,
     FaSignOutAlt,
-} from "react-icons/fa"; // Иконки
+} from "react-icons/fa";
 
 export default function Sidebar() {
     const pathname = usePathname();
     const router = useRouter();
+    const [user, setUser] = useState<User | null>(null);
+
+    // Слушаем изменения состояния аутентификации
+    useEffect(() => {
+        const unsubscribe = auth.onAuthStateChanged((currentUser) => {
+            setUser(currentUser);
+        });
+
+        return () => unsubscribe();
+    }, []);
 
     const handleLogout = async () => {
         try {
@@ -34,19 +46,19 @@ export default function Sidebar() {
             name: "Orders",
             href: "/client/dashboard/orders",
             icon: FaShoppingBag,
-            label: "Заказы",
+            label: "Orders",
         },
         {
             name: "Addresses",
             href: "/client/dashboard/addresses",
             icon: FaMapMarkerAlt,
-            label: "Адреса",
+            label: "Addresses",
         },
         {
             name: "Account",
             href: "/client/dashboard/profile",
             icon: FaCog,
-            label: "Аккаунт",
+            label: "Account",
         }, // Изменил на profile
     ];
 
@@ -57,12 +69,12 @@ export default function Sidebar() {
                 <FaUserCircle className="text-[var(--color-accent)] text-6xl mr-4" />{" "}
                 {/* Золотистая иконка пользователя */}
                 <div>
-                    <h2 className="text-2xl font-semibold">John Doe</h2>{" "}
-                    {/* TODO: Заменить на реальное имя пользователя */}
+                    <h2 className="text-2xl font-semibold">
+                        {user?.displayName || user?.email?.split('@')[0] || <T>User</T>}
+                    </h2>
                     <p className="text-sm text-gray-300">
-                        johndoe@example.com
-                    </p>{" "}
-                    {/* TODO: Заменить на реальный email */}
+                        {user?.email || <T>No email</T>}
+                    </p>
                 </div>
             </div>
 
@@ -85,7 +97,7 @@ export default function Sidebar() {
                                 `}
                             >
                                 <item.icon className="mr-3 text-2xl" />
-                                {item.label}
+                                <T>{item.label}</T>
                             </a>
                         </Link>
                     </li>
@@ -100,7 +112,7 @@ export default function Sidebar() {
                                bg-red-600 hover:bg-red-700 transition-colors duration-200"
                 >
                     <FaSignOutAlt className="mr-3 text-2xl" />
-                    Выйти
+                    <T>Sign Out</T>
                 </button>
             </div>
         </nav>

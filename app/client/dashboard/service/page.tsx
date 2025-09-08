@@ -2,6 +2,7 @@
 "use client";
 
 import React from "react";
+import { T } from "../../../components/T";
 import Link from "next/link";
 import {
     FaTruck,
@@ -11,6 +12,7 @@ import {
     FaCheckCircle,
 } from "react-icons/fa"; // Иконки для услуг и преимуществ
 
+
 export default function ServicePage() {
     return (
         <div className="bg-[var(--color-background)] text-[var(--color-text)] py-12 md:py-20">
@@ -18,18 +20,14 @@ export default function ServicePage() {
                 {/* Заголовок и Введение */}
                 <section className="text-center mb-12 md:mb-16">
                     <h1 className="text-4xl md:text-5xl font-extrabold text-[var(--color-primary)] leading-tight mb-4">
-                        Наши Услуги: Полный Спектр Решений для Вашего Забора
+                        <T>Our Services: Complete Range of Solutions for Your Fence</T>
                     </h1>
                     <p className="text-lg md:text-xl max-w-3xl mx-auto">
-                        В{" "}
+                        <T>At</T>{" "}
                         <strong className="text-[var(--color-primary)]">
-                            [Название Вашей Компании]
+                            <T>[Your Company Name]</T>
                         </strong>{" "}
-                        мы предлагаем не только высококачественные заборы, но и
-                        полный комплекс услуг, чтобы обеспечить их долговечность
-                        и безупречный вид. От доставки до установки и
-                        последующего обслуживания – мы заботимся о каждой
-                        детали.
+                        <T>we offer not only high-quality fences, but also a full range of services to ensure their durability and perfect appearance. From delivery to installation and subsequent maintenance – we take care of every detail.</T>
                     </p>
                 </section>
 
@@ -38,7 +36,7 @@ export default function ServicePage() {
                 {/* Список Услуг */}
                 <section className="mb-12 md:mb-16">
                     <h2 className="text-3xl md:text-4xl font-bold text-[var(--color-primary)] mb-8 text-center">
-                        Что мы предлагаем
+                        <T>What we offer</T>
                     </h2>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                         {/* Услуга: Доставка материалов */}
@@ -50,15 +48,10 @@ export default function ServicePage() {
                             {/* <-- Добавлены классы */}
                             <FaTruck className="text-[var(--color-accent)] w-16 h-16 mb-6" />
                             <h3 className="text-2xl font-semibold text-[var(--color-primary)] mb-3">
-                                Доставка Материалов
+                                <T>Material Delivery</T>
                             </h3>
                             <p className="text-lg leading-relaxed">
-                                Мы обеспечиваем своевременную и безопасную
-                                доставку всех необходимых материалов для вашего
-                                забора прямо на объект. Вам не нужно
-                                беспокоиться о логистике – мы сделаем всё за
-                                вас, гарантируя целостность и сохранность каждой
-                                детали.
+                                <T>We provide timely and safe delivery of all necessary materials for your fence directly to the site. You don't need to worry about logistics – we will do everything for you, guaranteeing the integrity and safety of every detail.</T>
                             </p>
                         </div>
 
@@ -71,14 +64,10 @@ export default function ServicePage() {
                             {/* <-- Добавлены классы */}
                             <FaHammer className="text-[var(--color-accent)] w-16 h-16 mb-6" />
                             <h3 className="text-2xl font-semibold text-[var(--color-primary)] mb-3">
-                                Профессиональная Установка (Монтаж)
+                                <T>Professional Installation (Assembly)</T>
                             </h3>
                             <p className="text-lg leading-relaxed">
-                                Наши опытные бригады выполняют монтаж заборов
-                                любой сложности с соблюдением всех стандартов
-                                качества и безопасности. Мы гарантируем быструю,
-                                аккуратную и надежную установку, которая
-                                прослужит вам долгие годы.
+                                <T>Our experienced teams perform installation of fences of any complexity in compliance with all quality and safety standards. We guarantee fast, accurate and reliable installation that will serve you for many years.</T>
                             </p>
                         </div>
 
@@ -91,14 +80,10 @@ export default function ServicePage() {
                             {/* <-- Добавлены классы */}
                             <FaWrench className="text-[var(--color-accent)] w-16 h-16 mb-6" />
                             <h3 className="text-2xl font-semibold text-[var(--color-primary)] mb-3">
-                                Ремонт и Восстановление Заборов
+                                <T>Fence Repair and Restoration</T>
                             </h3>
                             <p className="text-lg leading-relaxed">
-                                Если ваш забор нуждается в ремонте после
-                                погодных условий, износа или повреждений, наши
-                                специалисты оперативно восстановят его
-                                функциональность и внешний вид. Мы работаем с
-                                различными материалами и типами ограждений.
+                                <T>If your fence needs repair after weather conditions, wear or damage, our specialists will quickly restore its functionality and appearance. We work with various materials and types of fencing.</T>
                             </p>
                         </div>
 
@@ -111,14 +96,10 @@ export default function ServicePage() {
                             {/* <-- Добавлены классы */}
                             <FaTools className="text-[var(--color-accent)] w-16 h-16 mb-6" />
                             <h3 className="text-2xl font-semibold text-[var(--color-primary)] mb-3">
-                                Обслуживание и Уход
+                                <T>Maintenance and Care</T>
                             </h3>
                             <p className="text-lg leading-relaxed">
-                                Для продления срока службы вашего забора мы
-                                предлагаем услуги по регулярному обслуживанию и
-                                уходу. Это включает проверку состояния, мелкий
-                                ремонт, покраску или обработку, чтобы ваш забор
-                                всегда выглядел как новый.
+                                <T>To extend the life of your fence, we offer regular maintenance and care services. This includes condition checking, minor repairs, painting or treatment so that your fence always looks like new.</T>
                             </p>
                         </div>
                     </div>
@@ -129,18 +110,17 @@ export default function ServicePage() {
                 {/* Преимущества работы с нами для услуг */}
                 <section className="mb-12 md:mb-16 bg-white shadow-lg rounded-lg p-8">
                     <h2 className="text-3xl md:text-4xl font-bold text-[var(--color-primary)] mb-6 text-center">
-                        Почему выбирают наши услуги?
+                        <T>Why choose our services?</T>
                     </h2>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
                         <div className="flex items-start space-x-3">
                             <FaCheckCircle className="text-[var(--color-accent)] w-6 h-6 flex-shrink-0 mt-1" />
                             <div>
                                 <h3 className="text-xl font-semibold text-[var(--color-primary)] mb-1">
-                                    Опытные Специалисты
+                                    <T>Experienced Specialists</T>
                                 </h3>
                                 <p className="text-base">
-                                    Наши команды состоят из сертифицированных
-                                    профессионалов с многолетним опытом.
+                                    <T>Our teams consist of certified professionals with many years of experience.</T>
                                 </p>
                             </div>
                         </div>
@@ -148,11 +128,10 @@ export default function ServicePage() {
                             <FaCheckCircle className="text-[var(--color-accent)] w-6 h-6 flex-shrink-0 mt-1" />
                             <div>
                                 <h3 className="text-xl font-semibold text-[var(--color-primary)] mb-1">
-                                    Гарантия Качества
+                                    <T>Quality Guarantee</T>
                                 </h3>
                                 <p className="text-base">
-                                    Мы предоставляем гарантию на все выполненные
-                                    работы и используемые материалы.
+                                    <T>We provide warranty on all completed work and materials used.</T>
                                 </p>
                             </div>
                         </div>
@@ -160,11 +139,10 @@ export default function ServicePage() {
                             <FaCheckCircle className="text-[var(--color-accent)] w-6 h-6 flex-shrink-0 mt-1" />
                             <div>
                                 <h3 className="text-xl font-semibold text-[var(--color-primary)] mb-1">
-                                    Оперативность
+                                    <T>Efficiency</T>
                                 </h3>
                                 <p className="text-base">
-                                    Мы ценим ваше время и выполняем работы в
-                                    оговоренные сроки.
+                                    <T>We value your time and complete work within the agreed time frame.</T>
                                 </p>
                             </div>
                         </div>
@@ -172,11 +150,10 @@ export default function ServicePage() {
                             <FaCheckCircle className="text-[var(--color-accent)] w-6 h-6 flex-shrink-0 mt-1" />
                             <div>
                                 <h3 className="text-xl font-semibold text-[var(--color-primary)] mb-1">
-                                    Прозрачное Ценообразование
+                                    <T>Transparent Pricing</T>
                                 </h3>
                                 <p className="text-base">
-                                    Вы всегда будете знать точную стоимость
-                                    работ без скрытых платежей.
+                                    <T>You will always know the exact cost of work without hidden fees.</T>
                                 </p>
                             </div>
                         </div>
@@ -184,11 +161,10 @@ export default function ServicePage() {
                             <FaCheckCircle className="text-[var(--color-accent)] w-6 h-6 flex-shrink-0 mt-1" />
                             <div>
                                 <h3 className="text-xl font-semibold text-[var(--color-primary)] mb-1">
-                                    Индивидуальный Подход
+                                    <T>Individual Approach</T>
                                 </h3>
                                 <p className="text-base">
-                                    Мы адаптируем наши услуги под уникальные
-                                    потребности каждого клиента.
+                                    <T>We adapt our services to the unique needs of each client.</T>
                                 </p>
                             </div>
                         </div>
@@ -196,11 +172,10 @@ export default function ServicePage() {
                             <FaCheckCircle className="text-[var(--color-accent)] w-6 h-6 flex-shrink-0 mt-1" />
                             <div>
                                 <h3 className="text-xl font-semibold text-[var(--color-primary)] mb-1">
-                                    Полный Сервис
+                                    <T>Full Service</T>
                                 </h3>
                                 <p className="text-base">
-                                    От консультации до пост-обслуживания – мы
-                                    рядом на каждом этапе.
+                                    <T>From consultation to post-service – we are with you at every stage.</T>
                                 </p>
                             </div>
                         </div>
@@ -210,17 +185,16 @@ export default function ServicePage() {
                 {/* Призыв к действию (CTA) */}
                 <section className="text-center bg-[var(--color-primary)] text-white p-8 rounded-lg shadow-xl">
                     <h2 className="text-3xl md:text-4xl font-bold mb-4">
-                        Нужна помощь с вашим забором?
+                        <T>Need help with your fence?</T>
                     </h2>
                     <p className="text-xl mb-6">
-                        Свяжитесь с нами сегодня, чтобы обсудить ваши
-                        потребности и получить профессиональную консультацию!
+                        <T>Contact us today to discuss your needs and get professional consultation!</T>
                     </p>
                     <Link
                         href="/contact"
                         className="inline-block bg-[var(--color-accent)] hover:bg-opacity-90 text-[var(--color-primary)] font-bold py-3 px-8 rounded-full text-lg transition-colors duration-300 shadow-md"
                     >
-                        Получить Консультацию
+                        <T>Get Consultation</T>
                     </Link>
                 </section>
             </div>

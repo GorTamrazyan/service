@@ -4,7 +4,8 @@
 import React from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { useCart } from "../../context/CartContext"; // Импортируем useCart
+import { useCart } from "../../context/CartContext";
+import { T } from "../../../components/T";
 
 export default function CartPage() {
     const {
@@ -28,16 +29,16 @@ export default function CartPage() {
         return (
             <div className="bg-[var(--color-background)] text-[var(--color-text)] py-20 text-center">
                 <h1 className="text-3xl md:text-4xl font-bold text-[var(--color-primary)] mb-4">
-                    Ваша корзина пуста
+                    <T>Your cart is empty</T>
                 </h1>
                 <p className="text-lg text-gray-600 mb-6">
-                    Добавьте что-нибудь, чтобы начать оформление заказа!
+                    <T>Add something to start placing your order!</T>
                 </p>
                 <Link
                     href="/client/dashboard/products"
                     className="inline-block bg-[var(--color-accent)] text-[var(--color-primary)] font-bold py-3 px-6 rounded-full hover:bg-opacity-90 transition-colors duration-200"
                 >
-                    Перейти к продуктам
+                    <T>Go to products</T>
                 </Link>
             </div>
         );
@@ -47,7 +48,7 @@ export default function CartPage() {
         <div className="bg-[var(--color-background)] text-[var(--color-text)] py-12 md:py-20">
             <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
                 <h1 className="text-3xl md:text-4xl font-bold text-[var(--color-primary)] mb-8 text-center">
-                    Ваша Корзина Покупок
+                    <T>Your Shopping Cart</T>
                 </h1>
 
                 <div className="bg-white rounded-lg shadow-xl p-6 md:p-8">
@@ -70,14 +71,14 @@ export default function CartPage() {
                                     {item.name}
                                 </h2>
                                 <p className="text-gray-600">
-                                    Цена: ${parseFloat(item.price).toFixed(2)}
+                                    <T>Price</T>: ${parseFloat(item.price).toFixed(2)}
                                 </p>
                                 <div className="flex items-center mt-2 gap-2">
                                     <label
                                         htmlFor={`quantity-${item.id}`}
                                         className="sr-only"
                                     >
-                                        Количество
+                                        <T>Quantity</T>
                                     </label>
                                     <div className="relative inline-block w-auto min-w-[5rem]">
                                         {" "}
@@ -134,7 +135,7 @@ export default function CartPage() {
                                         onClick={() => removeFromCart(item.id)}
                                         className="text-red-600 hover:text-red-800 text-sm font-semibold transition-colors duration-200"
                                     >
-                                        Удалить
+                                        <T>Remove</T>
                                     </button>
                                 </div>
                             </div>
@@ -149,7 +150,7 @@ export default function CartPage() {
 
                     <div className="flex justify-between items-center mt-8 pt-4 border-t border-gray-300">
                         <h2 className="text-xl font-bold text-[var(--color-primary)]">
-                            Итого:
+                            <T>Total:</T>
                         </h2>
                         <p className="text-2xl font-bold text-[var(--color-accent)]">
                             ${getTotalPrice().toFixed(2)}
@@ -161,13 +162,13 @@ export default function CartPage() {
                             onClick={clearCart}
                             className="px-6 py-3 bg-gray-200 text-gray-800 rounded-md font-semibold hover:bg-gray-300 transition-colors duration-200"
                         >
-                            Очистить корзину
+                            <T>Clear cart</T>
                         </button>
                         <Link
                             href="/client/dashboard/checkout" // Ссылка на страницу оформления заказа
                             className="px-6 py-3 bg-[var(--color-accent)] text-[var(--color-primary)] rounded-md font-semibold hover:bg-opacity-90 transition-colors duration-200 text-center"
                         >
-                            Перейти к оформлению
+                            <T>Proceed to checkout</T>
                         </Link>
                     </div>
                 </div>

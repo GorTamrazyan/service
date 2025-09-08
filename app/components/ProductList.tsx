@@ -4,7 +4,8 @@
 import React from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { useCart } from "../client/context/CartContext"; // Убедитесь, что путь правильный
+import { useCart } from "../client/context/CartContext";
+import { T } from "./T";
 
 // Интерфейс для продукта
 interface Product {
@@ -30,7 +31,7 @@ export default function ProductList({
     selectedCategory,
 }: ProductListProps) {
     const groupedProducts = products.reduce((acc, product) => {
-        const category = product.category || "Другие";
+        const category = product.category || "Other";
         if (!acc[category]) {
             acc[category] = [];
         }
@@ -44,10 +45,10 @@ export default function ProductList({
         return (
             <div className="col-span-full text-center py-10">
                 <p className="text-2xl text-gray-600">
-                    К сожалению, продукты не найдены по вашим критериям.
+                    <T>Unfortunately, no products were found matching your criteria.</T>
                 </p>
                 <p className="text-lg text-gray-500 mt-2">
-                    Попробуйте изменить фильтры или свяжитесь с нами.
+                    <T>Try changing the filters or contact us.</T>
                 </p>
             </div>
         );
@@ -59,7 +60,7 @@ export default function ProductList({
                 sortedCategoriesDisplay.map((category) => (
                     <div key={category} className="mb-12">
                         <h2 className="text-3xl md:text-4xl font-bold text-[var(--color-primary)] mb-8 text-center capitalize">
-                            {category} Заборы
+                            {category} <T>Fences</T>
                         </h2>
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
                             {groupedProducts[category].map((product) => (
@@ -88,7 +89,7 @@ export function ProductCard({ product }: { product: Product }) {
 
     const handleAddToCart = () => {
         addToCart(product);
-        alert(`${product.name} добавлен в корзину!`);
+        alert(`${product.name} added to cart!`);
     };
 
     return (
@@ -110,7 +111,7 @@ export function ProductCard({ product }: { product: Product }) {
                     {product.name}
                 </h3>
                 <p className="text-sm text-[var(--color-text)] mb-3 h-20 overflow-hidden line-clamp-3 leading-relaxed">
-                    {product.description || "Нет описания."}
+                    {product.description || <T>No description.</T>}
                 </p>
                 <div className="flex items-baseline mt-auto mb-4">
                     <p className="text-2xl font-extrabold text-[var(--color-accent)]">
@@ -127,7 +128,7 @@ export function ProductCard({ product }: { product: Product }) {
                             }
                         `}
                     >
-                        {product.inStock ? "В наличии" : "Нет в наличии"}
+                        {product.inStock ? <T>In stock</T> : <T>Out of stock</T>}
                     </span>
                 </div>
                 <div className="flex flex-col gap-2 mt-3">
@@ -145,14 +146,14 @@ export function ProductCard({ product }: { product: Product }) {
                         `}
                     >
                         {product.inStock
-                            ? "Добавить в корзину"
-                            : "Нет в наличии"}
+                            ? <T>Add to cart</T>
+                            : <T>Out of stock</T>}
                     </button>
                     <Link
                         href={`/client/dashboard/products/${product.id}`}
                         className="py-2 px-4 rounded-full text-[var(--color-primary)] font-semibold text-sm border border-[var(--color-primary)] hover:bg-[var(--color-primary)] hover:text-white transition-all duration-200 ease-in-out transform hover:scale-105 flex items-center justify-center text-center"
                     >
-                        Подробнее
+                        <T>Details</T>
                     </Link>
                 </div>
             </div>

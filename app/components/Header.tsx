@@ -4,13 +4,17 @@ import React, { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
-import { FaSearch, FaShoppingCart, FaUserCircle } from "react-icons/fa";
-import { useCart } from "../client/context/CartContext"; // <--- Import useCart hook
+import { FaSearch, FaShoppingCart, FaUserCircle, FaBars, FaTimes } from "react-icons/fa";
+import { useCart } from "../client/context/CartContext";
+import { useLanguage } from "../contexts/LanguageContext";
+import { T } from "./T";
 
 export default function Header() {
     const pathname = usePathname();
     const [isSearchOpen, setIsSearchOpen] = useState(false);
-    const { getTotalItems } = useCart(); // <--- Get the total number of items in the cart
+    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+    const { getTotalItems } = useCart();
+    const { language } = useLanguage();
 
     const getLinkClassName = (expectedPaths: string | string[]) => {
         const baseClasses =
@@ -44,19 +48,34 @@ export default function Header() {
         setIsSearchOpen(!isSearchOpen);
     };
 
+    const toggleMobileMenu = () => {
+        setIsMobileMenuOpen(!isMobileMenuOpen);
+    };
+
     return (
         <header className="fixed top-0 left-0 w-full shadow-md py-4 px-8 flex flex-col bg-[var(--color-primary)] z-50">
             <div className="flex justify-between items-center w-full">
+                {/* Mobile menu button - only visible on small screens */}
+                <div className="flex items-center md:hidden">
+                    <button
+                        onClick={toggleMobileMenu}
+                        aria-label="Меню"
+                        className="text-[var(--color-background)] hover:text-[var(--color-accent)] transition-colors duration-200 mr-4"
+                    >
+                        {isMobileMenuOpen ? <FaTimes className="w-5 h-5" /> : <FaBars className="w-5 h-5" />}
+                    </button>
+                </div>
+
                 {/* Logo */}
                 <div className="flex-shrink-0">
                     <Link
                         href="/client/dashboard/home"
-                        className="text-2xl font-bold text-white hover:text-[var(--color-accent)] transition-colors duration-200"
+                        className="text-2xl font-bold text-[var(--color-background)] hover:text-[var(--color-accent)] transition-colors duration-200"
                     >
                         <Image
                             src="/images/logo.png"
                             alt="Логотип компании"
-                            width={45}
+                            width={20}
                             height={20}
                             priority={true}
                         />
@@ -69,7 +88,7 @@ export default function Header() {
                         href="/client/dashboard/home"
                         className={getLinkClassName("/client/dashboard/home")}
                     >
-                        Home
+                        <T>Home</T>
                     </Link>
                     <Link
                         href="/client/dashboard/products"
@@ -77,7 +96,7 @@ export default function Header() {
                             "/client/dashboard/products"
                         )}
                     >
-                        Product
+                        <T>Products</T>
                     </Link>
                     <Link
                         href="/client/dashboard/service"
@@ -85,23 +104,24 @@ export default function Header() {
                             "/client/dashboard/service"
                         )}
                     >
-                        Service
+                        <T>Service</T>
                     </Link>
                     <Link
                         href="/client/dashboard/about"
                         className={getLinkClassName("/client/dashboard/about")}
                     >
-                        About us
+                        <T>About us</T>
                     </Link>
                     {/* Cart icon in desktop navigation */}
                 </nav>
 
                 {/* Icons (for mobile/tablet and other actions) */}
                 <div className="flex-shrink-0 flex items-center space-x-6">
+                    {/* Cart icon - hidden on mobile since it's duplicated below */}
                     <Link
                         href="/client/dashboard/cart"
                         aria-label="Корзина"
-                        className="relative text-white hover:text-[var(--color-accent)] transition-colors duration-200"
+                        className="relative text-white hover:text-[var(--color-accent)] transition-colors duration-200 hidden md:inline-flex"
                     >
                         <FaShoppingCart className="w-5 h-5" />
                         {getTotalItems() > 0 && (
@@ -113,15 +133,15 @@ export default function Header() {
                     <button
                         aria-label="Поиск"
                         onClick={toggleSearch}
-                        className="text-white hover:text-[var(--color-accent)] transition-colors duration-200"
+                        className="text-[var(--color-background)] hover:text-[var(--color-accent)] transition-colors duration-200"
                     >
                         <FaSearch className="w-5 h-5" />
                     </button>
-                    {/* Cart icon for mobile/tablet (if not already in main nav for larger screens) */}
+                    {/* Cart icon for mobile - only show on mobile */}
                     <Link
                         href="/client/dashboard/cart"
                         aria-label="Корзина"
-                        className="relative text-white hover:text-[var(--color-accent)] transition-colors duration-200 md:hidden" // Only show for mobile/tablet
+                        className="relative text-white hover:text-[var(--color-accent)] transition-colors duration-200 md:hidden"
                     >
                         <FaShoppingCart className="w-5 h-5" />
                         {getTotalItems() > 0 && (
@@ -133,7 +153,7 @@ export default function Header() {
                     <Link
                         href="/client/dashboard/profile"
                         aria-label="Профиль"
-                        className="text-white hover:text-[var(--color-accent)] transition-colors duration-200"
+                        className="text-[var(--color-background)] hover:text-[var(--color-accent)] transition-colors duration-200"
                     >
                         <FaUserCircle className="w-6 h-6" />
                     </Link>
@@ -153,9 +173,52 @@ export default function Header() {
             >
                 <input
                     type="text"
-                    placeholder="Что ищем?"
-                    className="p-2 rounded-md border border-gray-300 w-full max-w-lg bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
+                    placeholder="What are you looking for?"
+                    className="p-2 rounded-md border border-gray-300 w-full max-w-lg bg-[var(--color-background)] text-[var(--color-text)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
                 />
+            </div>
+
+            {/* Mobile Navigation Menu */}
+            <div
+                className={`
+                    absolute top-full left-0 w-full bg-[var(--color-primary)] shadow-lg transition-all duration-300 ease-in-out md:hidden
+                    ${
+                        isMobileMenuOpen
+                            ? "max-h-96 opacity-100"
+                            : "max-h-0 opacity-0 overflow-hidden"
+                    }
+                `}
+            >
+                <nav className="flex flex-col py-4 px-8 space-y-4">
+                    <Link
+                        href="/client/dashboard/home"
+                        className={`${getLinkClassName("/client/dashboard/home")} py-2 border-b border-[var(--color-background)]/20`}
+                        onClick={() => setIsMobileMenuOpen(false)}
+                    >
+                        <T>Home</T>
+                    </Link>
+                    <Link
+                        href="/client/dashboard/products"
+                        className={`${getLinkClassName("/client/dashboard/products")} py-2 border-b border-[var(--color-background)]/20`}
+                        onClick={() => setIsMobileMenuOpen(false)}
+                    >
+                        <T>Products</T>
+                    </Link>
+                    <Link
+                        href="/client/dashboard/service"
+                        className={`${getLinkClassName("/client/dashboard/service")} py-2 border-b border-[var(--color-background)]/20`}
+                        onClick={() => setIsMobileMenuOpen(false)}
+                    >
+                        <T>Service</T>
+                    </Link>
+                    <Link
+                        href="/client/dashboard/about"
+                        className={`${getLinkClassName("/client/dashboard/about")} py-2`}
+                        onClick={() => setIsMobileMenuOpen(false)}
+                    >
+                        <T>About us</T>
+                    </Link>
+                </nav>
             </div>
         </header>
     );

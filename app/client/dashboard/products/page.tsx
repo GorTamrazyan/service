@@ -5,7 +5,8 @@ import React, { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import ProductList from "../../../components/ProductList";
-import ProductFilters from "../../../components/ProductFilters"; // Импортируем новый компонент
+import ProductFilters from "../../../components/ProductFilters";
+import { T } from "../../../components/T";
 
 interface Product {
     id: string;
@@ -128,7 +129,7 @@ export default function ProductPage() {
     if (loading) {
         return (
             <div className="bg-[var(--color-background)] text-[var(--color-text)] py-20 text-center">
-                <p className="text-xl">Загрузка продуктов...</p>
+                <p className="text-xl"><T>Loading products...</T></p>
             </div>
         );
     }
@@ -137,7 +138,7 @@ export default function ProductPage() {
         return (
             <div className="bg-[var(--color-background)] text-[var(--color-text)] py-20 text-center">
                 <p className="text-xl text-red-600">
-                    Ошибка при загрузке продуктов: {error}
+                    <T>Error loading products</T>: {error}
                 </p>
             </div>
         );
@@ -148,13 +149,10 @@ export default function ProductPage() {
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <section className="text-center mb-12 md:mb-16">
                     <h1 className="text-4xl md:text-5xl font-extrabold text-[var(--color-primary)] leading-tight mb-4">
-                        Наши Продукты: Заборы для Любых Нужд
+                        <T>Our Products: Fences for Any Need</T>
                     </h1>
                     <p className="text-lg md:text-xl max-w-3xl mx-auto">
-                        Откройте для себя наш широкий ассортимент
-                        высококачественных заборов. Мы предлагаем решения,
-                        которые сочетают в себе прочность, безопасность и
-                        эстетическую привлекательность.
+                        <T>Discover our wide range of high-quality fences. We offer solutions that combine strength, safety and aesthetic appeal.</T>
                     </p>
                 </section>
 
@@ -180,17 +178,16 @@ export default function ProductPage() {
 
                 <section className="text-center bg-[var(--color-primary)] text-white p-8 rounded-lg shadow-xl">
                     <h2 className="text-3xl md:text-4xl font-bold mb-4">
-                        Не нашли то, что искали?
+                        <T>Didn't find what you were looking for?</T>
                     </h2>
                     <p className="text-xl mb-6">
-                        Свяжитесь с нами, чтобы получить индивидуальное решение,
-                        разработанное специально для вас!
+                        <T>Contact us to get a custom solution designed specifically for you!</T>
                     </p>
                     <Link
                         href="/contact"
                         className="inline-block bg-[var(--color-accent)] hover:bg-opacity-90 text-[var(--color-primary)] font-bold py-3 px-8 rounded-full text-lg transition-colors duration-300 shadow-md"
                     >
-                        Получить Консультацию
+                        <T>Get Consultation</T>
                     </Link>
                 </section>
             </div>

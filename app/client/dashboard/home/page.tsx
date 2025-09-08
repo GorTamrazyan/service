@@ -15,6 +15,7 @@ import {
 
 // ПРАВИЛЬНЫЙ импорт ProductCard из компонента ProductList
 import { ProductCard } from "../../../components/ProductList";
+import { T } from "../../../components/T";
 
 // Интерфейс для продукта
 interface Product {
@@ -28,6 +29,7 @@ interface Product {
 }
 
 export default function HomePage() {
+    // Language context не используется, так как все переводы через T компонент
     const [products, setProducts] = useState<Product[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -70,29 +72,27 @@ export default function HomePage() {
                     ></div>
                     <div className="relative z-10">
                         <h1 className="text-4xl md:text-6xl font-extrabold leading-tight mb-4">
-                            Добро пожаловать домой,{" "}
+                            <T>High Quality Fences for Your</T>{" "}
                             <span className="text-[var(--color-accent)]">
-                                Уважаемый клиент
+                                <T>Home and Business</T>
                             </span>
                             !
                         </h1>
                         <p className="text-xl md:text-2xl max-w-4xl mx-auto mb-8">
-                            Ваш идеальный забор ждет вас. Откройте для себя нашу
-                            коллекцию, получите мгновенную оценку и начните
-                            преображение вашего участка уже сегодня!
+                            <T>We offer a full range of fencing solutions, from design and manufacturing to professional installation. Our products combine reliability, aesthetics and functionality.</T>
                         </p>
                         <div className="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-6">
                             <Link
                                 href="/client/dashboard/products"
                                 className="inline-block bg-[var(--color-accent)] hover:bg-opacity-90 text-[var(--color-primary)] font-bold py-3 px-8 rounded-full text-lg transition-colors duration-300 shadow-lg"
                             >
-                                Посмотреть Все Заборы
+                                <T>View Products</T>
                             </Link>
                             <Link
                                 href="/contact"
                                 className="inline-block border-2 border-white hover:border-[var(--color-accent)] text-white hover:text-[var(--color-accent)] font-bold py-3 px-8 rounded-full text-lg transition-colors duration-300 shadow-lg"
                             >
-                                Получить Бесплатную Оценку
+                                <T>Get Free Quote</T>
                             </Link>
                         </div>
                     </div>
@@ -103,14 +103,14 @@ export default function HomePage() {
                 {/* Featured Products Section */}
                 <section className="mb-16 md:mb-20">
                     <h2 className="text-3xl md:text-4xl font-bold text-[var(--color-primary)] mb-10 text-center">
-                        Наши Популярные Решения
+                        <T>Featured Products</T>
                     </h2>
 
                     {loading && (
                         <div className="flex justify-center items-center py-10">
                             <FaSpinner className="animate-spin text-5xl text-[var(--color-accent)]" />
                             <p className="ml-4 text-2xl text-[var(--color-primary)]">
-                                Загрузка популярных продуктов...
+                                <T>Loading featured products...</T>
                             </p>
                         </div>
                     )}
@@ -118,7 +118,7 @@ export default function HomePage() {
                     {error && (
                         <div className="text-center py-10">
                             <p className="text-xl text-red-600">
-                                Ошибка при загрузке продуктов: {error}
+                                <T>Error loading products</T>: {error}
                             </p>
                             <p className="text-sm text-gray-500 mt-2">
                                 Попробуйте обновить страницу или свяжитесь с
@@ -130,7 +130,7 @@ export default function HomePage() {
                     {!loading && products.length === 0 && (
                         <div className="text-center py-10">
                             <p className="text-2xl text-gray-600">
-                                Популярные продукты не найдены.
+                                <T>Error loading products</T>
                             </p>
                         </div>
                     )}
@@ -151,7 +151,7 @@ export default function HomePage() {
                             href="/client/dashboard/products"
                             className="inline-block bg-[var(--color-accent)] hover:bg-opacity-90 text-[var(--color-primary)] font-bold py-3 px-8 rounded-full text-lg transition-colors duration-300 shadow-md"
                         >
-                            Смотреть Все Заборы
+                            <T>View All Products</T>
                         </Link>
                     </div>
                 </section>
@@ -161,22 +161,17 @@ export default function HomePage() {
                 {/* Benefits Section */}
                 <section className="mb-16 md:mb-20 bg-white shadow-lg rounded-lg p-8 md:p-10">
                     <h2 className="text-3xl md:text-4xl font-bold text-[var(--color-primary)] mb-8 text-center">
-                        Почему клиенты выбирают{" "}
-                        <span className="text-[var(--color-accent)]">
-                            нашу компанию
-                        </span>
+                        <T>Why customers choose our company</T>
                     </h2>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                         <div className="flex items-start space-x-4">
                             <FaStar className="text-[var(--color-accent)] w-10 h-10 flex-shrink-0 mt-1" />
                             <div>
                                 <h3 className="text-xl font-semibold text-[var(--color-primary)] mb-2">
-                                    Высшее Качество
+                                    <T>Premium Quality</T>
                                 </h3>
                                 <p className="text-base text-[var(--color-text)]">
-                                    Мы используем только лучшие материалы,
-                                    гарантируя долговечность и красоту каждого
-                                    забора.
+                                    <T>We use only the best materials, ensuring durability and beauty of every fence.</T>
                                 </p>
                             </div>
                         </div>
@@ -184,12 +179,10 @@ export default function HomePage() {
                             <FaTruck className="text-[var(--color-accent)] w-10 h-10 flex-shrink-0 mt-1" />
                             <div>
                                 <h3 className="text-xl font-semibold text-[var(--color-primary)] mb-2">
-                                    Полный Спектр Услуг
+                                    <T>Full Service</T>
                                 </h3>
                                 <p className="text-base text-[var(--color-text)]">
-                                    От проектирования и производства до
-                                    установки и обслуживания — мы обеспечиваем
-                                    комплексный подход.
+                                    <T>From design and manufacturing to installation and maintenance - we provide a comprehensive approach.</T>
                                 </p>
                             </div>
                         </div>
@@ -197,11 +190,10 @@ export default function HomePage() {
                             <FaUsers className="text-[var(--color-accent)] w-10 h-10 flex-shrink-0 mt-1" />
                             <div>
                                 <h3 className="text-xl font-semibold text-[var(--color-primary)] mb-2">
-                                    Индивидуальный Подход
+                                    <T>Individual Approach</T>
                                 </h3>
                                 <p className="text-base text-[var(--color-text)]">
-                                    Каждый проект уникален, и мы тщательно
-                                    учитываем все ваши пожелания и требования.
+                                    <T>Each project is unique, and we carefully consider all your wishes and requirements.</T>
                                 </p>
                             </div>
                         </div>
@@ -209,12 +201,10 @@ export default function HomePage() {
                             <FaShieldAlt className="text-[var(--color-accent)] w-10 h-10 flex-shrink-0 mt-1" />
                             <div>
                                 <h3 className="text-xl font-semibold text-[var(--color-primary)] mb-2">
-                                    Гарантия Надежности
+                                    <T>Reliability Guarantee</T>
                                 </h3>
                                 <p className="text-base text-[var(--color-text)]">
-                                    Мы предоставляем гарантию на все наши
-                                    изделия и работы, подтверждая нашу
-                                    уверенность в качестве.
+                                    <T>We provide warranty on all our products and work, confirming our confidence in quality.</T>
                                 </p>
                             </div>
                         </div>
@@ -222,11 +212,10 @@ export default function HomePage() {
                             <FaTag className="text-[var(--color-accent)] w-10 h-10 flex-shrink-0 mt-1" />
                             <div>
                                 <h3 className="text-xl font-semibold text-[var(--color-primary)] mb-2">
-                                    Конкурентные Цены
+                                    <T>Competitive Prices</T>
                                 </h3>
                                 <p className="text-base text-[var(--color-text)]">
-                                    Предлагаем оптимальное соотношение цены и
-                                    качества, делая наши заборы доступными.
+                                    <T>We offer optimal price-quality ratio, making our fences accessible.</T>
                                 </p>
                             </div>
                         </div>
@@ -234,12 +223,10 @@ export default function HomePage() {
                             <FaTools className="text-[var(--color-accent)] w-10 h-10 flex-shrink-0 mt-1" />
                             <div>
                                 <h3 className="text-xl font-semibold text-[var(--color-primary)] mb-2">
-                                    Профессиональный Монтаж
+                                    <T>Professional Installation</T>
                                 </h3>
                                 <p className="text-base text-[var(--color-text)]">
-                                    Наши бригады — это опытные специалисты,
-                                    которые выполнят установку быстро и
-                                    качественно.
+                                    <T>Our teams are experienced specialists who will complete installation quickly and efficiently.</T>
                                 </p>
                             </div>
                         </div>
@@ -249,34 +236,32 @@ export default function HomePage() {
                 {/* Testimonials Section */}
                 <section className="mb-16 md:mb-20 text-center">
                     <h2 className="text-3xl md:text-4xl font-bold text-[var(--color-primary)] mb-6">
-                        Что говорят наши клиенты
+                        <T>What Our Customers Say</T>
                     </h2>
                     <p className="text-xl max-w-2xl mx-auto text-[var(--color-text)]">
-                        Доверие наших клиентов — лучшая награда. Прочитайте их
-                        истории успеха.
+                        <T>See what our satisfied customers have to say about our fencing solutions and service quality.</T>
                     </p>
                     <Link
                         href="/client/dashboard/testimonials"
                         className="inline-block mt-6 bg-[var(--color-primary)] hover:bg-opacity-90  text-white font-bold py-3 px-8 rounded-full text-lg transition-colors duration-300 shadow-md"
                     >
-                        Читать Отзывы
+                        <T>Read Testimonials</T>
                     </Link>
                 </section>
 
                 {/* Final CTA Section */}
                 <section className="text-center bg-[var(--color-accent)] text-[var(--color-primary)] p-8 rounded-lg shadow-xl">
                     <h2 className="text-3xl md:text-4xl font-bold mb-4">
-                        Начните свой проект уже сегодня!
+                        <T>Start your project today!</T>
                     </h2>
                     <p className="text-xl mb-6">
-                        Мы готовы воплотить в жизнь ваши идеи об идеальном
-                        заборе. Свяжитесь с нами для бесплатной консультации.
+                        <T>We are ready to bring your ideas about the perfect fence to life. Contact us for a free consultation.</T>
                     </p>
                     <Link
                         href="/contact"
                         className="inline-block bg-[var(--color-primary)] hover:bg-opacity-90 text-white font-bold py-3 px-8 rounded-full text-lg transition-colors duration-300 shadow-md"
                     >
-                        Связаться с Нами
+                        <T>Contact Us</T>
                     </Link>
                 </section>
             </div>

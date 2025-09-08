@@ -9,8 +9,11 @@ import { useRouter } from "next/navigation";
 import SidebarNavigation from "../../../components/profile/SidebarNavigation";
 import ProfileContent from "../../../components/profile/ProfileContent";
 import { UserProfile } from "../../../types/profile";
+import { useLanguage } from "../../../contexts/LanguageContext";
 
 export default function ProfilePage() {
+    const { t } = useLanguage();
+    
     // Состояния
     const [user, setUser] = useState<User | null>(null);
     const [profile, setProfile] = useState<UserProfile | null>(null);
@@ -44,6 +47,10 @@ export default function ProfilePage() {
             if (docSnap.exists()) {
                 // Профиль существует - загружаем данные
                 const data = docSnap.data() as UserProfile;
+                // Убеждаемся, что email синхронизирован с Firebase Auth
+                data.email = user?.email || data.email;
+                console.log('✅ Loaded profile:', data);
+                console.log('🔐 User email from auth:', user?.email);
                 setProfile(data);
             } else {
                 // Профиль не существует - создаем новый
@@ -60,6 +67,8 @@ export default function ProfilePage() {
                     },
                     email: user?.email || "",
                 };
+                console.log('🆕 Created new profile:', newProfile);
+                console.log('🔐 User email from auth:', user?.email);
                 setProfile(newProfile);
 
                 // Сохраняем базовый профиль в Firebase
@@ -102,8 +111,16 @@ export default function ProfilePage() {
         setLoading(true);
         setError(null);
         try {
+            // Убеждаемся что email всегда актуальный перед сохранением
+            const updatedProfile = {
+                ...profile,
+                email: user.email || profile.email
+            };
+            console.log('💾 Saving profile:', updatedProfile);
+            
             const userDocRef = doc(db, "users", user.uid);
-            await setDoc(userDocRef, profile, { merge: true });
+            await setDoc(userDocRef, updatedProfile, { merge: true });
+            setProfile(updatedProfile); // Обновляем локальное состояние
             setIsEditing(false);
         } catch (err: any) {
             setError("Ошибка при сохранении профиля: " + err.message);
@@ -144,8 +161,8 @@ export default function ProfilePage() {
     // Loading состояние
     if (loading) {
         return (
-            <div className="flex justify-center items-center min-h-screen bg-[#F9FAFB]">
-                <p className="text-xl text-[#1F2937]">Загрузка профиля...</p>
+            <div className="flex justify-center items-center min-h-screen bg-[var(--color-background)]">
+                <p className="text-xl text-[var(--color-text)]">{t('common.profile.loading')}</p>
             </div>
         );
     }
@@ -153,7 +170,7 @@ export default function ProfilePage() {
     // Ошибка
     if (error) {
         return (
-            <div className="flex justify-center items-center min-h-screen bg-[#F9FAFB]">
+            <div className="flex justify-center items-center min-h-screen bg-[var(--color-background)]">
                 <p className="text-xl text-red-600">{error}</p>
             </div>
         );
@@ -162,9 +179,9 @@ export default function ProfilePage() {
     // Профиль не найден
     if (!profile) {
         return (
-            <div className="flex justify-center items-center min-h-screen bg-[#F9FAFB]">
-                <p className="text-xl text-gray-600">
-                    Профиль не найден. Пожалуйста, войдите снова.
+            <div className="flex justify-center items-center min-h-screen bg-[var(--color-background)]">
+                <p className="text-xl text-[var(--color-text)]">
+                    {t('common.profile.notFound')}
                 </p>
             </div>
         );
@@ -172,7 +189,7 @@ export default function ProfilePage() {
 
     // Основной интерфейс
     return (
-        <div className="min-h-screen bg-[#F9FAFB] flex">
+        <div className="min-h-screen bg-[var(--color-background)] flex pt-20">
             {/* Боковая навигация */}
             <SidebarNavigation
                 profile={profile}
@@ -182,7 +199,7 @@ export default function ProfilePage() {
             />
 
             {/* Основной контент */}
-            <div className="flex-1 p-8">
+            <div className="flex-1 p-8 overflow-auto bg-[var(--color-background)]">
                 <ProfileContent
                     profile={profile}
                     activeSection={activeSection}

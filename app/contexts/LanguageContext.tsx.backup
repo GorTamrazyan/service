@@ -1,0 +1,368 @@
+"use client";
+
+import React, { createContext, useContext, useState, useEffect } from 'react';
+
+interface LanguageContextType {
+    language: string;
+    setLanguage: (lang: string) => void;
+    t: (key: string) => string;
+    autoTranslate: (text: string) => Promise<string>;
+}
+
+const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
+
+const translations = {
+    en: {
+        "header.home": "Home",
+        "header.products": "Products",
+        "header.service": "Service",
+        "header.about": "About us",
+        "header.search.placeholder": "What are you looking for?",
+        "profile.personalInfo": "Personal Info",
+        "profile.personalInfo.desc": "Update your details",
+        "profile.orders": "Orders",
+        "profile.orders.desc": "View order history",
+        "profile.settings": "Settings",
+        "profile.settings.desc": "Account preferences",
+        "profile.signOut": "Sign Out",
+        "profile.signOut.desc": "End your session",
+        "personalInfo.title": "Personal Information",
+        "personalInfo.subtitle": "Manage your account details and contact information",
+        "personalInfo.firstName": "First Name",
+        "personalInfo.lastName": "Last Name",
+        "personalInfo.email": "Email Address",
+        "personalInfo.phone": "Phone Number",
+        "personalInfo.address": "Address",
+        "personalInfo.street": "Street",
+        "personalInfo.houseNumber": "House Number",
+        "personalInfo.apartmentNumber": "Apartment Number",
+        "personalInfo.city": "City",
+        "personalInfo.zipCode": "Zip Code",
+        "personalInfo.edit": "Edit Profile",
+        "personalInfo.save": "Save Changes",
+        "personalInfo.cancel": "Cancel",
+        "settings.title": "Account Settings",
+        "settings.subtitle": "Manage your account preferences and security settings",
+        "settings.notifications": "Notifications",
+        "settings.notifications.desc": "Choose how you want to be notified",
+        "settings.notifications.email": "Email Notifications",
+        "settings.notifications.email.desc": "Receive updates via email",
+        "settings.notifications.push": "Push Notifications",
+        "settings.notifications.push.desc": "Get notified on your device",
+        "settings.notifications.sms": "SMS Notifications",
+        "settings.notifications.sms.desc": "Receive text messages",
+        "settings.appearance": "Appearance",
+        "settings.appearance.desc": "Customize how the app looks",
+        "settings.darkMode": "Dark Mode",
+        "settings.darkMode.desc": "Switch to dark theme",
+        "settings.language": "Language",
+        "settings.language.desc": "Choose your preferred language",
+        "settings.security": "Security",
+        "settings.security.desc": "Manage your account security",
+        "settings.changePassword": "Change Password",
+        "settings.changePassword.desc": "Update your account password",
+        "settings.twoFactor": "Two-Factor Authentication",
+        "settings.twoFactor.desc": "Add extra security to your account",
+        "settings.deleteAccount": "Delete Account",
+        "settings.deleteAccount.desc": "Permanently remove your account",
+        "orders.title": "Order History",
+        "orders.subtitle": "View and track your recent orders",
+        "orders.total": "Total Orders",
+        "orders.delivered": "Delivered",
+        "orders.inTransit": "In Transit",
+        "orders.recent": "Recent Orders",
+        "orders.recent.desc": "Your order history will appear here",
+        "orders.noOrders": "No orders yet",
+        "orders.noOrders.desc": "When you place your first order, it will appear here along with tracking information and order details.",
+        "orders.startShopping": "Start Shopping",
+        "home.hero.title": "Welcome home",
+        "home.hero.client": "Dear client",
+        "home.hero.description": "Your perfect fence awaits you. Discover our collection, get instant evaluation and start transforming your property today!",
+        "home.hero.viewProducts": "View All Fences",
+        "home.hero.getQuote": "Get Free Quote",
+        "home.features.quality": "Premium Quality",
+        "home.features.quality.desc": "Only the finest materials and craftsmanship",
+        "home.features.delivery": "Fast Delivery",
+        "home.features.delivery.desc": "Quick and reliable delivery to your location",
+        "home.features.support": "Expert Support",
+        "home.features.support.desc": "Professional consultation and installation help",
+        "home.featured.title": "Featured Products",
+        "home.featured.subtitle": "Explore our most popular fence designs",
+        "home.featured.loading": "Loading featured products...",
+        "home.featured.error": "Error loading products",
+        "home.featured.viewAll": "View All Products",
+        "common.loading": "Loading...",
+        "common.error": "Error occurred",
+        "common.profile.loading": "Loading profile...",
+        "common.profile.notFound": "Profile not found. Please sign in again.",
+        
+        // Additional home page texts
+        "home.hero.getQuote": "Get Free Quote",
+        "home.featured.title": "Featured Products",
+        "home.featured.subtitle": "Explore our most popular fence designs",
+        "home.featured.loading": "Loading featured products...",
+        "home.featured.error": "Error loading products",
+        "home.featured.viewAll": "View All Products",
+        "home.benefits.title": "Why customers choose our company",
+        "home.benefits.quality": "Premium Quality",
+        "home.benefits.quality.desc": "We use only the best materials, ensuring durability and beauty of every fence.",
+        "home.benefits.service": "Full Service",
+        "home.benefits.service.desc": "From design and manufacturing to installation and maintenance - we provide a comprehensive approach.",
+        "home.benefits.individual": "Individual Approach",
+        "home.benefits.individual.desc": "Each project is unique, and we carefully consider all your wishes and requirements.",
+        "home.benefits.guarantee": "Reliability Guarantee",
+        "home.benefits.guarantee.desc": "We provide warranty on all our products and work, confirming our confidence in quality.",
+        "home.benefits.price": "Competitive Prices",
+        "home.benefits.price.desc": "We offer optimal price-quality ratio, making our fences accessible.",
+        "home.benefits.installation": "Professional Installation",
+        "home.benefits.installation.desc": "Our teams are experienced specialists who will complete installation quickly and efficiently.",
+        "home.testimonials.title": "What our customers say",
+        "home.testimonials.subtitle": "Customer trust is our best reward. Read their success stories.",
+        "home.testimonials.read": "Read Reviews",
+        "home.cta.title": "Start your project today!",
+        "home.cta.subtitle": "We are ready to bring your ideas about the perfect fence to life. Contact us for a free consultation.",
+        "home.cta.contact": "Contact Us"
+    },
+    
+    ru: {
+        "header.home": "Дом",
+        "header.products": "Продукция",
+        "header.service": "Услуга",
+        "header.about": "О нас",
+        "header.search.placeholder": "Что Вы ищете?",
+        "profile.personalInfo": "Личная информация",
+        "profile.personalInfo.desc": "Обновите свои данные",
+        "profile.orders": "Приказ",
+        "profile.orders.desc": "Просмотреть историю заказа",
+        "profile.settings": "Настройки",
+        "profile.settings.desc": "Настройки учетной записи",
+        "profile.signOut": "Выход",
+        "profile.signOut.desc": "Завершите свою сессию",
+        "personalInfo.title": "Персональная информация",
+        "personalInfo.subtitle": "Управляйте информацией вашей учетной записи и контактной информацией",
+        "personalInfo.firstName": "Имя",
+        "personalInfo.lastName": "Фамилия",
+        "personalInfo.email": "Адрес электронной почты",
+        "personalInfo.phone": "Номер телефона",
+        "personalInfo.address": "Адрес",
+        "personalInfo.street": "Улица",
+        "personalInfo.houseNumber": "Номер дома",
+        "personalInfo.apartmentNumber": "Номер квартиры",
+        "personalInfo.city": "Город",
+        "personalInfo.zipCode": "Почтовый индекс",
+        "personalInfo.edit": "Редактировать профиль",
+        "personalInfo.save": "Сохранить изменения",
+        "personalInfo.cancel": "Отмена",
+        "settings.title": "Настройки учетной записи",
+        "settings.subtitle": "Управляйте предпочтениями вашей учетной записи и настройками безопасности",
+        "settings.notifications": "Уведомления",
+        "settings.notifications.desc": "Выберите, как вы хотите, чтобы вас уведомляли",
+        "settings.notifications.email": "Уведомления по электронной почте",
+        "settings.notifications.email.desc": "Получить обновления по электронной почте",
+        "settings.notifications.push": "Push -уведомления",
+        "settings.notifications.push.desc": "Получите уведомление на вашем устройстве",
+        "settings.notifications.sms": "SMS -уведомления",
+        "settings.notifications.sms.desc": "Получить текстовые сообщения",
+        "settings.appearance": "Появление",
+        "settings.appearance.desc": "Настройте, как выглядит приложение",
+        "settings.darkMode": "Темный режим",
+        "settings.darkMode.desc": "Переключиться на темную тему",
+        "settings.language": "Язык",
+        "settings.language.desc": "Выберите свой предпочтительный язык",
+        "settings.security": "Безопасность",
+        "settings.security.desc": "Управление безопасностью вашей учетной записи",
+        "settings.changePassword": "Изменить пароль",
+        "settings.changePassword.desc": "Обновите пароль своей учетной записи",
+        "settings.twoFactor": "Двухфакторная аутентификация",
+        "settings.twoFactor.desc": "Добавьте дополнительную безопасность в свою учетную запись",
+        "settings.deleteAccount": "Удалить учетную запись",
+        "settings.deleteAccount.desc": "Постоянно удалить свою учетную запись",
+        "orders.title": "История заказа",
+        "orders.subtitle": "Просмотреть и отслеживать ваши недавние заказы",
+        "orders.total": "Общие заказы",
+        "orders.delivered": "Доставленный",
+        "orders.inTransit": "В пути",
+        "orders.recent": "Недавние заказы",
+        "orders.recent.desc": "Ваша история заказа появится здесь",
+        "orders.noOrders": "Пока нет заказов",
+        "orders.noOrders.desc": "Когда вы разместите свой первый заказ, он появится здесь вместе с информацией о отслеживании и сведениями заказа.",
+        "orders.startShopping": "Начните делать покупки",
+        "home.hero.title": "Добро пожаловать домой",
+        "home.hero.client": "Уважаемый клиент",
+        "home.hero.description": "Ваш идеальный забор ждет вас. ",
+        "home.hero.viewProducts": "Просмотреть все заборы",
+        "home.hero.getQuote": "Получите бесплатную цитату",
+        "home.features.quality": "Премиальное качество",
+        "home.features.quality.desc": "Только лучшие материалы и мастерство",
+        "home.features.delivery": "Быстрая доставка",
+        "home.features.delivery.desc": "Быстрая и надежная доставка в ваше место",
+        "home.features.support": "Экспертная поддержка",
+        "home.features.support.desc": "Профессиональная консультация и помощь в установке",
+        "home.featured.title": "Избранные продукты",
+        "home.featured.subtitle": "Исследуйте наши самые популярные дизайны забора",
+        "home.featured.loading": "Загрузка представленных продуктов ...",
+        "home.featured.error": "Ошибка загрузки продуктов",
+        "home.featured.viewAll": "Посмотреть все продукты",
+        "common.loading": "Загрузка ...",
+        "common.error": "Произошла ошибка",
+        "common.profile.loading": "Профиль загрузки ...",
+        "common.profile.notFound": "Профиль не найден. "
+    },
+    
+    hy: {
+        "header.home": "Տուն",
+        "header.products": "Արտադրանք",
+        "header.service": "Ծառայություն",
+        "header.about": "Մեր մասին",
+        "header.search.placeholder": "Ինչ եք փնտրում:",
+        "profile.personalInfo": "Անձնական տեղեկություն",
+        "profile.personalInfo.desc": "Թարմացրեք ձեր մանրամասները",
+        "profile.orders": "Պատվերներ",
+        "profile.orders.desc": "Դիտեք պատվերի պատմությունը",
+        "profile.settings": "Կարգավորումներ",
+        "profile.settings.desc": "Հաշվի նախապատվությունները",
+        "profile.signOut": "Դուրս գալ",
+        "profile.signOut.desc": "Վերջացրեք ձեր նիստը",
+        "personalInfo.title": "Անձնական տեղեկություններ",
+        "personalInfo.subtitle": "Կառավարեք ձեր հաշվի մանրամասները եւ կոնտակտային տվյալները",
+        "personalInfo.firstName": "Անուն",
+        "personalInfo.lastName": "Ազգանուն",
+        "personalInfo.email": "Էլ.փոստի հասցե",
+        "personalInfo.phone": "Հեռախոսահամար",
+        "personalInfo.address": "Ուղերձ",
+        "personalInfo.street": "Փողոց",
+        "personalInfo.houseNumber": "Տնային համարը",
+        "personalInfo.apartmentNumber": "Բնակարանի համարը",
+        "personalInfo.city": "Քաղաք",
+        "personalInfo.zipCode": "Փոստային կոդ",
+        "personalInfo.edit": "Խմբագրել պրոֆիլը",
+        "personalInfo.save": "Պահել փոփոխությունները",
+        "personalInfo.cancel": "Չեղարկել",
+        "settings.title": "Հաշվի պարամետրերը",
+        "settings.subtitle": "Կառավարեք ձեր հաշվի նախասիրությունները եւ անվտանգության պարամետրերը",
+        "settings.notifications": "Ծանուցումներ",
+        "settings.notifications.desc": "Ընտրեք, թե ինչպես եք ուզում տեղեկացվել",
+        "settings.notifications.email": "Էլ.փոստի ծանուցումներ",
+        "settings.notifications.email.desc": "Ստացեք թարմացումներ էլփոստով",
+        "settings.notifications.push": "Հրել ծանուցումներ",
+        "settings.notifications.push.desc": "Տեղեկացեք ձեր սարքում",
+        "settings.notifications.sms": "SMS ծանուցումներ",
+        "settings.notifications.sms.desc": "Ստացեք տեքստային հաղորդագրություններ",
+        "settings.appearance": "Արտաքին տեսք",
+        "settings.appearance.desc": "Անհատականացրեք, թե ինչպես է ծրագիրը նայում",
+        "settings.darkMode": "Մութ ռեժիմ",
+        "settings.darkMode.desc": "Անցեք մութ թեմային",
+        "settings.language": "Լեզու",
+        "settings.language.desc": "Ընտրեք ձեր նախընտրած լեզուն",
+        "settings.security": "Անվտանգություն",
+        "settings.security.desc": "Կառավարեք ձեր հաշվի անվտանգությունը",
+        "settings.changePassword": "Փոխել գաղտնաբառը",
+        "settings.changePassword.desc": "Թարմացրեք ձեր հաշվի գաղտնաբառը",
+        "settings.twoFactor": "Երկու գործոնային վավերացում",
+        "settings.twoFactor.desc": "Լրացուցիչ անվտանգություն ավելացրեք ձեր հաշվին",
+        "settings.deleteAccount": "Delete նջել հաշիվը",
+        "settings.deleteAccount.desc": "Մշտապես հեռացրեք ձեր հաշիվը",
+        "orders.title": "Պատվիրեք պատմություն",
+        "orders.subtitle": "Դիտեք եւ հետեւեք ձեր վերջին պատվերներին",
+        "orders.total": "Ընդհանուր պատվերներ",
+        "orders.delivered": "Ազատ",
+        "orders.inTransit": "Տրանզիտում",
+        "orders.recent": "Վերջին պատվերները",
+        "orders.recent.desc": "Ձեր պատվերի պատմությունը հայտնվի այստեղ",
+        "orders.noOrders": "Դեռ պատվերներ չկան",
+        "orders.noOrders.desc": "Ձեր առաջին կարգը տեղադրելիս այն կհայտնվի այստեղ, տեղեկատվության հետեւելու եւ պատվիրելու մանրամասների հետ միասին:",
+        "orders.startShopping": "Սկսեք գնումներ կատարել",
+        "home.hero.title": "Ողջույն տուն",
+        "home.hero.client": "Հարգելի հաճախորդ",
+        "home.hero.description": "Ձեր կատարյալ ցանկապատը սպասում է ձեզ: ",
+        "home.hero.viewProducts": "Դիտեք բոլոր ցանկապատերը",
+        "home.hero.getQuote": "Ստացեք անվճար մեջբերում",
+        "home.features.quality": "Պրեմիում որակ",
+        "home.features.quality.desc": "Միայն լավագույն նյութերն ու արհեստագործությունը",
+        "home.features.delivery": "Արագ առաքում",
+        "home.features.delivery.desc": "Արագ եւ հուսալի առաքում ձեր գտնվելու վայրին",
+        "home.features.support": "Փորձագիտական ​​աջակցություն",
+        "home.features.support.desc": "Մասնագիտական ​​խորհրդատվություն եւ տեղադրում",
+        "home.featured.title": "Ընտրված արտադրանք",
+        "home.featured.subtitle": "Ուսումնասիրեք մեր ամենատարածված ցանկապատի ձեւավորումները",
+        "home.featured.loading": "Բեռնում է ներկայացված արտադրանքները ...",
+        "home.featured.error": "Սխալների բեռնման սխալ",
+        "home.featured.viewAll": "Դիտեք բոլոր ապրանքները",
+        "common.loading": "Բեռնում ...",
+        "common.error": "Սխալ է տեղի ունեցել",
+        "common.profile.loading": "Բեռնվող պրոֆիլը ...",
+        "common.profile.notFound": "Պրոֆիլը չի ​​գտնվել: "
+    }
+};
+
+// Функция для автоматического перевода новых текстов
+async function translateText(text: string, targetLang: string): Promise<string> {
+    try {
+        const response = await fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=${targetLang}&dt=t&q=${encodeURIComponent(text)}`);
+        const result = await response.json();
+        return result[0][0][0];
+    } catch (error) {
+        console.warn('Auto-translation failed:', error);
+        return text;
+    }
+}
+
+export function LanguageProvider({ children }: { children: React.ReactNode }) {
+    const [language, setLanguageState] = useState('en');
+
+    useEffect(() => {
+        const savedLanguage = localStorage.getItem('language') || 'en';
+        setLanguageState(savedLanguage);
+    }, []);
+
+    const setLanguage = (lang: string) => {
+        setLanguageState(lang);
+        localStorage.setItem('language', lang);
+    };
+
+    const t = (key: string): string => {
+        const langTranslations = translations[language as keyof typeof translations];
+        return (langTranslations as any)?.[key] || key;
+    };
+    
+    // Автоматический перевод для новых текстов
+    const autoTranslate = async (text: string): Promise<string> => {
+        if (language === 'en') return text;
+        
+        const langMap: { [key: string]: string } = {
+            ru: 'ru',
+            hy: 'hy'
+        };
+        
+        const targetLang = langMap[language];
+        if (!targetLang) return text;
+        
+        return await translateText(text, targetLang);
+    };
+
+    return (
+        <LanguageContext.Provider value={{ language, setLanguage, t, autoTranslate }}>
+            {children}
+        </LanguageContext.Provider>
+    );
+}
+
+export const useLanguage = () => {
+    const context = useContext(LanguageContext);
+    if (context === undefined) {
+        throw new Error('useLanguage must be used within a LanguageProvider');
+    }
+    return context;
+};
+
+// Хук для автоматического перевода
+export const useAutoTranslate = () => {
+    const { autoTranslate, language } = useLanguage();
+    
+    const translate = async (text: string) => {
+        if (language === 'en') return text;
+        return await autoTranslate(text);
+    };
+    
+    return translate;
+};

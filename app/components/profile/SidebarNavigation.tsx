@@ -1,7 +1,8 @@
 // components/profile/SidebarNavigation.tsx
 import React from "react";
-import { LogOut, ChevronRight, Link } from "lucide-react";
+import { LogOut, User, ShoppingBag, Settings, Star } from "lucide-react";
 import { SidebarNavigationProps } from "../../types/profile";
+import { T } from "../T";
 
 export default function SidebarNavigation({
     profile,
@@ -9,78 +10,119 @@ export default function SidebarNavigation({
     onSectionChange,
     onLogout,
 }: SidebarNavigationProps) {
+    // Используем T компонент для переводов
+    
     const menuItems = [
         {
+            id: "personalInfo",
+            title: <T>Personal Info</T>,
+            description: <T>Manage personal details</T>,
+            icon: User,
+        },
+        {
             id: "orders",
-            title: "Orders",
-            description: "View your order history",
+            title: <T>Orders</T>,
+            description: <T>View order history</T>,
+            icon: ShoppingBag,
         },
         {
             id: "settings",
-            title: "Settings",
-            description: "Change your account settings",
-        },
-        {
-            id: "personalInfo",
-            title: "Personal Info",
-            description: "Update your personal information",
+            title: <T>Settings</T>,
+            description: <T>Account preferences</T>,
+            icon: Settings,
         },
     ];
 
-    return (
-        <div className="w-80 bg-[#2d3748] text-white flex flex-col">
-            {/* Заголовок Profile */}
-            <div className="p-6">
-                <h1 className="text-2xl font-bold">Profile</h1>
-            </div>
+    const getInitials = () => {
+        const firstName = profile.firstName || "J";
+        const lastName = profile.lastName || "D";
+        return `${firstName[0]}${lastName[0]}`.toUpperCase();
+    };
 
-            {/* Профиль пользователя с аватаром */}
-            <div className="px-6 pb-8">
-                <div className="flex items-center space-x-4">
-                    {/* Аватар */}
-                    <div className="w-16 h-16 bg-gray-400 rounded-full flex items-center justify-center">
-                        <div className="w-8 h-8 bg-[#a0896b] rounded-full"></div>
+    return (
+        <div className="w-80 bg-gradient-to-b from-slate-900 to-slate-800 dark:from-slate-700 dark:to-slate-600 text-white dark:text-[var(--color-text)] flex flex-col shadow-2xl">
+            {/* Header */}
+            <div className="p-8 bg-gradient-to-r from-blue-600 to-purple-600">
+                <div className="flex items-center gap-4">
+                    <div className="relative">
+                        <div className="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center border border-white/30">
+                            <span className="text-xl font-bold text-white">
+                                {getInitials()}
+                            </span>
+                        </div>
+                        <div className="absolute -top-1 -right-1">
+                            <div className="w-6 h-6 bg-emerald-500 rounded-full flex items-center justify-center border-2 border-white">
+                                <Star className="w-3 h-3 text-white" />
+                            </div>
+                        </div>
                     </div>
-                    {/* Информация о пользователе */}
-                    <div>
-                        <h2 className="font-semibold text-lg">
-                            {profile.firstName || "John"}{" "}
-                            {profile.lastName || "Doe"}
+                    <div className="flex-1">
+                        <h2 className="text-xl font-bold text-white">
+                            {profile.firstName || "John"} {profile.lastName || "Doe"}
                         </h2>
-                        <p className="text-gray-300 text-sm">{profile.email}</p>
+                        <p className="text-blue-100 text-sm opacity-90 truncate">
+                            {profile.email}
+                        </p>
                     </div>
                 </div>
             </div>
 
-            {/* Навигационное меню */}
-            <nav className="flex-1">
-                {menuItems.map((item) => (
-                    <button
-                        key={item.id}
-                        className={`w-full px-6 py-4 text-left flex items-center justify-between hover:bg-gray-600 transition-colors ${
-                            activeSection === item.id ? "bg-gray-600" : ""
-                        }`}
-                        onClick={() => onSectionChange(item.id)}
-                    >
-                        <div>
-                            <div className="font-medium">{item.title}</div>
-                            <div className="text-sm text-gray-300">
-                                {item.description}
+            {/* Navigation Menu */}
+            <nav className="flex-1 p-4 space-y-2">
+                {menuItems.map((item) => {
+                    const IconComponent = item.icon;
+                    const isActive = activeSection === item.id;
+                    
+                    return (
+                        <button
+                            key={item.id}
+                            className={`w-full p-4 text-left flex items-center gap-4 rounded-xl transition-all duration-200 group ${
+                                isActive
+                                    ? "bg-gradient-to-r from-blue-600 to-purple-600 shadow-lg transform scale-105"
+                                    : "hover:bg-slate-700/50 hover:transform hover:scale-105"
+                            }`}
+                            onClick={() => onSectionChange(item.id)}
+                        >
+                            <div className={`p-2 rounded-lg transition-all duration-200 ${
+                                isActive 
+                                    ? "bg-white/20 text-white" 
+                                    : "bg-slate-700 text-slate-300 group-hover:bg-slate-600 group-hover:text-white"
+                            }`}>
+                                <IconComponent className="w-5 h-5" />
                             </div>
-                        </div>
-                        <ChevronRight className="w-5 h-5" />
-                    </button>
-                ))}
+                            <div className="flex-1">
+                                <div className={`font-semibold transition-colors duration-200 ${
+                                    isActive ? "text-white" : "text-slate-200 group-hover:text-white"
+                                }`}>
+                                    {item.title}
+                                </div>
+                                <div className={`text-xs transition-colors duration-200 ${
+                                    isActive ? "text-blue-100" : "text-slate-400 group-hover:text-slate-300"
+                                }`}>
+                                    {item.description}
+                                </div>
+                            </div>
+                            {isActive && (
+                                <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
+                            )}
+                        </button>
+                    );
+                })}
             </nav>
 
-            {/* Кнопка выхода */}
-            <div className="p-6 border-t border-gray-600">
+            {/* Logout Button */}
+            <div className="p-4 border-t border-slate-700">
                 <button
                     onClick={onLogout}
-                    className="w-full px-4 py-2 text-left flex items-center text-gray-300 hover:text-white transition-colors"
+                    className="w-full p-4 text-left flex items-center gap-4 rounded-xl text-slate-300 hover:bg-red-500/10 hover:text-red-400 transition-all duration-200 group"
                 >
-                    <LogOut className="mr-3 w-5 h-5" />
-                    Sign out
+                    <div className="p-2 rounded-lg bg-slate-700 text-slate-400 group-hover:bg-red-500/20 group-hover:text-red-400 transition-all duration-200">
+                        <LogOut className="w-5 h-5" />
+                    </div>
+                    <div className="flex-1">
+                        <div className="font-semibold"><T>Sign Out</T></div>
+                        <div className="text-xs text-slate-400"><T>End your session</T></div>
+                    </div>
                 </button>
             </div>
         </div>

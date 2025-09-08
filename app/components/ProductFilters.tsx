@@ -2,6 +2,7 @@
 "use client";
 
 import React, { useState, useEffect, useCallback } from "react";
+import { T } from "./T";
 
 interface ProductFiltersProps {
     // Пропсы, которые ProductFilters будет передавать родительскому компоненту
@@ -74,7 +75,7 @@ export default function ProductFilters({
                     htmlFor="category-filter"
                     className="text-sm font-medium text-gray-700 mb-1"
                 >
-                    Категория:
+                    <T>Category:</T>
                 </label>
                 <select
                     id="category-filter"
@@ -96,7 +97,7 @@ export default function ProductFilters({
                     {availableCategories.map((cat) => (
                         <option key={cat} value={cat}>
                             {cat === "all"
-                                ? "Все категории"
+                                ? "All categories"
                                 : cat.charAt(0).toUpperCase() + cat.slice(1)}
                         </option>
                     ))}
@@ -125,7 +126,7 @@ export default function ProductFilters({
                     htmlFor="min-price"
                     className="text-sm font-medium text-gray-700 mb-1"
                 >
-                    Мин. цена:
+                    <T>Minimal price:</T>
                 </label>
                 <input
                     type="number"
@@ -144,7 +145,7 @@ export default function ProductFilters({
                     value={tempMinPrice}
                     onChange={(e) => setTempMinPrice(e.target.value)}
                     onKeyDown={handlePriceKeyDown}
-                    placeholder="От"
+                    placeholder="From"
                     min="0"
                 />
             </div>
@@ -154,7 +155,7 @@ export default function ProductFilters({
                     htmlFor="max-price"
                     className="text-sm font-medium text-gray-700 mb-1"
                 >
-                    Макс. цена:
+                    <T>Maximal price:</T>
                 </label>
                 <input
                     type="number"
@@ -173,7 +174,7 @@ export default function ProductFilters({
                     value={tempMaxPrice}
                     onChange={(e) => setTempMaxPrice(e.target.value)}
                     onKeyDown={handlePriceKeyDown}
-                    placeholder="До"
+                    placeholder="To"
                     min="0"
                 />
             </div>
@@ -184,7 +185,7 @@ export default function ProductFilters({
                     onClick={handleApply}
                     className="mt-4 md:mt-0 bg-[var(--color-accent)] text-[var(--color-primary)] font-bold py-2 px-4 rounded-md hover:bg-opacity-90 transition-colors duration-200 text-sm"
                 >
-                    Применить фильтры
+                    <T>Apply filters</T>
                 </button>
             )}
 
@@ -194,7 +195,7 @@ export default function ProductFilters({
                     onClick={onResetFilters} // Вызываем колбэк для сброса
                     className="mt-4 md:mt-0 bg-gray-200 text-gray-800 py-2 px-4 rounded-md hover:bg-gray-300 transition-colors duration-200 text-sm"
                 >
-                    Сбросить фильтры
+                    <T>Reset filters</T>
                 </button>
             )}
         </section>

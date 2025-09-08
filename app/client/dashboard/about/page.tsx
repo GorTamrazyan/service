@@ -1,9 +1,10 @@
 // app/client/dashboard/about/page.tsx
 "use client"; // <-- ДОБАВЬТЕ ЭТУ СТРОКУ В САМОЕ НАЧАЛО ФАЙЛА
 
-import React, { useState } from "react"; // Убедитесь, что useState импортирован
+import React, { useState } from "react";
 import Link from "next/link";
 import { FaShieldAlt, FaTools, FaHandshake, FaLightbulb } from "react-icons/fa";
+import { T } from "../../../components/T";
 
 // Импортируем Swiper React компоненты
 import { Swiper, SwiperSlide } from "swiper/react";
@@ -23,18 +24,18 @@ export default function AboutUsPage() {
             before: "https://via.placeholder.com/800x600?text=До+Забора+1",
             after: "https://via.placeholder.com/800x600?text=После+Забора+1",
             description:
-                "Старый деревянный забор заменен на современный виниловый.",
+                "Old wooden fence replaced with modern vinyl.",
         },
         {
             before: "https://via.placeholder.com/800x600?text=До+Забора+2",
             after: "https://via.placeholder.com/800x600?text=После+Забора+2",
             description:
-                "Установка нового металлического ограждения для безопасности.",
+                "Installation of new metal fencing for security.",
         },
         {
             before: "https://via.placeholder.com/800x600?text=До+Забора+3",
             after: "https://via.placeholder.com/800x600?text=После+Забора+3",
-            description: "Преображение участка с помощью декоративного забора.",
+            description: "Site transformation with decorative fencing.",
         },
         // Добавьте больше изображений по аналогии
     ];
@@ -45,37 +46,28 @@ export default function AboutUsPage() {
                 {/* Заголовок и Введение */}
                 <section className="text-center mb-12 md:mb-16">
                     <h1 className="text-4xl md:text-5xl font-extrabold text-[var(--color-primary)] leading-tight mb-4">
-                        О нас: Ваш Надежный Партнер по Заборам в Америке
+                        <T>About Us: Your Reliable Partner for Fences in America</T>
                     </h1>
                     <p className="text-lg md:text-xl max-w-3xl mx-auto">
-                        Добро пожаловать в{" "}
-                        <strong className="text-[var(--color-primary)]">
-                            [Название Вашей Компании]
-                        </strong>{" "}
-                        – лидера в производстве и установке качественных заборов
-                        по всей Америке. Мы специализируемся на предоставлении
-                        долговечных и эстетически привлекательных решений для
-                        ограждений, которые защищают вашу собственность и
-                        улучшают ее внешний вид.
+                        <T>Welcome to [Your Company Name] – a leader in manufacturing and installing quality fences across America. We specialize in providing durable and aesthetically appealing fencing solutions that protect your property and improve its appearance.</T>
                     </p>
                     <p className="text-lg md:text-xl max-w-3xl mx-auto mt-2">
-                        От{" "}
+                        <T>From</T>{" "}
                         <strong className="text-[var(--color-accent)]">
-                            деревянных и виниловых
+                            <T>wooden and vinyl</T>
                         </strong>{" "}
-                        до{" "}
+                        <T>to</T>{" "}
                         <strong className="text-[var(--color-accent)]">
-                            металлических и декоративных
+                            <T>metal and decorative</T>
                         </strong>{" "}
-                        — мы предлагаем широкий ассортимент материалов и
-                        дизайнов, чтобы удовлетворить любые потребности.
+                        <T>— we offer a wide range of materials and designs to meet any need.</T>
                     </p>
                 </section>
 
                 {/* --- Карусель "До и После" --- */}
                 <section className="mb-12 md:mb-16">
                     <h2 className="text-3xl md:text-4xl font-bold text-[var(--color-primary)] mb-8 text-center">
-                        Наши Проекты: До и После
+                        <T>Our Projects: Before and After</T>
                     </h2>
                     <Swiper
                         modules={[Navigation, Pagination, Autoplay]}
@@ -97,11 +89,11 @@ export default function AboutUsPage() {
                                     <div className="w-full md:w-1/2 h-full relative">
                                         <img
                                             src={item.before}
-                                            alt={`До: ${item.description}`}
+                                            alt={`Before: ${item.description}`}
                                             className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
                                         />
                                         <span className="absolute top-4 left-4 bg-[var(--color-primary)] text-white text-sm md:text-base font-bold px-3 py-1 rounded-full shadow-md">
-                                            ДО
+                                            <T>BEFORE</T>
                                         </span>
                                     </div>
 
@@ -109,17 +101,17 @@ export default function AboutUsPage() {
                                     <div className="w-full md:w-1/2 h-full relative">
                                         <img
                                             src={item.after}
-                                            alt={`После: ${item.description}`}
+                                            alt={`After: ${item.description}`}
                                             className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
                                         />
                                         <span className="absolute top-4 right-4 bg-[var(--color-accent)] text-[var(--color-primary)] text-sm md:text-base font-bold px-3 py-1 rounded-full shadow-md">
-                                            ПОСЛЕ
+                                            <T>AFTER</T>
                                         </span>
                                     </div>
                                 </div>
                                 {/* Описание под слайдом */}
                                 <p className="text-center text-md md:text-lg mt-4 mb-8 text-[var(--color-primary)] font-semibold">
-                                    {item.description}
+                                    <T>{item.description}</T>
                                 </p>
                             </SwiperSlide>
                         ))}
@@ -132,15 +124,10 @@ export default function AboutUsPage() {
                 {/* Наша Миссия */}
                 <section className="mb-12 md:mb-16 bg-white shadow-lg rounded-lg p-8">
                     <h2 className="text-3xl md:text-4xl font-bold text-[var(--color-primary)] mb-4 text-center">
-                        Наша Миссия
+                        <T>Our Mission</T>
                     </h2>
                     <p className="text-lg text-center max-w-4xl mx-auto">
-                        Наша миссия – обеспечивать наших клиентов
-                        высококачественными, надежными и красивыми ограждениями,
-                        предоставляя при этом исключительный сервис. Мы
-                        стремимся превзойти ожидания, создавая безопасные и
-                        стильные пространства для домов и предприятий по всей
-                        территории США.
+                        <T>Our mission is to provide our clients with high-quality, reliable and beautiful fences, while providing exceptional service. We strive to exceed expectations by creating safe and stylish spaces for homes and businesses across the United States.</T>
                     </p>
                 </section>
 
@@ -149,42 +136,34 @@ export default function AboutUsPage() {
                 {/* Наша История / Наш Опыт */}
                 <section className="mb-12 md:mb-16">
                     <h2 className="text-3xl md:text-4xl font-bold text-[var(--color-primary)] mb-6 text-center">
-                        Наша История и Опыт
+                        <T>Our History and Experience</T>
                     </h2>
                     <div className="flex flex-col md:flex-row items-center md:space-x-8">
                         <div className="md:w-1/2 mb-6 md:mb-0">
                             <img
-                                src="https://via.placeholder.com/600x400?text=Изображение+Завода+или+Команды"
-                                alt="История компании по производству заборов"
+                                src="https://via.placeholder.com/600x400?text=Company+Factory+or+Team+Image"
+                                alt="Company history in fence manufacturing"
                                 className="rounded-lg shadow-lg w-full h-auto object-cover"
                             />
                         </div>
                         <div className="md:w-1/2">
                             <p className="text-lg leading-relaxed mb-4">
-                                Основанная в{" "}
+                                <T>Founded in</T>{" "}
                                 <strong className="text-[var(--color-accent)]">
-                                    [Год Основания]
+                                    <T>[Year Founded]</T>
                                 </strong>
-                                ,{" "}
+                                <T>,</T>{" "}
                                 <strong className="text-[var(--color-primary)]">
-                                    [Название Вашей Компании]
+                                    <T>[Your Company Name]</T>
                                 </strong>{" "}
-                                быстро завоевала репутацию надежного поставщика
-                                и установщика заборов. Мы выросли из страсти к
-                                качеству, инновациям и желанию предоставлять
-                                первоклассные услуги, которые превосходят
-                                ожидания наших клиентов.
+                                <T>quickly gained a reputation as a reliable supplier and installer of fences. We grew out of a passion for quality, innovation and a desire to provide first-class services that exceed our clients' expectations.</T>
                             </p>
                             <p className="text-lg leading-relaxed">
-                                С более чем{" "}
+                                <T>With more than</T>{" "}
                                 <strong className="text-[var(--color-accent)]">
-                                    [Количество]
+                                    <T>[Number]</T>
                                 </strong>{" "}
-                                годами опыта в индустрии, мы гордимся своим
-                                наследием в производстве и установке заборов. Мы
-                                постоянно совершенствуем наши методы и расширяем
-                                ассортимент, чтобы предлагать самые современные
-                                и эффективные решения для ограждений.
+                                <T>years of experience in the industry, we are proud of our heritage in fence manufacturing and installation. We constantly improve our methods and expand our range to offer the most modern and effective fencing solutions.</T>
                             </p>
                         </div>
                     </div>
@@ -195,54 +174,43 @@ export default function AboutUsPage() {
                 {/* Почему выбирают нас? (Наши Преимущества) */}
                 <section className="mb-12 md:mb-16">
                     <h2 className="text-3xl md:text-4xl font-bold text-[var(--color-primary)] mb-8 text-center">
-                        Почему выбирают нас?
+                        <T>Why choose us?</T>
                     </h2>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
                         <div className="bg-white p-6 rounded-lg shadow-lg text-center hover:shadow-xl transition-shadow duration-300">
                             <FaShieldAlt className="text-[var(--color-accent)] w-12 h-12 mx-auto mb-4" />
                             <h3 className="text-xl font-semibold text-[var(--color-primary)] mb-2">
-                                Опыт и Экспертиза
+                                <T>Experience and Expertise</T>
                             </h3>
                             <p className="text-base">
-                                Наша команда состоит из высококвалифицированных
-                                специалистов с многолетним опытом в
-                                проектировании, производстве и установке заборов
-                                любой сложности.
+                                <T>Our team consists of highly qualified specialists with many years of experience in designing, manufacturing and installing fences of any complexity.</T>
                             </p>
                         </div>
                         <div className="bg-white p-6 rounded-lg shadow-lg text-center hover:shadow-xl transition-shadow duration-300">
                             <FaTools className="text-[var(--color-accent)] w-12 h-12 mx-auto mb-4" />
                             <h3 className="text-xl font-semibold text-[var(--color-primary)] mb-2">
-                                Качество Материалов
+                                <T>Material Quality</T>
                             </h3>
                             <p className="text-base">
-                                Мы используем только сертифицированные,
-                                долговечные материалы от проверенных
-                                поставщиков, что гарантирует прочность и
-                                долговечность каждого установленного забора.
+                                <T>We use only certified, durable materials from trusted suppliers, which guarantees the strength and durability of every installed fence.</T>
                             </p>
                         </div>
                         <div className="bg-white p-6 rounded-lg shadow-lg text-center hover:shadow-xl transition-shadow duration-300">
                             <FaHandshake className="text-[var(--color-accent)] w-12 h-12 mx-auto mb-4" />
                             <h3 className="text-xl font-semibold text-[var(--color-primary)] mb-2">
-                                Индивидуальный Подход
+                                <T>Individual Approach</T>
                             </h3>
                             <p className="text-base">
-                                Мы понимаем, что каждый проект уникален. Мы
-                                внимательно прислушиваемся к вашим потребностям
-                                и предлагаем индивидуальные решения.
+                                <T>We understand that every project is unique. We listen carefully to your needs and offer individual solutions.</T>
                             </p>
                         </div>
                         <div className="bg-white p-6 rounded-lg shadow-lg text-center hover:shadow-xl transition-shadow duration-300">
                             <FaLightbulb className="text-[var(--color-accent)] w-12 h-12 mx-auto mb-4" />
                             <h3 className="text-xl font-semibold text-[var(--color-primary)] mb-2">
-                                Превосходный Сервис
+                                <T>Excellent Service</T>
                             </h3>
                             <p className="text-base">
-                                От первой консультации до завершения установки,
-                                мы гарантируем гладкий и профессиональный
-                                процесс. Ваше удовлетворение – наш главный
-                                приоритет.
+                                <T>From the first consultation to completion of installation, we guarantee a smooth and professional process. Your satisfaction is our top priority.</T>
                             </p>
                         </div>
                     </div>
@@ -253,49 +221,39 @@ export default function AboutUsPage() {
                 {/* Наши Ценности */}
                 <section className="mb-12 md:mb-16 bg-white shadow-lg rounded-lg p-8">
                     <h2 className="text-3xl md:text-4xl font-bold text-[var(--color-primary)] mb-6 text-center">
-                        Наши Ценности
+                        <T>Our Values</T>
                     </h2>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
                         <div>
                             <h3 className="text-xl font-semibold text-[var(--color-accent)] mb-2">
-                                Качество
+                                <T>Quality</T>
                             </h3>
                             <p className="text-base">
-                                Мы стремимся к совершенству во всем, что мы
-                                делаем, от выбора материалов до финальной
-                                установки, чтобы каждый забор служил
-                                десятилетиями.
+                                <T>We strive for excellence in everything we do, from material selection to final installation, so that every fence serves for decades.</T>
                             </p>
                         </div>
                         <div>
                             <h3 className="text-xl font-semibold text-[var(--color-accent)] mb-2">
-                                Честность
+                                <T>Honesty</T>
                             </h3>
                             <p className="text-base">
-                                Мы строим долгосрочные отношения с клиентами на
-                                основе доверия, прозрачности и открытого общения
-                                на каждом этапе проекта.
+                                <T>We build long-term relationships with clients based on trust, transparency and open communication at every stage of the project.</T>
                             </p>
                         </div>
                         <div>
                             <h3 className="text-xl font-semibold text-[var(--color-accent)] mb-2">
-                                Клиентоориентированность
+                                <T>Customer Focus</T>
                             </h3>
                             <p className="text-base">
-                                Ваши потребности и удовлетворение являются
-                                движущей силой всего нашего бизнеса. Мы здесь,
-                                чтобы превратить ваши идеи в реальность.
+                                <T>Your needs and satisfaction are the driving force of our entire business. We are here to turn your ideas into reality.</T>
                             </p>
                         </div>
                         <div>
                             <h3 className="text-xl font-semibold text-[var(--color-accent)] mb-2">
-                                Инновации
+                                <T>Innovation</T>
                             </h3>
                             <p className="text-base">
-                                Мы постоянно ищем новые и лучшие способы
-                                предоставить вам самые современные и эффективные
-                                решения для ограждений, следуя последним
-                                тенденциям индустрии.
+                                <T>We constantly search for new and better ways to provide you with the most modern and effective fencing solutions, following the latest industry trends.</T>
                             </p>
                         </div>
                     </div>
@@ -304,17 +262,16 @@ export default function AboutUsPage() {
                 {/* Призыв к действию (CTA) */}
                 <section className="text-center bg-[var(--color-primary)] text-white p-8 rounded-lg shadow-xl">
                     <h2 className="text-3xl md:text-4xl font-bold mb-4">
-                        Готовы обсудить ваш проект?
+                        <T>Ready to discuss your project?</T>
                     </h2>
                     <p className="text-xl mb-6">
-                        Свяжитесь с нами сегодня, чтобы получить бесплатную
-                        консультацию и оценку вашего будущего ограждения!
+                        <T>Contact us today to get a free consultation and estimate for your future fence!</T>
                     </p>
                     <Link
                         href="/contact"
                         className="inline-block bg-[var(--color-accent)] hover:bg-opacity-90 text-[var(--color-primary)] font-bold py-3 px-8 rounded-full text-lg transition-colors duration-300 shadow-md"
                     >
-                        Получить Бесплатную Оценку
+                        <T>Get Free Estimate</T>
                     </Link>
                 </section>
             </div>
