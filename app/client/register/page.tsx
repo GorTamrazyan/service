@@ -9,6 +9,8 @@ import {
     signInWithPopup,
     OAuthProvider,
 } from "firebase/auth";
+import { doc, setDoc, getDoc } from "firebase/firestore";
+import { db } from "../../lib/firebase/firebase";
 import { FcGoogle } from "react-icons/fc";
 import { FaApple } from "react-icons/fa";
 import Link from "next/link";
@@ -21,6 +23,39 @@ export default function RegisterPage() {
     const [error, setError] = useState("");
 
     const router = useRouter();
+
+    // Функция для создания профиля пользователя в Firestore (если не существует)
+    const createUserProfile = async (userId: string, email: string) => {
+        try {
+            const userDocRef = doc(db, "users", userId);
+            const docSnap = await getDoc(userDocRef);
+
+            if (!docSnap.exists()) {
+                const newProfile = {
+                    firstName: "",
+                    lastName: "",
+                    phone: "",
+                    address: {
+                        street: "",
+                        houseNumber: "",
+                        apartmentNumber: "",
+                        city: "",
+                        zipCode: "",
+                    },
+                    email: email,
+                    createdAt: new Date(),
+                    updatedAt: new Date()
+                };
+
+                await setDoc(userDocRef, newProfile);
+                console.log("✅ Профиль пользователя создан в Firestore:", newProfile);
+            } else {
+                console.log("ℹ️ Профиль пользователя уже существует");
+            }
+        } catch (error) {
+            console.error("❌ Ошибка при создании профиля:", error);
+        }
+    };
 
     const handleEmailPasswordSubmit = async (event: React.FormEvent) => {
         event.preventDefault();
@@ -40,6 +75,10 @@ export default function RegisterPage() {
             );
             const user = userCredential.user;
             console.log("Успешная регистрация через Email/Пароль:", user);
+            
+            // Создаем профиль пользователя в Firestore
+            await createUserProfile(user.uid, email);
+            
             router.push("/client/dashboard/home");
         } catch (firebaseError: any) {
             setError(firebaseError.message);
@@ -60,6 +99,12 @@ export default function RegisterPage() {
             const result = await signInWithPopup(auth, provider);
             const user = result.user;
             console.log("Успешная регистрация через Google:", user);
+            
+            // Создаем профиль пользователя в Firestore, если его еще нет
+            if (user.email) {
+                await createUserProfile(user.uid, user.email);
+            }
+            
             router.push("/client/dashboard/home");
         } catch (firebaseError: any) {
             setError(firebaseError.message);
@@ -73,6 +118,12 @@ export default function RegisterPage() {
             const result = await signInWithPopup(auth, provider);
             const user = result.user;
             console.log("Успешная регистрация через Apple/iCloud:", user);
+            
+            // Создаем профиль пользователя в Firestore, если его еще нет
+            if (user.email) {
+                await createUserProfile(user.uid, user.email);
+            }
+            
             router.push("/client/dashboard/home");
         } catch (firebaseError: any) {
             setError(firebaseError.message);
@@ -84,13 +135,13 @@ export default function RegisterPage() {
     };
 
     return (
-        <div className="min-h-screen bg-gray-100 flex flex-col">
+        <div className="min-h-screen bg-[var(--color-background)] flex flex-col">
             {/* Header with logo */}
-            <div className="bg-red-600 w-full py-6">
+            <div className="bg-[var(--color-secondary)] w-full py-6">
                 <div className="flex items-center justify-center">
                     <div className="flex items-center space-x-4">
                         {/* Fence icon */}
-                        <div className="text-yellow-400">
+                        <div className="text-[var(--color-accent)]">
                             <svg
                                 width="60"
                                 height="40"
@@ -109,7 +160,7 @@ export default function RegisterPage() {
                                 <polygon points="38,8 41,4 44,8" />
                             </svg>
                         </div>
-                        <h1 className="text-4xl font-bold text-gray-800">
+                        <h1 className="text-4xl font-bold text-[var(--color-text)]">
                             ONIK'S VINYL
                         </h1>
                     </div>
@@ -121,7 +172,7 @@ export default function RegisterPage() {
                 <div className="w-full max-w-md">
                     {/* REGISTER title */}
                     <div className="text-center mb-8">
-                        <h2 className="text-5xl font-bold text-gray-800 mb-8">
+                        <h2 className="text-5xl font-bold text-[var(--color-primary)] mb-8">
                             REGISTER
                         </h2>
                     </div>
@@ -135,7 +186,7 @@ export default function RegisterPage() {
                         <div>
                             <label
                                 htmlFor="email"
-                                className="block text-lg font-medium text-gray-700 mb-2"
+                                className="block text-lg font-medium text-[var(--color-text)] mb-2"
                             >
                                 Email
                             </label>
@@ -145,7 +196,7 @@ export default function RegisterPage() {
                                 type="email"
                                 autoComplete="email"
                                 required
-                                className="w-full px-4 py-3 border-2 border-gray-800 rounded-lg bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-lg"
+                                className="w-full px-4 py-3 border-2 border-[var(--color-text)]/30 rounded-lg bg-[var(--color-background)] text-[var(--color-text)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] focus:border-[var(--color-accent)] text-lg"
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
                             />
@@ -155,7 +206,7 @@ export default function RegisterPage() {
                         <div>
                             <label
                                 htmlFor="password"
-                                className="block text-lg font-medium text-gray-700 mb-2"
+                                className="block text-lg font-medium text-[var(--color-text)] mb-2"
                             >
                                 Password
                             </label>
@@ -165,7 +216,7 @@ export default function RegisterPage() {
                                 type="password"
                                 autoComplete="new-password"
                                 required
-                                className="w-full px-4 py-3 border-2 border-gray-800 rounded-lg bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-lg"
+                                className="w-full px-4 py-3 border-2 border-[var(--color-text)]/30 rounded-lg bg-[var(--color-background)] text-[var(--color-text)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] focus:border-[var(--color-accent)] text-lg"
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
                             />
@@ -175,7 +226,7 @@ export default function RegisterPage() {
                         <div>
                             <label
                                 htmlFor="confirmPassword"
-                                className="block text-lg font-medium text-gray-700 mb-2"
+                                className="block text-lg font-medium text-[var(--color-text)] mb-2"
                             >
                                 Confirm Password
                             </label>
@@ -185,7 +236,7 @@ export default function RegisterPage() {
                                 type="password"
                                 autoComplete="new-password"
                                 required
-                                className="w-full px-4 py-3 border-2 border-gray-800 rounded-lg bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-lg"
+                                className="w-full px-4 py-3 border-2 border-[var(--color-text)]/30 rounded-lg bg-[var(--color-background)] text-[var(--color-text)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] focus:border-[var(--color-accent)] text-lg"
                                 value={confirmPassword}
                                 onChange={(e) =>
                                     setConfirmPassword(e.target.value)
@@ -204,7 +255,7 @@ export default function RegisterPage() {
                         <div className="pt-4">
                             <button
                                 type="submit"
-                                className="w-full bg-yellow-500 hover:bg-yellow-600 text-gray-800 font-bold py-4 px-6 rounded-lg text-xl transition duration-150 ease-in-out"
+                                className="w-full bg-[var(--color-accent)] hover:opacity-90 text-[var(--color-primary)] font-bold py-4 px-6 rounded-lg text-xl transition duration-150 ease-in-out"
                             >
                                 REGISTER
                             </button>
@@ -215,10 +266,10 @@ export default function RegisterPage() {
                             <button
                                 type="button"
                                 onClick={handleGoogleSignIn}
-                                className="w-full flex items-center justify-center py-3 px-4 m-0 border-2 border-gray-300 rounded-lg bg-white hover:bg-gray-50 transition duration-150 ease-in-out"
+                                className="w-full flex items-center justify-center py-3 px-4 m-0 border-2 border-[var(--color-text)]/30 rounded-lg bg-[var(--color-background)] hover:bg-[var(--color-secondary)]/20 transition duration-150 ease-in-out"
                             >
                                 <FcGoogle className="h-6 w-6 mr-3" />
-                                <span className="text-gray-700 font-medium">
+                                <span className="text-[var(--color-text)] font-medium">
                                     Continue with Google
                                 </span>
                             </button>
@@ -226,10 +277,10 @@ export default function RegisterPage() {
                             <button
                                 type="button"
                                 onClick={handleAppleSignIn}
-                                className="w-full flex items-center justify-center py-3 px-4 border-2 border-gray-300 rounded-lg bg-white hover:bg-gray-50 transition duration-150 ease-in-out"
+                                className="w-full flex items-center justify-center py-3 px-4 border-2 border-[var(--color-text)]/30 rounded-lg bg-[var(--color-background)] hover:bg-[var(--color-secondary)]/20 transition duration-150 ease-in-out"
                             >
-                                <FaApple className="h-6 w-6 mr-3 text-gray-800" />
-                                <span className="text-gray-700 font-medium">
+                                <FaApple className="h-6 w-6 mr-3 text-[var(--color-text)]" />
+                                <span className="text-[var(--color-text)] font-medium">
                                     Continue with Apple
                                 </span>
                             </button>
@@ -239,7 +290,7 @@ export default function RegisterPage() {
                         <div className="text-center pt-6">
                             <Link
                                 href="/client/sign-in"
-                                className="text-gray-700 hover:text-blue-600 transition duration-150 ease-in-out font-medium"
+                                className="text-[var(--color-text)] hover:text-[var(--color-accent)] transition duration-150 ease-in-out font-medium"
                             >
                                 Already have an account? Sign in
                             </Link>

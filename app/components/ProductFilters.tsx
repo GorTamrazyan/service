@@ -3,6 +3,7 @@
 
 import React, { useState, useEffect, useCallback } from "react";
 import { T } from "./T";
+import Link from "next/link";
 
 interface ProductFiltersProps {
     // Пропсы, которые ProductFilters будет передавать родительскому компоненту
@@ -191,12 +192,12 @@ export default function ProductFilters({
 
             {/* Кнопка сброса фильтров */}
             {areAnyFiltersApplied && (
-                <button
-                    onClick={onResetFilters} // Вызываем колбэк для сброса
-                    className="mt-4 md:mt-0 bg-gray-200 text-gray-800 py-2 px-4 rounded-md hover:bg-gray-300 transition-colors duration-200 text-sm"
-                >
-                    <T>Reset filters</T>
-                </button>
+                    <button
+                        onClick={onResetFilters} // Вызываем колбэк для сброса
+                        className="mt-4 md:mt-0 bg-gray-200 text-gray-800 py-2 px-4 rounded-md hover:bg-gray-300 transition-colors duration-200 text-sm"
+                    >
+                        <T>Reset filters</T>
+                    </button>
             )}
         </section>
     );

@@ -8,11 +8,14 @@
     "start": "next start",
     "lint": "next lint",
     "translate": "node scripts/smart-translate.js",
-    "translate:add": "node scripts/smart-translate.js add"
+    "translate:add": "node scripts/smart-translate.js add",
+    "migrate:firestore": "node scripts/client-migrate-to-firestore.js",
+    "migrate:firestore:clear": "node scripts/client-migrate-to-firestore.js --clear"
   },
   "dependencies": {
     "@prisma/client": "^6.12.0",
     "firebase": "^12.0.0",
+    "firebase-admin": "^13.5.0",
     "i18next": "^25.5.2",
     "i18next-browser-languagedetector": "^8.2.0",
     "lucide-react": "^0.542.0",

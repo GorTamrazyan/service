@@ -73,10 +73,10 @@ export default function Header() {
                         className="text-2xl font-bold text-[var(--color-background)] hover:text-[var(--color-accent)] transition-colors duration-200"
                     >
                         <Image
-                            src="/images/logo.png"
+                            src="/images/oniks_vinyl_text.png"
                             alt="Логотип компании"
-                            width={20}
-                            height={20}
+                            width={30}
+                            height={40}
                             priority={true}
                         />
                     </Link>

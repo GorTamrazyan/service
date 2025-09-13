@@ -27,17 +27,17 @@ export default function PersonalInfoPanel({
             {/* Header */}
             <div className="flex justify-between items-start">
                 <div className="space-y-1">
-                    <h1 className="text-3xl font-bold text-slate-900 dark:text-slate-100">
+                    <h1 className="text-3xl font-bold text-[var(--color-primary)]">
                         <T>Personal Information</T>
                     </h1>
-                    <p className="text-slate-600 dark:text-slate-400">
+                    <p className="text-[var(--color-text)]/70">
                         <T>Manage your personal details and information</T>
                     </p>
                 </div>
                 {!isEditing ? (
                     <button
                         onClick={onEdit}
-                        className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-3 rounded-xl font-medium hover:from-blue-700 hover:to-purple-700 transform hover:scale-105 transition-all duration-200 shadow-lg"
+                        className="inline-flex items-center gap-2 bg-gradient-to-r from-[var(--color-accent)] to-[var(--color-primary)] text-white px-6 py-3 rounded-xl font-medium hover:opacity-90 transform hover:scale-105 transition-all duration-200 shadow-lg"
                     >
                         <Edit className="w-4 h-4" />
                         <T>Edit</T>
@@ -46,14 +46,14 @@ export default function PersonalInfoPanel({
                     <div className="flex gap-3">
                         <button
                             onClick={onSave}
-                            className="inline-flex items-center gap-2 bg-gradient-to-r from-emerald-600 to-green-600 text-white px-6 py-3 rounded-xl font-medium hover:from-emerald-700 hover:to-green-700 transform hover:scale-105 transition-all duration-200 shadow-lg"
+                            className="inline-flex items-center gap-2 bg-gradient-to-r from-green-600 to-emerald-600 text-white px-6 py-3 rounded-xl font-medium hover:opacity-90 transform hover:scale-105 transition-all duration-200 shadow-lg"
                         >
                             <Save className="w-4 h-4" />
                             <T>Save</T>
                         </button>
                         <button
                             onClick={onCancel}
-                            className="inline-flex items-center gap-2 bg-gradient-to-r from-slate-500 to-slate-600 text-white px-6 py-3 rounded-xl font-medium hover:from-slate-600 hover:to-slate-700 transform hover:scale-105 transition-all duration-200 shadow-lg"
+                            className="inline-flex items-center gap-2 bg-gradient-to-r from-gray-500 to-gray-600 text-white px-6 py-3 rounded-xl font-medium hover:opacity-90 transform hover:scale-105 transition-all duration-200 shadow-lg"
                         >
                             <X className="w-4 h-4" />
                             <T>Cancel</T>
@@ -63,24 +63,24 @@ export default function PersonalInfoPanel({
             </div>
 
             {/* Personal Info Card */}
-            <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-700 overflow-hidden">
-                <div className="bg-gradient-to-r from-slate-50 to-slate-100 dark:from-slate-700 dark:to-slate-600 px-8 py-6 border-b border-slate-200 dark:border-slate-600">
-                    <h3 className="text-xl font-semibold text-slate-900 dark:text-slate-100"><T>Personal Information</T></h3>
-                    <p className="text-slate-600 dark:text-slate-400 mt-1"><T>Manage your personal details and information</T></p>
+            <div className="bg-[var(--color-background)] rounded-2xl shadow-xl border border-[var(--color-text)]/10 overflow-hidden">
+                <div className="bg-gradient-to-r from-[var(--color-secondary)] to-[var(--color-secondary)]/80 px-8 py-6 border-b border-[var(--color-text)]/10">
+                    <h3 className="text-xl font-semibold text-[var(--color-primary)]"><T>Personal Information</T></h3>
+                    <p className="text-[var(--color-text)]/70 mt-1"><T>Manage your personal details and information</T></p>
                 </div>
                 
                 <div className="p-8 space-y-6">
                     {/* Email (read-only) */}
                     <div className="space-y-2">
-                        <label className="block text-sm font-medium text-slate-700 dark:text-slate-300">
+                        <label className="block text-sm font-medium text-[var(--color-text)]">
                             <T>Email</T>
                         </label>
                         <div className="relative">
-                            <div className="px-4 py-3 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl text-slate-600 dark:text-slate-300 font-mono">
+                            <div className="px-4 py-3 bg-[var(--color-secondary)]/20 border border-[var(--color-text)]/20 rounded-xl text-[var(--color-text)] font-mono">
                                 {profile.email}
                             </div>
                             <div className="absolute right-3 top-3">
-                                <span className="inline-flex items-center gap-1 text-xs text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-600 px-2 py-1 rounded-md">
+                                <span className="inline-flex items-center gap-1 text-xs text-[var(--color-text)]/60 bg-[var(--color-secondary)]/30 px-2 py-1 rounded-md">
                                     Verified
                                 </span>
                             </div>
@@ -90,7 +90,7 @@ export default function PersonalInfoPanel({
                     {/* Name Fields */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div className="space-y-2">
-                            <label htmlFor="firstName" className="block text-sm font-medium text-slate-700 dark:text-slate-300">
+                            <label htmlFor="firstName" className="block text-sm font-medium text-[var(--color-text)]">
                                 <T>First Name</T>
                             </label>
                             <input
@@ -102,15 +102,15 @@ export default function PersonalInfoPanel({
                                 readOnly={!isEditing}
                                 className={`w-full px-4 py-3 border rounded-xl shadow-sm transition-all duration-200 ${
                                     !isEditing
-                                        ? "bg-slate-50 dark:bg-slate-700 border-slate-200 dark:border-slate-600 text-slate-600 dark:text-slate-300 cursor-not-allowed"
-                                        : "bg-white dark:bg-slate-700 border-slate-300 dark:border-slate-600 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-slate-400 dark:hover:border-slate-500"
+                                        ? "bg-[var(--color-secondary)]/20 border-[var(--color-text)]/20 text-[var(--color-text)]/60 cursor-not-allowed"
+                                        : "bg-[var(--color-background)] border-[var(--color-text)]/30 text-[var(--color-text)] focus:ring-2 focus:ring-[var(--color-accent)] focus:border-[var(--color-accent)] hover:border-[var(--color-text)]/50"
                                 }`}
                                 placeholder="Enter your first name"
                             />
                         </div>
 
                         <div className="space-y-2">
-                            <label htmlFor="lastName" className="block text-sm font-medium text-slate-700 dark:text-slate-300">
+                            <label htmlFor="lastName" className="block text-sm font-medium text-[var(--color-text)]">
                                 <T>Last Name</T>
                             </label>
                             <input
@@ -122,8 +122,8 @@ export default function PersonalInfoPanel({
                                 readOnly={!isEditing}
                                 className={`w-full px-4 py-3 border rounded-xl shadow-sm transition-all duration-200 ${
                                     !isEditing
-                                        ? "bg-slate-50 dark:bg-slate-700 border-slate-200 dark:border-slate-600 text-slate-600 dark:text-slate-300 cursor-not-allowed"
-                                        : "bg-white dark:bg-slate-700 border-slate-300 dark:border-slate-600 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-slate-400 dark:hover:border-slate-500"
+                                        ? "bg-[var(--color-secondary)]/20 border-[var(--color-text)]/20 text-[var(--color-text)]/60 cursor-not-allowed"
+                                        : "bg-[var(--color-background)] border-[var(--color-text)]/30 text-[var(--color-text)] focus:ring-2 focus:ring-[var(--color-accent)] focus:border-[var(--color-accent)] hover:border-[var(--color-text)]/50"
                                 }`}
                                 placeholder="Enter your last name"
                             />
@@ -132,7 +132,7 @@ export default function PersonalInfoPanel({
 
                     {/* Phone */}
                     <div className="space-y-2">
-                        <label htmlFor="phone" className="block text-sm font-medium text-slate-700 dark:text-slate-300">
+                        <label htmlFor="phone" className="block text-sm font-medium text-[var(--color-text)]">
                             <T>Phone</T>
                         </label>
                         <input
@@ -144,8 +144,8 @@ export default function PersonalInfoPanel({
                             readOnly={!isEditing}
                             className={`w-full px-4 py-3 border rounded-xl shadow-sm transition-all duration-200 ${
                                 !isEditing
-                                    ? "bg-slate-50 border-slate-200 text-slate-600 cursor-not-allowed"
-                                    : "bg-white border-slate-300 text-slate-900 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-slate-400"
+                                    ? "bg-[var(--color-secondary)]/20 border-[var(--color-text)]/20 text-[var(--color-text)]/60 cursor-not-allowed"
+                                    : "bg-[var(--color-background)] border-[var(--color-text)]/30 text-[var(--color-text)] focus:ring-2 focus:ring-[var(--color-accent)] focus:border-[var(--color-accent)] hover:border-[var(--color-text)]/50"
                             }`}
                             placeholder="Enter your phone number"
                         />
@@ -154,16 +154,16 @@ export default function PersonalInfoPanel({
             </div>
 
             {/* Address Card */}
-            <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-700 overflow-hidden">
-                <div className="bg-gradient-to-r from-slate-50 to-slate-100 dark:from-slate-700 dark:to-slate-600 px-8 py-6 border-b border-slate-200 dark:border-slate-600">
-                    <h3 className="text-xl font-semibold text-slate-900 dark:text-slate-100"><T>Address Information</T></h3>
-                    <p className="text-slate-600 dark:text-slate-400 mt-1"><T>Manage your personal details and information</T></p>
+            <div className="bg-[var(--color-background)] rounded-2xl shadow-xl border border-[var(--color-text)]/10 overflow-hidden">
+                <div className="bg-gradient-to-r from-[var(--color-secondary)] to-[var(--color-secondary)]/80 px-8 py-6 border-b border-[var(--color-text)]/10">
+                    <h3 className="text-xl font-semibold text-[var(--color-primary)]"><T>Address Information</T></h3>
+                    <p className="text-[var(--color-text)]/70 mt-1"><T>Manage your personal details and information</T></p>
                 </div>
                 
                 <div className="p-8 space-y-6">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div className="space-y-2">
-                            <label htmlFor="address.street" className="block text-sm font-medium text-slate-700 dark:text-slate-300">
+                            <label htmlFor="address.street" className="block text-sm font-medium text-[var(--color-text)]">
                                 <T>Street</T>
                             </label>
                             <input
@@ -175,15 +175,15 @@ export default function PersonalInfoPanel({
                                 readOnly={!isEditing}
                                 className={`w-full px-4 py-3 border rounded-xl shadow-sm transition-all duration-200 ${
                                     !isEditing
-                                        ? "bg-slate-50 dark:bg-slate-700 border-slate-200 dark:border-slate-600 text-slate-600 dark:text-slate-300 cursor-not-allowed"
-                                        : "bg-white dark:bg-slate-700 border-slate-300 dark:border-slate-600 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-slate-400 dark:hover:border-slate-500"
+                                        ? "bg-[var(--color-secondary)]/20 border-[var(--color-text)]/20 text-[var(--color-text)]/60 cursor-not-allowed"
+                                        : "bg-[var(--color-background)] border-[var(--color-text)]/30 text-[var(--color-text)] focus:ring-2 focus:ring-[var(--color-accent)] focus:border-[var(--color-accent)] hover:border-[var(--color-text)]/50"
                                 }`}
                                 placeholder="Enter street name"
                             />
                         </div>
 
                         <div className="space-y-2">
-                            <label htmlFor="address.houseNumber" className="block text-sm font-medium text-slate-700 dark:text-slate-300">
+                            <label htmlFor="address.houseNumber" className="block text-sm font-medium text-[var(--color-text)]">
                                 <T>House Number</T>
                             </label>
                             <input
@@ -195,15 +195,15 @@ export default function PersonalInfoPanel({
                                 readOnly={!isEditing}
                                 className={`w-full px-4 py-3 border rounded-xl shadow-sm transition-all duration-200 ${
                                     !isEditing
-                                        ? "bg-slate-50 dark:bg-slate-700 border-slate-200 dark:border-slate-600 text-slate-600 dark:text-slate-300 cursor-not-allowed"
-                                        : "bg-white dark:bg-slate-700 border-slate-300 dark:border-slate-600 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-slate-400 dark:hover:border-slate-500"
+                                        ? "bg-[var(--color-secondary)]/20 border-[var(--color-text)]/20 text-[var(--color-text)]/60 cursor-not-allowed"
+                                        : "bg-[var(--color-background)] border-[var(--color-text)]/30 text-[var(--color-text)] focus:ring-2 focus:ring-[var(--color-accent)] focus:border-[var(--color-accent)] hover:border-[var(--color-text)]/50"
                                 }`}
                                 placeholder="Enter house number"
                             />
                         </div>
 
                         <div className="space-y-2">
-                            <label htmlFor="address.apartmentNumber" className="block text-sm font-medium text-slate-700 dark:text-slate-300">
+                            <label htmlFor="address.apartmentNumber" className="block text-sm font-medium text-[var(--color-text)]">
                                 <T>Apartment Number</T>
                             </label>
                             <input
@@ -215,15 +215,15 @@ export default function PersonalInfoPanel({
                                 readOnly={!isEditing}
                                 className={`w-full px-4 py-3 border rounded-xl shadow-sm transition-all duration-200 ${
                                     !isEditing
-                                        ? "bg-slate-50 dark:bg-slate-700 border-slate-200 dark:border-slate-600 text-slate-600 dark:text-slate-300 cursor-not-allowed"
-                                        : "bg-white dark:bg-slate-700 border-slate-300 dark:border-slate-600 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-slate-400 dark:hover:border-slate-500"
+                                        ? "bg-[var(--color-secondary)]/20 border-[var(--color-text)]/20 text-[var(--color-text)]/60 cursor-not-allowed"
+                                        : "bg-[var(--color-background)] border-[var(--color-text)]/30 text-[var(--color-text)] focus:ring-2 focus:ring-[var(--color-accent)] focus:border-[var(--color-accent)] hover:border-[var(--color-text)]/50"
                                 }`}
                                 placeholder="Apt, suite, etc. (optional)"
                             />
                         </div>
 
                         <div className="space-y-2">
-                            <label htmlFor="address.city" className="block text-sm font-medium text-slate-700 dark:text-slate-300">
+                            <label htmlFor="address.city" className="block text-sm font-medium text-[var(--color-text)]">
                                 <T>City</T>
                             </label>
                             <input
@@ -235,15 +235,15 @@ export default function PersonalInfoPanel({
                                 readOnly={!isEditing}
                                 className={`w-full px-4 py-3 border rounded-xl shadow-sm transition-all duration-200 ${
                                     !isEditing
-                                        ? "bg-slate-50 dark:bg-slate-700 border-slate-200 dark:border-slate-600 text-slate-600 dark:text-slate-300 cursor-not-allowed"
-                                        : "bg-white dark:bg-slate-700 border-slate-300 dark:border-slate-600 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-slate-400 dark:hover:border-slate-500"
+                                        ? "bg-[var(--color-secondary)]/20 border-[var(--color-text)]/20 text-[var(--color-text)]/60 cursor-not-allowed"
+                                        : "bg-[var(--color-background)] border-[var(--color-text)]/30 text-[var(--color-text)] focus:ring-2 focus:ring-[var(--color-accent)] focus:border-[var(--color-accent)] hover:border-[var(--color-text)]/50"
                                 }`}
                                 placeholder="Enter city name"
                             />
                         </div>
 
                         <div className="space-y-2">
-                            <label htmlFor="address.zipCode" className="block text-sm font-medium text-slate-700 dark:text-slate-300">
+                            <label htmlFor="address.zipCode" className="block text-sm font-medium text-[var(--color-text)]">
                                 <T>Zip Code</T>
                             </label>
                             <input
@@ -255,8 +255,8 @@ export default function PersonalInfoPanel({
                                 readOnly={!isEditing}
                                 className={`w-full px-4 py-3 border rounded-xl shadow-sm transition-all duration-200 ${
                                     !isEditing
-                                        ? "bg-slate-50 dark:bg-slate-700 border-slate-200 dark:border-slate-600 text-slate-600 dark:text-slate-300 cursor-not-allowed"
-                                        : "bg-white dark:bg-slate-700 border-slate-300 dark:border-slate-600 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-slate-400 dark:hover:border-slate-500"
+                                        ? "bg-[var(--color-secondary)]/20 border-[var(--color-text)]/20 text-[var(--color-text)]/60 cursor-not-allowed"
+                                        : "bg-[var(--color-background)] border-[var(--color-text)]/30 text-[var(--color-text)] focus:ring-2 focus:ring-[var(--color-accent)] focus:border-[var(--color-accent)] hover:border-[var(--color-text)]/50"
                                 }`}
                                 placeholder="Enter ZIP code"
                             />

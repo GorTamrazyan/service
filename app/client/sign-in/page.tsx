@@ -9,6 +9,8 @@ import {
     signInWithPopup,
     OAuthProvider,
 } from "firebase/auth";
+import { doc, getDoc, setDoc } from "firebase/firestore";
+import { db } from "../../lib/firebase/firebase";
 import { FcGoogle } from "react-icons/fc";
 import { FaApple } from "react-icons/fa";
 import Link from "next/link";
@@ -20,6 +22,39 @@ export default function SignInPage() {
     const [error, setError] = useState("");
 
     const router = useRouter();
+
+    // Функция для создания профиля пользователя в Firestore (если не существует)
+    const createUserProfileIfNotExists = async (userId: string, email: string) => {
+        try {
+            const userDocRef = doc(db, "users", userId);
+            const docSnap = await getDoc(userDocRef);
+
+            if (!docSnap.exists()) {
+                const newProfile = {
+                    firstName: "",
+                    lastName: "",
+                    phone: "",
+                    address: {
+                        street: "",
+                        houseNumber: "",
+                        apartmentNumber: "",
+                        city: "",
+                        zipCode: "",
+                    },
+                    email: email,
+                    createdAt: new Date(),
+                    updatedAt: new Date()
+                };
+
+                await setDoc(userDocRef, newProfile);
+                console.log("✅ Профиль пользователя создан в Firestore:", newProfile);
+            } else {
+                console.log("ℹ️ Профиль пользователя уже существует");
+            }
+        } catch (error) {
+            console.error("❌ Ошибка при создании профиля:", error);
+        }
+    };
 
     const handleEmailPasswordSignIn = async (event: React.FormEvent) => {
         event.preventDefault();
@@ -49,6 +84,12 @@ export default function SignInPage() {
             const result = await signInWithPopup(auth, provider);
             const user = result.user;
             console.log("Успешный вход через Google:", user);
+            
+            // Создаем профиль пользователя в Firestore, если его еще нет
+            if (user.email) {
+                await createUserProfileIfNotExists(user.uid, user.email);
+            }
+            
             router.push("/client/dashboard/home");
         } catch (firebaseError: any) {
             setError(firebaseError.message);
@@ -62,6 +103,12 @@ export default function SignInPage() {
             const result = await signInWithPopup(auth, provider);
             const user = result.user;
             console.log("Успешный вход через Apple/iCloud:", user);
+            
+            // Создаем профиль пользователя в Firestore, если его еще нет
+            if (user.email) {
+                await createUserProfileIfNotExists(user.uid, user.email);
+            }
+            
             router.push("/client/dashboard/home");
         } catch (firebaseError: any) {
             setError(firebaseError.message);
@@ -70,13 +117,13 @@ export default function SignInPage() {
     };
 
     return (
-        <div className="min-h-screen bg-gray-100 flex flex-col">
+        <div className="min-h-screen bg-[var(--color-background)] flex flex-col">
             {/* Header with logo */}
-            <div className="bg-red-600 w-full py-6">
+            <div className="bg-[var(--color-secondary)] w-full py-6">
                 <div className="flex items-center justify-center">
                     <div className="flex items-center space-x-4">
                         {/* Fence icon */}
-                        <div className="text-yellow-400">
+                        <div className="text-[var(--color-accent)]">
                             <svg width="60" height="40" viewBox="0 0 60 40" fill="currentColor">
                                 <rect x="8" y="8" width="6" height="24" />
                                 <rect x="18" y="8" width="6" height="24" />
@@ -90,7 +137,7 @@ export default function SignInPage() {
                                 <polygon points="38,8 41,4 44,8" />
                             </svg>
                         </div>
-                        <h1 className="text-4xl font-bold text-gray-800">ONIK'S VINYL</h1>
+                        <h1 className="text-4xl font-bold text-[var(--color-text)]">ONIK'S VINYL</h1>
                     </div>
                 </div>
             </div>
@@ -100,14 +147,14 @@ export default function SignInPage() {
                 <div className="w-full max-w-md">
                     {/* LOGIN title */}
                     <div className="text-center mb-8">
-                        <h2 className="text-5xl font-bold text-gray-800 mb-8">LOGIN</h2>
+                        <h2 className="text-5xl font-bold text-[var(--color-primary)] mb-8">LOGIN</h2>
                     </div>
 
                     {/* Form */}
                     <form onSubmit={handleEmailPasswordSignIn} className="space-y-6">
                         {/* Email field */}
                         <div>
-                            <label htmlFor="email" className="block text-lg font-medium text-gray-700 mb-2">
+                            <label htmlFor="email" className="block text-lg font-medium text-[var(--color-text)] mb-2">
                                 Email
                             </label>
                             <input
@@ -116,7 +163,7 @@ export default function SignInPage() {
                                 type="email"
                                 autoComplete="email"
                                 required
-                                className="w-full px-4 py-3 border-2 border-gray-800 rounded-lg bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-lg"
+                                className="w-full px-4 py-3 border-2 border-[var(--color-text)]/30 rounded-lg bg-[var(--color-background)] text-[var(--color-text)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] focus:border-[var(--color-accent)] text-lg"
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
                             />
@@ -124,7 +171,7 @@ export default function SignInPage() {
 
                         {/* Password field */}
                         <div>
-                            <label htmlFor="password" className="block text-lg font-medium text-gray-700 mb-2">
+                            <label htmlFor="password" className="block text-lg font-medium text-[var(--color-text)] mb-2">
                                 Password
                             </label>
                             <input
@@ -133,7 +180,7 @@ export default function SignInPage() {
                                 type="password"
                                 autoComplete="current-password"
                                 required
-                                className="w-full px-4 py-3 border-2 border-gray-800 rounded-lg bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-lg"
+                                className="w-full px-4 py-3 border-2 border-[var(--color-text)]/30 rounded-lg bg-[var(--color-background)] text-[var(--color-text)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] focus:border-[var(--color-accent)] text-lg"
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
                             />
@@ -143,7 +190,7 @@ export default function SignInPage() {
                         <div className="text-left">
                             <Link 
                                 href="/forgot-password" 
-                                className="text-gray-700 hover:text-blue-600 transition duration-150 ease-in-out"
+                                className="text-[var(--color-text)] hover:text-[var(--color-accent)] transition duration-150 ease-in-out"
                             >
                                 Forgot password?
                             </Link>
@@ -160,7 +207,7 @@ export default function SignInPage() {
                         <div className="pt-4">
                             <button
                                 type="submit"
-                                className="w-full bg-yellow-500 hover:bg-yellow-600 text-gray-800 font-bold py-4 px-6 rounded-lg text-xl transition duration-150 ease-in-out"
+                                className="w-full bg-[var(--color-accent)] hover:opacity-90 text-[var(--color-primary)] font-bold py-4 px-6 rounded-lg text-xl transition duration-150 ease-in-out"
                             >
                                 LOGIN
                             </button>
@@ -171,19 +218,19 @@ export default function SignInPage() {
                             <button
                                 type="button"
                                 onClick={handleGoogleSignIn}
-                                className="w-full flex items-center justify-center py-3 px-4 m-0 border-2 border-gray-300 rounded-lg bg-white hover:bg-gray-50 transition duration-150 ease-in-out"
+                                className="w-full flex items-center justify-center py-3 px-4 m-0 border-2 border-[var(--color-text)]/30 rounded-lg bg-[var(--color-background)] hover:bg-[var(--color-secondary)]/20 transition duration-150 ease-in-out"
                             >
                                 <FcGoogle className="h-6 w-6 mr-3" />
-                                <span className="text-gray-700 font-medium">Continue with Google</span>
+                                <span className="text-[var(--color-text)] font-medium">Continue with Google</span>
                             </button>
 
                             <button
                                 type="button"
                                 onClick={handleAppleSignIn}
-                                className="w-full flex items-center justify-center py-3 px-4 border-2 border-gray-300 rounded-lg bg-white hover:bg-gray-50 transition duration-150 ease-in-out"
+                                className="w-full flex items-center justify-center py-3 px-4 border-2 border-[var(--color-text)]/30 rounded-lg bg-[var(--color-background)] hover:bg-[var(--color-secondary)]/20 transition duration-150 ease-in-out"
                             >
-                                <FaApple className="h-6 w-6 mr-3 text-gray-800" />
-                                <span className="text-gray-700 font-medium">Continue with Apple</span>
+                                <FaApple className="h-6 w-6 mr-3 text-[var(--color-text)]" />
+                                <span className="text-[var(--color-text)] font-medium">Continue with Apple</span>
                             </button>
                         </div>
 
@@ -191,7 +238,7 @@ export default function SignInPage() {
                         <div className="text-center pt-6">
                             <Link
                                 href="/client/register"
-                                className="text-gray-700 hover:text-blue-600 transition duration-150 ease-in-out font-medium"
+                                className="text-[var(--color-text)] hover:text-[var(--color-accent)] transition duration-150 ease-in-out font-medium"
                             >
                                 Create an account
                             </Link>

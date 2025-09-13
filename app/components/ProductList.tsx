@@ -108,10 +108,10 @@ export function ProductCard({ product }: { product: Product }) {
             )}
             <div className="p-5 flex flex-col flex-grow">
                 <h3 className="text-xl font-bold text-[var(--color-primary)] mb-2 h-14 overflow-hidden line-clamp-2">
-                    {product.name}
+                    <T>{product.name}</T>
                 </h3>
                 <p className="text-sm text-[var(--color-text)] mb-3 h-20 overflow-hidden line-clamp-3 leading-relaxed">
-                    {product.description || <T>No description.</T>}
+                    <T>{product.description || "No description."}</T>
                 </p>
                 <div className="flex items-baseline mt-auto mb-4">
                     <p className="text-2xl font-extrabold text-[var(--color-accent)]">
@@ -128,7 +128,11 @@ export function ProductCard({ product }: { product: Product }) {
                             }
                         `}
                     >
-                        {product.inStock ? <T>In stock</T> : <T>Out of stock</T>}
+                        {product.inStock ? (
+                            <T>In stock</T>
+                        ) : (
+                            <T>Out of stock</T>
+                        )}
                     </span>
                 </div>
                 <div className="flex flex-col gap-2 mt-3">
@@ -145,9 +149,11 @@ export function ProductCard({ product }: { product: Product }) {
                             }
                         `}
                     >
-                        {product.inStock
-                            ? <T>Add to cart</T>
-                            : <T>Out of stock</T>}
+                        {product.inStock ? (
+                            <T>Add to cart</T>
+                        ) : (
+                            <T>Out of stock</T>
+                        )}
                     </button>
                     <Link
                         href={`/client/dashboard/products/${product.id}`}

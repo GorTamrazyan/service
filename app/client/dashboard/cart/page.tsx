@@ -16,13 +16,17 @@ export default function CartPage() {
         clearCart,
     } = useCart();
 
-    // Функция для изменения количества
-    const handleQuantityChange = (
-        id: string,
-        event: React.ChangeEvent<HTMLSelectElement>
-    ) => {
-        const newQuantity = parseInt(event.target.value);
-        updateQuantity(id, newQuantity);
+    // Функции для изменения количества
+    const incrementQuantity = (id: string, currentQuantity: number) => {
+        if (currentQuantity < 100) { // Ограничиваем максимальное количество
+            updateQuantity(id, currentQuantity + 1);
+        }
+    };
+
+    const decrementQuantity = (id: string, currentQuantity: number) => {
+        if (currentQuantity > 1) { // Минимальное количество 1
+            updateQuantity(id, currentQuantity - 1);
+        }
     };
 
     if (cartItems.length === 0) {
@@ -73,63 +77,55 @@ export default function CartPage() {
                                 <p className="text-gray-600">
                                     <T>Price</T>: ${parseFloat(item.price).toFixed(2)}
                                 </p>
-                                <div className="flex items-center mt-2 gap-2">
-                                    <label
-                                        htmlFor={`quantity-${item.id}`}
-                                        className="sr-only"
-                                    >
-                                        <T>Quantity</T>
-                                    </label>
-                                    <div className="relative inline-block w-auto min-w-[5rem]">
-                                        {" "}
-                                        {/* Добавлена обертка для кастомной стрелки и ширины */}
-                                        <select
-                                            id={`quantity-${item.id}`}
-                                            value={item.quantity}
-                                            onChange={(e) =>
-                                                handleQuantityChange(
-                                                    item.id,
-                                                    e as React.ChangeEvent<HTMLSelectElement>
-                                                )
-                                            }
-                                            className="
-            block w-full
-            appearance-none focus:outline-none focus:ring-0 focus:border-0 // Отключаем стандартный вид и фокус
-            pl-3 pr-8 py-2 // Увеличиваем правый отступ для стрелки
-            text-base font-medium text-[var(--color-text)] // Стиль текста
-            bg-white // Белый фон
-            border border-gray-300 rounded-lg // Скругленные углы и граница
-            shadow-sm // Небольшая тень
-            cursor-pointer // Курсор-указатель
-            hover:border-[var(--color-accent)] // Изменение цвета границы при наведении
-            transition-all duration-200 ease-in-out // Плавные переходы
-        "
+                                <div className="flex items-center mt-2 gap-4">
+                                    <div className="flex items-center gap-2">
+                                        <span className="text-sm text-gray-600 mr-2">
+                                            <T>Quantity:</T>
+                                        </span>
+                                        {/* Кнопка уменьшения количества */}
+                                        <button
+                                            onClick={() => decrementQuantity(item.id, item.quantity)}
+                                            disabled={item.quantity <= 1}
+                                            className={`
+                                                flex items-center justify-center
+                                                w-9 h-9 rounded-lg border-2 
+                                                font-bold text-xl
+                                                transition-all duration-200 ease-in-out
+                                                shadow-sm hover:shadow-md
+                                                ${item.quantity <= 1 
+                                                    ? 'border-gray-300 text-gray-300 cursor-not-allowed bg-gray-50' 
+                                                    : 'border-[var(--color-accent)] text-[var(--color-accent)] hover:bg-[var(--color-accent)] hover:text-white cursor-pointer bg-white hover:scale-105 active:scale-95'
+                                                }
+                                            `}
                                         >
-                                            {[...Array(10)].map((_, i) => (
-                                                <option
-                                                    key={i + 1}
-                                                    value={i + 1}
-                                                >
-                                                    {i + 1}
-                                                </option>
-                                            ))}
-                                        </select>
-                                        {/* Кастомная стрелка для select */}
-                                        <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
-                                            <svg
-                                                className="h-5 w-5 text-gray-400"
-                                                xmlns="http://www.w3.org/2000/svg"
-                                                viewBox="0 0 20 20"
-                                                fill="currentColor"
-                                                aria-hidden="true"
-                                            >
-                                                <path
-                                                    fillRule="evenodd"
-                                                    d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-                                                    clipRule="evenodd"
-                                                />
-                                            </svg>
+                                            −
+                                        </button>
+                                        
+                                        {/* Отображение текущего количества */}
+                                        <div className="mx-4 px-3 py-1 bg-gray-50 rounded-lg ">
+                                            <span className="text-lg font-bold text-[var(--color-text)]">
+                                                {item.quantity}
+                                            </span>
                                         </div>
+                                        
+                                        {/* Кнопка увеличения количества */}
+                                        <button
+                                            onClick={() => incrementQuantity(item.id, item.quantity)}
+                                            disabled={item.quantity >= 100}
+                                            className={`
+                                                flex items-center justify-center
+                                                w-9 h-9 rounded-lg border-2 
+                                                font-bold text-xl
+                                                transition-all duration-200 ease-in-out
+                                                shadow-sm hover:shadow-md
+                                                ${item.quantity >= 100
+                                                    ? 'border-gray-300 text-gray-300 cursor-not-allowed bg-gray-50' 
+                                                    : 'border-[var(--color-accent)] text-[var(--color-accent)] hover:bg-[var(--color-accent)] hover:text-white cursor-pointer bg-white hover:scale-105 active:scale-95'
+                                                }
+                                            `}
+                                        >
+                                            +
+                                        </button>
                                     </div>
                                     <button
                                         onClick={() => removeFromCart(item.id)}
