@@ -9,6 +9,7 @@ import React, {
     ReactNode,
     useCallback,
 } from "react";
+import { useAuthState } from "../../hooks/useAuthState";
 
 // Интерфейс для продукта в корзине
 interface CartItem {
@@ -33,6 +34,8 @@ interface CartContextType {
     clearCart: () => void;
     getTotalItems: () => number;
     getTotalPrice: () => number;
+    isAuthenticated: boolean;
+    requiresAuth: (action: string) => boolean;
 }
 
 // Создаем контекст с значениями по умолчанию
@@ -47,6 +50,7 @@ export const CartProvider = ({ children }: CartProviderProps) => {
     // Фактические данные из localStorage будут загружены только на клиенте.
     const [cartItems, setCartItems] = useState<CartItem[]>([]);
     const [isClient, setIsClient] = useState(false); // <--- Добавляем состояние для проверки клиента
+    const [user, loading] = useAuthState();
 
     // Этот useEffect выполняется только на клиенте после монтирования
     useEffect(() => {
@@ -68,6 +72,22 @@ export const CartProvider = ({ children }: CartProviderProps) => {
         }
     }, [cartItems, isClient]); // Зависит от cartItems и isClient
 
+    // Проверка авторизации
+    const isAuthenticated = !loading && !!user;
+
+    // Функция для определения, требует ли действие авторизации
+    const requiresAuth = (action: string) => {
+        const actionsRequiringAuth = ['addToCart', 'removeFromCart', 'updateQuantity', 'clearCart'];
+        return actionsRequiringAuth.includes(action);
+    };
+
+    // Функция для показа предупреждения о необходимости авторизации
+    const showAuthRequired = () => {
+        alert('Для добавления товаров в корзину необходимо войти в аккаунт или зарегистрироваться');
+        // Перенаправляем на страницу входа
+        window.location.href = '/client/sign-in';
+    };
+
     // Добавление продукта в корзину
     const addToCart = useCallback(
         (product: {
@@ -76,6 +96,11 @@ export const CartProvider = ({ children }: CartProviderProps) => {
             price: string;
             imageUrl: string | null;
         }) => {
+            if (!isAuthenticated) {
+                showAuthRequired();
+                return;
+            }
+
             setCartItems((prevItems) => {
                 const existingItem = prevItems.find(
                     (item) => item.id === product.id
@@ -91,16 +116,26 @@ export const CartProvider = ({ children }: CartProviderProps) => {
                 }
             });
         },
-        []
+        [isAuthenticated]
     );
 
     // Удаление продукта из корзины (полностью)
     const removeFromCart = useCallback((id: string) => {
+        if (!isAuthenticated) {
+            showAuthRequired();
+            return;
+        }
+
         setCartItems((prevItems) => prevItems.filter((item) => item.id !== id));
-    }, []);
+    }, [isAuthenticated]);
 
     // Обновление количества продукта
     const updateQuantity = useCallback((id: string, newQuantity: number) => {
+        if (!isAuthenticated) {
+            showAuthRequired();
+            return;
+        }
+
         setCartItems((prevItems) => {
             if (newQuantity <= 0) {
                 return prevItems.filter((item) => item.id !== id); // Удаляем, если количество <= 0
@@ -109,20 +144,23 @@ export const CartProvider = ({ children }: CartProviderProps) => {
                 item.id === id ? { ...item, quantity: newQuantity } : item
             );
         });
-    }, []);
+    }, [isAuthenticated]);
 
     // Очистка всей корзины
     const clearCart = useCallback(() => {
-        setCartItems([]);
-    }, []);
+        if (!isAuthenticated) {
+            showAuthRequired();
+            return;
+        }
 
-    // Получение общего количества товаров
+        setCartItems([]);
+    }, [isAuthenticated]);
+
+    // Получение количества уникальных типов товаров (не общее количество)
     const getTotalItems = useCallback(() => {
         // Возвращаем 0, если мы еще не на клиенте (до гидрации)
         // чтобы сервер и клиент рендерили одно и то же значение по умолчанию
-        return isClient
-            ? cartItems.reduce((total, item) => total + item.quantity, 0)
-            : 0;
+        return isClient ? cartItems.length : 0;
     }, [cartItems, isClient]);
 
     // Получение общей стоимости
@@ -146,6 +184,8 @@ export const CartProvider = ({ children }: CartProviderProps) => {
         clearCart,
         getTotalItems,
         getTotalPrice,
+        isAuthenticated,
+        requiresAuth,
     };
 
     return (

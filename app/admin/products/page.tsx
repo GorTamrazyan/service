@@ -2,57 +2,143 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Plus, Search, Filter, Edit, Trash2, Eye, Package } from "lucide-react";
+import { Plus, Search, Filter, Edit, Trash2, Eye, Package, X } from "lucide-react";
 import { T } from "../../components/T";
-
-interface Product {
-    id: string;
-    name: string;
-    price: number;
-    category: string;
-    stock: number;
-    status: 'active' | 'inactive';
-    image?: string;
-}
+import { 
+    getAllProducts, 
+    createProduct, 
+    deleteProduct, 
+    updateProduct,
+    Product,
+    getAllCategories
+} from "../../lib/firebase/firestore";
 
 export default function AdminProductsPage() {
     const [products, setProducts] = useState<Product[]>([]);
+    const [categories, setCategories] = useState<string[]>([]);
     const [searchQuery, setSearchQuery] = useState("");
     const [selectedCategory, setSelectedCategory] = useState("all");
     const [isLoading, setIsLoading] = useState(true);
+    const [showAddForm, setShowAddForm] = useState(false);
+    const [showEditForm, setShowEditForm] = useState(false);
+    const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+    const [error, setError] = useState("");
+    const [newProduct, setNewProduct] = useState({
+        name: "",
+        description: "",
+        price: "",
+        category: "",
+        imageUrl: ""
+    });
+    const [editProduct, setEditProduct] = useState({
+        name: "",
+        description: "",
+        price: "",
+        category: "",
+        imageUrl: "",
+        inStock: true
+    });
 
     useEffect(() => {
-        // Simulate loading products
-        setTimeout(() => {
-            setProducts([
-                {
-                    id: "1",
-                    name: "Premium Vinyl Fence Panel",
-                    price: 299.99,
-                    category: "vinyl",
-                    stock: 25,
-                    status: "active"
-                },
-                {
-                    id: "2", 
-                    name: "Wood Privacy Fence",
-                    price: 199.99,
-                    category: "wood",
-                    stock: 0,
-                    status: "inactive"
-                },
-                {
-                    id: "3",
-                    name: "Metal Security Fence",
-                    price: 449.99,
-                    category: "metal",
-                    stock: 12,
-                    status: "active"
-                }
-            ]);
-            setIsLoading(false);
-        }, 1000);
+        loadProducts();
+        loadCategories();
     }, []);
+
+    const loadProducts = async () => {
+        try {
+            setIsLoading(true);
+            const productsData = await getAllProducts();
+            setProducts(productsData);
+        } catch (error) {
+            console.error("Error loading products:", error);
+            setError("Failed to load products");
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    const loadCategories = async () => {
+        try {
+            const categoriesData = await getAllCategories();
+            setCategories(categoriesData);
+        } catch (error) {
+            console.error("Error loading categories:", error);
+        }
+    };
+
+    const handleAddProduct = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setError("");
+        
+        try {
+            await createProduct({
+                name: newProduct.name,
+                description: newProduct.description,
+                price: newProduct.price,
+                category: newProduct.category,
+                imageUrl: newProduct.imageUrl,
+                inStock: true
+            });
+            
+            setNewProduct({ name: "", description: "", price: "", category: "", imageUrl: "" });
+            setShowAddForm(false);
+            loadProducts();
+        } catch (error: any) {
+            console.error("Error adding product:", error);
+            setError(error.message || "Failed to add product");
+        }
+    };
+
+    const handleDeleteProduct = async (productId: string, productName: string) => {
+        if (confirm(`Are you sure you want to delete "${productName}"?`)) {
+            try {
+                await deleteProduct(productId);
+                loadProducts();
+            } catch (error: any) {
+                console.error("Error deleting product:", error);
+                setError(error.message || "Failed to delete product");
+            }
+        }
+    };
+
+    const handleEditProduct = (product: Product) => {
+        setEditingProduct(product);
+        setEditProduct({
+            name: product.name,
+            description: product.description || "",
+            price: product.price,
+            category: product.category || "",
+            imageUrl: product.imageUrl || "",
+            inStock: product.inStock
+        });
+        setShowEditForm(true);
+        setError("");
+    };
+
+    const handleUpdateProduct = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!editingProduct?.id) return;
+        
+        setError("");
+        
+        try {
+            await updateProduct(editingProduct.id, {
+                name: editProduct.name,
+                description: editProduct.description,
+                price: editProduct.price,
+                category: editProduct.category,
+                imageUrl: editProduct.imageUrl,
+                inStock: editProduct.inStock
+            });
+            
+            setShowEditForm(false);
+            setEditingProduct(null);
+            loadProducts();
+        } catch (error: any) {
+            console.error("Error updating product:", error);
+            setError(error.message || "Failed to update product");
+        }
+    };
 
     const filteredProducts = products.filter(product => {
         const matchesSearch = product.name.toLowerCase().includes(searchQuery.toLowerCase());
@@ -81,11 +167,21 @@ export default function AdminProductsPage() {
                     </p>
                 </div>
                 
-                <button className="flex items-center gap-2 bg-[var(--color-accent)] text-[var(--color-primary)] px-6 py-3 rounded-xl font-medium hover:opacity-90 transition-opacity">
+                <button 
+                    onClick={() => setShowAddForm(true)}
+                    className="flex items-center gap-2 bg-[var(--color-accent)] text-white px-6 py-3 rounded-xl font-medium hover:opacity-90 transition-opacity"
+                >
                     <Plus className="w-5 h-5" />
                     <T>Add Product</T>
                 </button>
             </div>
+
+            {/* Error Display */}
+            {error && (
+                <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-xl">
+                    {error}
+                </div>
+            )}
 
             {/* Filters */}
             <div className="bg-[var(--color-background)] rounded-2xl shadow-xl border border-[var(--color-text)]/10 p-6">
@@ -111,10 +207,11 @@ export default function AdminProductsPage() {
                             className="appearance-none pl-10 pr-8 py-3 border border-[var(--color-text)]/20 rounded-xl bg-[var(--color-secondary)]/30 text-[var(--color-text)] focus:ring-2 focus:ring-[var(--color-accent)] focus:border-[var(--color-accent)] cursor-pointer min-w-[180px]"
                         >
                             <option value="all">All Categories</option>
-                            <option value="vinyl">Vinyl Fences</option>
-                            <option value="wood">Wood Fences</option>
-                            <option value="metal">Metal Fences</option>
-                            <option value="plastic">Plastic Fences</option>
+                            {categories.map(category => (
+                                <option key={category} value={category}>
+                                    {category.charAt(0).toUpperCase() + category.slice(1)}
+                                </option>
+                            ))}
                         </select>
                     </div>
                 </div>
@@ -136,10 +233,10 @@ export default function AdminProductsPage() {
                                     <T>Price</T>
                                 </th>
                                 <th className="text-left p-6 text-[var(--color-primary)] font-semibold">
-                                    <T>Stock</T>
+                                    <T>Status</T>
                                 </th>
                                 <th className="text-left p-6 text-[var(--color-primary)] font-semibold">
-                                    <T>Status</T>
+                                    <T>Created</T>
                                 </th>
                                 <th className="text-center p-6 text-[var(--color-primary)] font-semibold">
                                     <T>Actions</T>
@@ -180,23 +277,17 @@ export default function AdminProductsPage() {
                                         </span>
                                     </td>
                                     <td className="p-6">
-                                        <span className={`font-medium ${
-                                            product.stock === 0 
-                                                ? 'text-red-500' 
-                                                : product.stock < 10 
-                                                    ? 'text-yellow-500' 
-                                                    : 'text-green-500'
+                                        <span className={`px-3 py-1 rounded-full text-xs font-medium ${
+                                            product.inStock
+                                                ? 'bg-green-100 text-green-600'
+                                                : 'bg-red-100 text-red-600'
                                         }`}>
-                                            {product.stock === 0 ? 'Out of Stock' : `${product.stock} units`}
+                                            {product.inStock ? 'In Stock' : 'Out of Stock'}
                                         </span>
                                     </td>
                                     <td className="p-6">
-                                        <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-                                            product.status === 'active'
-                                                ? 'bg-green-100 text-green-600'
-                                                : 'bg-gray-100 text-gray-600'
-                                        }`}>
-                                            <T>{product.status}</T>
+                                        <span className="text-sm text-[var(--color-text)]/60">
+                                            {new Date(product.createdAt).toLocaleDateString('ru-RU')}
                                         </span>
                                     </td>
                                     <td className="p-6">
@@ -204,10 +295,16 @@ export default function AdminProductsPage() {
                                             <button className="p-2 rounded-lg hover:bg-blue-100 text-blue-600 transition-colors">
                                                 <Eye className="w-4 h-4" />
                                             </button>
-                                            <button className="p-2 rounded-lg hover:bg-green-100 text-green-600 transition-colors">
+                                            <button 
+                                                onClick={() => handleEditProduct(product)}
+                                                className="p-2 rounded-lg hover:bg-green-100 text-green-600 transition-colors"
+                                            >
                                                 <Edit className="w-4 h-4" />
                                             </button>
-                                            <button className="p-2 rounded-lg hover:bg-red-100 text-red-600 transition-colors">
+                                            <button 
+                                                onClick={() => handleDeleteProduct(product.id!, product.name)}
+                                                className="p-2 rounded-lg hover:bg-red-100 text-red-600 transition-colors"
+                                            >
                                                 <Trash2 className="w-4 h-4" />
                                             </button>
                                         </div>
@@ -218,6 +315,246 @@ export default function AdminProductsPage() {
                     </table>
                 </div>
             </div>
+
+            {/* Add Product Modal */}
+            {showAddForm && (
+                <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+                    <div className="bg-[var(--color-background)] rounded-2xl p-6 w-full max-w-md mx-4">
+                        <div className="flex items-center justify-between mb-4">
+                            <h2 className="text-xl font-bold text-[var(--color-primary)]">
+                                <T>Add New Product</T>
+                            </h2>
+                            <button 
+                                onClick={() => setShowAddForm(false)}
+                                className="p-2 hover:bg-[var(--color-secondary)]/20 rounded-lg"
+                            >
+                                <X className="w-5 h-5" />
+                            </button>
+                        </div>
+                        
+                        <form onSubmit={handleAddProduct} className="space-y-4">
+                            <div>
+                                <label className="block text-sm font-medium text-[var(--color-text)] mb-2">
+                                    <T>Product Name</T>
+                                </label>
+                                <input
+                                    type="text"
+                                    value={newProduct.name}
+                                    onChange={(e) => setNewProduct(prev => ({...prev, name: e.target.value}))}
+                                    className="w-full px-4 py-2 border border-[var(--color-text)]/30 rounded-xl bg-[var(--color-background)] text-[var(--color-text)] focus:ring-2 focus:ring-[var(--color-accent)] focus:border-[var(--color-accent)]"
+                                    required
+                                />
+                            </div>
+                            
+                            <div>
+                                <label className="block text-sm font-medium text-[var(--color-text)] mb-2">
+                                    <T>Description</T>
+                                </label>
+                                <textarea
+                                    value={newProduct.description}
+                                    onChange={(e) => setNewProduct(prev => ({...prev, description: e.target.value}))}
+                                    className="w-full px-4 py-2 border border-[var(--color-text)]/30 rounded-xl bg-[var(--color-background)] text-[var(--color-text)] focus:ring-2 focus:ring-[var(--color-accent)] focus:border-[var(--color-accent)] h-20"
+                                    rows={3}
+                                />
+                            </div>
+                            
+                            <div>
+                                <label className="block text-sm font-medium text-[var(--color-text)] mb-2">
+                                    <T>Price</T>
+                                </label>
+                                <input
+                                    type="number"
+                                    step="0.01"
+                                    value={newProduct.price}
+                                    onChange={(e) => setNewProduct(prev => ({...prev, price: e.target.value}))}
+                                    className="w-full px-4 py-2 border border-[var(--color-text)]/30 rounded-xl bg-[var(--color-background)] text-[var(--color-text)] focus:ring-2 focus:ring-[var(--color-accent)] focus:border-[var(--color-accent)]"
+                                    required
+                                />
+                            </div>
+                            
+                            <div>
+                                <label className="block text-sm font-medium text-[var(--color-text)] mb-2">
+                                    <T>Category</T>
+                                </label>
+                                <input
+                                    type="text"
+                                    value={newProduct.category}
+                                    onChange={(e) => setNewProduct(prev => ({...prev, category: e.target.value}))}
+                                    className="w-full px-4 py-2 border border-[var(--color-text)]/30 rounded-xl bg-[var(--color-background)] text-[var(--color-text)] focus:ring-2 focus:ring-[var(--color-accent)] focus:border-[var(--color-accent)]"
+                                    placeholder="e.g. vinyl, wood, metal"
+                                    required
+                                />
+                            </div>
+                            
+                            <div>
+                                <label className="block text-sm font-medium text-[var(--color-text)] mb-2">
+                                    <T>Image URL</T>
+                                </label>
+                                <input
+                                    type="url"
+                                    value={newProduct.imageUrl}
+                                    onChange={(e) => setNewProduct(prev => ({...prev, imageUrl: e.target.value}))}
+                                    className="w-full px-4 py-2 border border-[var(--color-text)]/30 rounded-xl bg-[var(--color-background)] text-[var(--color-text)] focus:ring-2 focus:ring-[var(--color-accent)] focus:border-[var(--color-accent)]"
+                                    placeholder="https://..."
+                                />
+                            </div>
+                            
+                            {error && (
+                                <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-xl text-sm">
+                                    {error}
+                                </div>
+                            )}
+                            
+                            <div className="flex gap-3 pt-4">
+                                <button
+                                    type="submit"
+                                    className="flex-1 bg-[var(--color-accent)] text-white px-4 py-2 rounded-xl hover:opacity-90 transition-opacity"
+                                >
+                                    <T>Add Product</T>
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => setShowAddForm(false)}
+                                    className="flex-1 bg-gray-500 text-white px-4 py-2 rounded-xl hover:opacity-90 transition-opacity"
+                                >
+                                    <T>Cancel</T>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
+
+            {/* Edit Product Modal */}
+            {showEditForm && editingProduct && (
+                <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+                    <div className="bg-[var(--color-background)] rounded-2xl p-6 w-full max-w-md mx-4">
+                        <div className="flex items-center justify-between mb-4">
+                            <h2 className="text-xl font-bold text-[var(--color-primary)]">
+                                <T>Edit Product</T>
+                            </h2>
+                            <button 
+                                onClick={() => {
+                                    setShowEditForm(false);
+                                    setEditingProduct(null);
+                                    setError("");
+                                }}
+                                className="p-2 hover:bg-[var(--color-secondary)]/20 rounded-lg"
+                            >
+                                <X className="w-5 h-5" />
+                            </button>
+                        </div>
+                        
+                        <form onSubmit={handleUpdateProduct} className="space-y-4">
+                            <div>
+                                <label className="block text-sm font-medium text-[var(--color-text)] mb-2">
+                                    <T>Product Name</T>
+                                </label>
+                                <input
+                                    type="text"
+                                    value={editProduct.name}
+                                    onChange={(e) => setEditProduct(prev => ({...prev, name: e.target.value}))}
+                                    className="w-full px-4 py-2 border border-[var(--color-text)]/30 rounded-xl bg-[var(--color-background)] text-[var(--color-text)] focus:ring-2 focus:ring-[var(--color-accent)] focus:border-[var(--color-accent)]"
+                                    required
+                                />
+                            </div>
+                            
+                            <div>
+                                <label className="block text-sm font-medium text-[var(--color-text)] mb-2">
+                                    <T>Description</T>
+                                </label>
+                                <textarea
+                                    value={editProduct.description}
+                                    onChange={(e) => setEditProduct(prev => ({...prev, description: e.target.value}))}
+                                    className="w-full px-4 py-2 border border-[var(--color-text)]/30 rounded-xl bg-[var(--color-background)] text-[var(--color-text)] focus:ring-2 focus:ring-[var(--color-accent)] focus:border-[var(--color-accent)] h-20"
+                                    rows={3}
+                                />
+                            </div>
+                            
+                            <div>
+                                <label className="block text-sm font-medium text-[var(--color-text)] mb-2">
+                                    <T>Price</T>
+                                </label>
+                                <input
+                                    type="number"
+                                    step="0.01"
+                                    value={editProduct.price}
+                                    onChange={(e) => setEditProduct(prev => ({...prev, price: e.target.value}))}
+                                    className="w-full px-4 py-2 border border-[var(--color-text)]/30 rounded-xl bg-[var(--color-background)] text-[var(--color-text)] focus:ring-2 focus:ring-[var(--color-accent)] focus:border-[var(--color-accent)]"
+                                    required
+                                />
+                            </div>
+                            
+                            <div>
+                                <label className="block text-sm font-medium text-[var(--color-text)] mb-2">
+                                    <T>Category</T>
+                                </label>
+                                <input
+                                    type="text"
+                                    value={editProduct.category}
+                                    onChange={(e) => setEditProduct(prev => ({...prev, category: e.target.value}))}
+                                    className="w-full px-4 py-2 border border-[var(--color-text)]/30 rounded-xl bg-[var(--color-background)] text-[var(--color-text)] focus:ring-2 focus:ring-[var(--color-accent)] focus:border-[var(--color-accent)]"
+                                    placeholder="e.g. vinyl, wood, metal"
+                                    required
+                                />
+                            </div>
+                            
+                            <div>
+                                <label className="block text-sm font-medium text-[var(--color-text)] mb-2">
+                                    <T>Image URL</T>
+                                </label>
+                                <input
+                                    type="url"
+                                    value={editProduct.imageUrl}
+                                    onChange={(e) => setEditProduct(prev => ({...prev, imageUrl: e.target.value}))}
+                                    className="w-full px-4 py-2 border border-[var(--color-text)]/30 rounded-xl bg-[var(--color-background)] text-[var(--color-text)] focus:ring-2 focus:ring-[var(--color-accent)] focus:border-[var(--color-accent)]"
+                                    placeholder="https://..."
+                                />
+                            </div>
+                            
+                            <div>
+                                <label className="flex items-center gap-2">
+                                    <input
+                                        type="checkbox"
+                                        checked={editProduct.inStock}
+                                        onChange={(e) => setEditProduct(prev => ({...prev, inStock: e.target.checked}))}
+                                        className="rounded border-[var(--color-text)]/30 text-[var(--color-accent)] focus:ring-[var(--color-accent)]"
+                                    />
+                                    <span className="text-sm font-medium text-[var(--color-text)]">
+                                        <T>In Stock</T>
+                                    </span>
+                                </label>
+                            </div>
+                            
+                            {error && (
+                                <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-xl text-sm">
+                                    {error}
+                                </div>
+                            )}
+                            
+                            <div className="flex gap-3 pt-4">
+                                <button
+                                    type="submit"
+                                    className="flex-1 bg-[var(--color-accent)] text-white px-4 py-2 rounded-xl hover:opacity-90 transition-opacity"
+                                >
+                                    <T>Update Product</T>
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        setShowEditForm(false);
+                                        setEditingProduct(null);
+                                        setError("");
+                                    }}
+                                    className="flex-1 bg-gray-500 text-white px-4 py-2 rounded-xl hover:opacity-90 transition-opacity"
+                                >
+                                    <T>Cancel</T>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
 
             {/* Empty State */}
             {filteredProducts.length === 0 && (

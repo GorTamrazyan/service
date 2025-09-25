@@ -66,8 +66,7 @@ export default function HomePage() {
                     <div
                         className="absolute inset-0 bg-cover bg-center opacity-30"
                         style={{
-                            backgroundImage:
-                                "url('/')",
+                            backgroundImage: "url('/')",
                         }}
                     ></div>
                     <div className="relative z-10">
@@ -79,7 +78,12 @@ export default function HomePage() {
                             !
                         </h1>
                         <p className="text-xl md:text-2xl max-w-4xl mx-auto mb-8">
-                            <T>We offer a full range of fencing solutions, from design and manufacturing to professional installation. Our products combine reliability, aesthetics and functionality.</T>
+                            <T>
+                                We offer a full range of fencing solutions, from
+                                design and manufacturing to professional
+                                installation. Our products combine reliability,
+                                aesthetics and functionality.
+                            </T>
                         </p>
                         <div className="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-6">
                             <Link
@@ -137,7 +141,7 @@ export default function HomePage() {
 
                     {products.length > 0 && (
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-                            {products.map((product) => (
+                            {products.slice(0, 4).map((product) => (
                                 <ProductCard
                                     key={product.id}
                                     product={product}
@@ -171,7 +175,10 @@ export default function HomePage() {
                                     <T>Premium Quality</T>
                                 </h3>
                                 <p className="text-base text-[var(--color-text)]">
-                                    <T>We use only the best materials, ensuring durability and beauty of every fence.</T>
+                                    <T>
+                                        We use only the best materials, ensuring
+                                        durability and beauty of every fence.
+                                    </T>
                                 </p>
                             </div>
                         </div>
@@ -182,7 +189,11 @@ export default function HomePage() {
                                     <T>Full Service</T>
                                 </h3>
                                 <p className="text-base text-[var(--color-text)]">
-                                    <T>From design and manufacturing to installation and maintenance - we provide a comprehensive approach.</T>
+                                    <T>
+                                        From design and manufacturing to
+                                        installation and maintenance - we
+                                        provide a comprehensive approach.
+                                    </T>
                                 </p>
                             </div>
                         </div>
@@ -193,7 +204,11 @@ export default function HomePage() {
                                     <T>Individual Approach</T>
                                 </h3>
                                 <p className="text-base text-[var(--color-text)]">
-                                    <T>Each project is unique, and we carefully consider all your wishes and requirements.</T>
+                                    <T>
+                                        Each project is unique, and we carefully
+                                        consider all your wishes and
+                                        requirements.
+                                    </T>
                                 </p>
                             </div>
                         </div>
@@ -204,7 +219,11 @@ export default function HomePage() {
                                     <T>Reliability Guarantee</T>
                                 </h3>
                                 <p className="text-base text-[var(--color-text)]">
-                                    <T>We provide warranty on all our products and work, confirming our confidence in quality.</T>
+                                    <T>
+                                        We provide warranty on all our products
+                                        and work, confirming our confidence in
+                                        quality.
+                                    </T>
                                 </p>
                             </div>
                         </div>
@@ -215,7 +234,10 @@ export default function HomePage() {
                                     <T>Competitive Prices</T>
                                 </h3>
                                 <p className="text-base text-[var(--color-text)]">
-                                    <T>We offer optimal price-quality ratio, making our fences accessible.</T>
+                                    <T>
+                                        We offer optimal price-quality ratio,
+                                        making our fences accessible.
+                                    </T>
                                 </p>
                             </div>
                         </div>
@@ -226,7 +248,11 @@ export default function HomePage() {
                                     <T>Professional Installation</T>
                                 </h3>
                                 <p className="text-base text-[var(--color-text)]">
-                                    <T>Our teams are experienced specialists who will complete installation quickly and efficiently.</T>
+                                    <T>
+                                        Our teams are experienced specialists
+                                        who will complete installation quickly
+                                        and efficiently.
+                                    </T>
                                 </p>
                             </div>
                         </div>
@@ -239,7 +265,10 @@ export default function HomePage() {
                         <T>What Our Customers Say</T>
                     </h2>
                     <p className="text-xl max-w-2xl mx-auto text-[var(--color-text)]">
-                        <T>See what our satisfied customers have to say about our fencing solutions and service quality.</T>
+                        <T>
+                            See what our satisfied customers have to say about
+                            our fencing solutions and service quality.
+                        </T>
                     </p>
                     <Link
                         href="/client/dashboard/testimonials"
@@ -255,7 +284,10 @@ export default function HomePage() {
                         <T>Start your project today!</T>
                     </h2>
                     <p className="text-xl mb-6">
-                        <T>We are ready to bring your ideas about the perfect fence to life. Contact us for a free consultation.</T>
+                        <T>
+                            We are ready to bring your ideas about the perfect
+                            fence to life. Contact us for a free consultation.
+                        </T>
                     </p>
                     <Link
                         href="/contact"

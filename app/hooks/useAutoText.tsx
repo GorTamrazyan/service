@@ -1,5 +1,6 @@
 "use client";
 
+import React from "react";
 import { useLanguage } from "../contexts/LanguageContext";
 import { useEffect, useState } from "react";
 
@@ -47,20 +48,16 @@ interface AutoTextProps {
     children: string;
     fallback?: string;
     className?: string;
-    as?: keyof JSX.IntrinsicElements;
+    as?: keyof React.JSX.IntrinsicElements;
 }
 
-export function AutoText({ 
-    children, 
-    fallback, 
-    className = "", 
-    as: Component = "span" 
+export function AutoText({
+    children,
+    fallback,
+    className = "",
+    as: Component = "span"
 }: AutoTextProps) {
     const translatedText = useAutoText(children, fallback);
-    
-    return (
-        <Component className={className}>
-            {translatedText}
-        </Component>
-    );
+
+    return React.createElement(Component as React.ElementType, { className }, translatedText);
 }

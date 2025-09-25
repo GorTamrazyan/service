@@ -1,7 +1,6 @@
 // lib/firebase/admin.ts
 import { collection, doc, getDoc, getDocs, setDoc, query, where, addDoc } from "firebase/firestore";
-import { auth, db } from "./firebase";
-import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from "firebase/auth";
+import { db } from "./firebase";
 
 export interface AdminUser {
     id: string;
@@ -9,16 +8,16 @@ export interface AdminUser {
     username: string;
     role: 'super_admin' | 'admin' | 'moderator';
     permissions: string[];
-    createdAt: Date;
-    lastLoginAt?: Date;
+    createdAt: Date | any; // Firestore Timestamp or Date
+    lastLoginAt?: Date | any; // Firestore Timestamp or Date
     isActive: boolean;
 }
 
 export interface AdminSession {
     adminId: string;
     sessionToken: string;
-    createdAt: Date;
-    expiresAt: Date;
+    createdAt: Date | any; // Firestore Timestamp or Date
+    expiresAt: Date | any; // Firestore Timestamp or Date
     isActive: boolean;
 }
 
@@ -26,36 +25,37 @@ export interface AdminSession {
 const ADMIN_COLLECTION = "admins";
 const ADMIN_SESSIONS_COLLECTION = "admin_sessions";
 
-// Create an admin user (only for initial setup)
+// Create an admin user (только Firestore, без Firebase Auth)
 export const createAdminUser = async (
-    email: string, 
-    password: string, 
-    username: string, 
+    email: string,
+    password: string,
+    username: string,
     role: AdminUser['role'] = 'admin'
 ): Promise<AdminUser> => {
     try {
-        // Create Firebase Auth user
-        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-        const firebaseUser = userCredential.user;
-
-        // Create admin document in Firestore
-        const adminData: Omit<AdminUser, 'id'> = {
+        // Create admin document in Firestore (без Firebase Auth)
+        const adminData = {
             email,
             username,
+            password, // В продакшене используйте bcrypt!
             role,
             permissions: getPermissionsForRole(role),
             createdAt: new Date(),
             isActive: true
         };
 
-        const adminDocRef = doc(db, ADMIN_COLLECTION, firebaseUser.uid);
-        await setDoc(adminDocRef, adminData);
+        const adminDocRef = await addDoc(collection(db, ADMIN_COLLECTION), adminData);
 
         console.log("✅ Admin user created successfully:", adminData);
 
         return {
-            id: firebaseUser.uid,
-            ...adminData
+            id: adminDocRef.id,
+            email: adminData.email,
+            username: adminData.username,
+            role: adminData.role,
+            permissions: adminData.permissions,
+            createdAt: adminData.createdAt,
+            isActive: adminData.isActive
         };
     } catch (error) {
         console.error("❌ Error creating admin user:", error);
@@ -94,37 +94,46 @@ const getPermissionsForRole = (role: AdminUser['role']): string[] => {
     }
 };
 
-// Login admin user
+// Login admin user (без Firebase Auth, только Firestore)
 export const loginAdmin = async (email: string, password: string): Promise<{
     admin: AdminUser;
     sessionToken: string;
 }> => {
     try {
-        // Sign in with Firebase Auth
-        const userCredential = await signInWithEmailAndPassword(auth, email, password);
-        const firebaseUser = userCredential.user;
+        // Find admin by email in Firestore
+        const adminsRef = collection(db, ADMIN_COLLECTION);
+        const adminQuery = query(adminsRef, where("email", "==", email));
+        const adminSnapshot = await getDocs(adminQuery);
 
-        // Get admin data from Firestore
-        const adminDocRef = doc(db, ADMIN_COLLECTION, firebaseUser.uid);
-        const adminDoc = await getDoc(adminDocRef);
-
-        if (!adminDoc.exists()) {
+        if (adminSnapshot.empty) {
             throw new Error("Admin account not found");
         }
 
-        const adminData = adminDoc.data() as Omit<AdminUser, 'id'>;
-        
+        const adminDoc = adminSnapshot.docs[0];
+        const adminData = adminDoc.data() as Omit<AdminUser, 'id'> & { password: string };
+
+        // Verify password (in production, use bcrypt!)
+        if (adminData.password !== password) {
+            throw new Error("Invalid password");
+        }
+
         if (!adminData.isActive) {
             throw new Error("Admin account is deactivated");
         }
 
         const admin: AdminUser = {
-            id: firebaseUser.uid,
-            ...adminData
+            id: adminDoc.id,
+            email: adminData.email,
+            username: adminData.username,
+            role: adminData.role,
+            permissions: adminData.permissions,
+            createdAt: adminData.createdAt,
+            lastLoginAt: adminData.lastLoginAt,
+            isActive: adminData.isActive
         };
 
         // Update last login time
-        await setDoc(adminDocRef, {
+        await setDoc(doc(db, ADMIN_COLLECTION, adminDoc.id), {
             ...adminData,
             lastLoginAt: new Date()
         });
@@ -132,7 +141,7 @@ export const loginAdmin = async (email: string, password: string): Promise<{
         // Create session
         const sessionToken = generateSessionToken();
         const session: Omit<AdminSession, 'id'> = {
-            adminId: firebaseUser.uid,
+            adminId: adminDoc.id,
             sessionToken,
             createdAt: new Date(),
             expiresAt: new Date(Date.now() + 8 * 60 * 60 * 1000), // 8 hours
@@ -173,7 +182,8 @@ export const verifyAdminSession = async (sessionToken: string): Promise<AdminUse
         const sessionData = sessionDoc.data() as AdminSession;
 
         // Check if session is expired
-        if (new Date() > sessionData.expiresAt.toDate()) {
+        const expiresAt = toDate(sessionData.expiresAt);
+        if (new Date() > expiresAt) {
             // Deactivate expired session
             await setDoc(doc(db, ADMIN_SESSIONS_COLLECTION, sessionDoc.id), {
                 ...sessionData,
@@ -206,19 +216,19 @@ export const verifyAdminSession = async (sessionToken: string): Promise<AdminUse
     }
 };
 
-// Logout admin
+// Logout admin (без Firebase Auth)
 export const logoutAdmin = async (sessionToken: string): Promise<void> => {
     try {
         // Find and deactivate session
         const sessionsRef = collection(db, ADMIN_SESSIONS_COLLECTION);
         const sessionQuery = query(
-            sessionsRef, 
+            sessionsRef,
             where("sessionToken", "==", sessionToken),
             where("isActive", "==", true)
         );
-        
+
         const sessionSnapshot = await getDocs(sessionQuery);
-        
+
         for (const sessionDoc of sessionSnapshot.docs) {
             await setDoc(doc(db, ADMIN_SESSIONS_COLLECTION, sessionDoc.id), {
                 ...sessionDoc.data(),
@@ -226,9 +236,6 @@ export const logoutAdmin = async (sessionToken: string): Promise<void> => {
             });
         }
 
-        // Sign out from Firebase Auth
-        await auth.signOut();
-        
         console.log("✅ Admin logged out successfully");
     } catch (error) {
         console.error("❌ Error logging out admin:", error);
@@ -257,10 +264,23 @@ export const getAllAdmins = async (): Promise<AdminUser[]> => {
     }
 };
 
+// Helper function to convert Firestore Timestamp to Date
+const toDate = (dateField: Date | any): Date => {
+    if (dateField instanceof Date) {
+        return dateField;
+    }
+    if (dateField && typeof dateField.toDate === 'function') {
+        return dateField.toDate();
+    }
+    // Fallback to current date if conversion fails
+    console.warn('Could not convert date field, using current date');
+    return new Date();
+};
+
 // Generate random session token
 const generateSessionToken = (): string => {
-    return Math.random().toString(36).substring(2, 15) + 
-           Math.random().toString(36).substring(2, 15) + 
+    return Math.random().toString(36).substring(2, 15) +
+           Math.random().toString(36).substring(2, 15) +
            Date.now().toString(36);
 };
 
@@ -273,14 +293,14 @@ export const initializeDefaultAdmin = async () => {
         if (adminsSnapshot.empty) {
             console.log("🔧 No admins found, creating default admin...");
             await createAdminUser(
-                "admin@oniksvinyl.com",
-                "admin123456",
+                "gor.tamrazyan5@mail.ru",
+                "123321",
                 "admin",
                 "super_admin"
             );
             console.log("✅ Default admin created successfully!");
-            console.log("📧 Email: admin@oniksvinyl.com");
-            console.log("🔑 Password: admin123456");
+            console.log("📧 Email: gor.tamrazyan5@mail.ru");
+            console.log("🔑 Password: 123321");
         } else {
             console.log("ℹ️ Admin users already exist");
         }

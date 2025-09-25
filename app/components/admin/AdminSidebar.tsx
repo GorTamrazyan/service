@@ -16,6 +16,7 @@ import {
     ChevronRight
 } from "lucide-react";
 import { T } from "../T";
+import { logoutAdmin } from "../../lib/firebase/admin";
 
 const menuItems = [
     {
@@ -135,10 +136,22 @@ export default function AdminSidebar() {
                 {/* Logout */}
                 <div className="p-4 border-t border-[var(--color-text)]/10">
                     <button 
-                        onClick={() => {
-                            localStorage.removeItem("adminSessionToken");
-                            localStorage.removeItem("adminUser");
-                            window.location.href = "/admin/login";
+                        onClick={async () => {
+                            try {
+                                const sessionToken = localStorage.getItem("adminSessionToken");
+                                if (sessionToken) {
+                                    await logoutAdmin(sessionToken);
+                                }
+                                localStorage.removeItem("adminSessionToken");
+                                localStorage.removeItem("adminUser");
+                                window.location.href = "/admin/login";
+                            } catch (error) {
+                                console.error("Logout error:", error);
+                                // Even if logout fails, clear local storage and redirect
+                                localStorage.removeItem("adminSessionToken");
+                                localStorage.removeItem("adminUser");
+                                window.location.href = "/admin/login";
+                            }
                         }}
                         className={`flex items-center gap-3 px-4 py-3 rounded-xl w-full transition-colors hover:bg-red-500/10 text-red-500 hover:text-red-600 ${
                             isCollapsed ? 'justify-center' : ''

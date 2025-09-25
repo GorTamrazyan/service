@@ -6,15 +6,13 @@ import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { FaSearch, FaShoppingCart, FaUserCircle, FaBars, FaTimes } from "react-icons/fa";
 import { useCart } from "../client/context/CartContext";
-import { useLanguage } from "../contexts/LanguageContext";
 import { T } from "./T";
 
 export default function Header() {
     const pathname = usePathname();
     const [isSearchOpen, setIsSearchOpen] = useState(false);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-    const { getTotalItems } = useCart();
-    const { language } = useLanguage();
+    const { getTotalItems, isAuthenticated } = useCart();
 
     const getLinkClassName = (expectedPaths: string | string[]) => {
         const baseClasses =
@@ -53,7 +51,7 @@ export default function Header() {
     };
 
     return (
-        <header className="fixed top-0 left-0 w-full shadow-md py-4 px-8 flex flex-col bg-[var(--color-primary)] z-50">
+        <header className="fixed top-0 left-0 w-full shadow-md py-4 px-8 flex flex-col bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-accent)] z-50">
             <div className="flex justify-between items-center w-full">
                 {/* Mobile menu button - only visible on small screens */}
                 <div className="flex items-center md:hidden">
@@ -62,7 +60,11 @@ export default function Header() {
                         aria-label="Меню"
                         className="text-[var(--color-background)] hover:text-[var(--color-accent)] transition-colors duration-200 mr-4"
                     >
-                        {isMobileMenuOpen ? <FaTimes className="w-5 h-5" /> : <FaBars className="w-5 h-5" />}
+                        {isMobileMenuOpen ? (
+                            <FaTimes className="w-5 h-5" />
+                        ) : (
+                            <FaBars className="w-5 h-5" />
+                        )}
                     </button>
                 </div>
 
@@ -118,18 +120,28 @@ export default function Header() {
                 {/* Icons (for mobile/tablet and other actions) */}
                 <div className="flex-shrink-0 flex items-center space-x-6">
                     {/* Cart icon - hidden on mobile since it's duplicated below */}
-                    <Link
-                        href="/client/dashboard/cart"
-                        aria-label="Корзина"
-                        className="relative text-white hover:text-[var(--color-accent)] transition-colors duration-200 hidden md:inline-flex"
-                    >
-                        <FaShoppingCart className="w-5 h-5" />
-                        {getTotalItems() > 0 && (
-                            <span className="absolute -top-2 -right-2 bg-red-600 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
-                                {getTotalItems()}
-                            </span>
-                        )}
-                    </Link>
+                    {isAuthenticated ? (
+                        <Link
+                            href="/client/dashboard/cart"
+                            aria-label="Корзина"
+                            className="relative text-white hover:text-[var(--color-accent)] transition-colors duration-200 hidden md:inline-flex"
+                        >
+                            <FaShoppingCart className="w-5 h-5" />
+                            {getTotalItems() > 0 && (
+                                <span className="absolute -top-2 -right-2 bg-red-600 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
+                                    {getTotalItems()}
+                                </span>
+                            )}
+                        </Link>
+                    ) : (
+                        <button
+                            onClick={() => alert('Войдите в аккаунт для доступа к корзине')}
+                            aria-label="Корзина"
+                            className="relative text-white/60 hover:text-[var(--color-accent)] transition-colors duration-200 hidden md:inline-flex cursor-pointer"
+                        >
+                            <FaShoppingCart className="w-5 h-5" />
+                        </button>
+                    )}
                     <button
                         aria-label="Поиск"
                         onClick={toggleSearch}
@@ -138,31 +150,59 @@ export default function Header() {
                         <FaSearch className="w-5 h-5" />
                     </button>
                     {/* Cart icon for mobile - only show on mobile */}
-                    <Link
-                        href="/client/dashboard/cart"
-                        aria-label="Корзина"
-                        className="relative text-white hover:text-[var(--color-accent)] transition-colors duration-200 md:hidden"
-                    >
-                        <FaShoppingCart className="w-5 h-5" />
-                        {getTotalItems() > 0 && (
-                            <span className="absolute -top-2 -right-2 bg-red-600 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
-                                {getTotalItems()}
-                            </span>
-                        )}
-                    </Link>
-                    <Link
-                        href="/client/dashboard/profile"
-                        aria-label="Профиль"
-                        className="text-[var(--color-background)] hover:text-[var(--color-accent)] transition-colors duration-200"
-                    >
-                        <FaUserCircle className="w-6 h-6" />
-                    </Link>
+                    {isAuthenticated ? (
+                        <Link
+                            href="/client/dashboard/cart"
+                            aria-label="Корзина"
+                            className="relative text-white hover:text-[var(--color-accent)] transition-colors duration-200 md:hidden"
+                        >
+                            <FaShoppingCart className="w-5 h-5" />
+                            {getTotalItems() > 0 && (
+                                <span className="absolute -top-2 -right-2 bg-red-600 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
+                                    {getTotalItems()}
+                                </span>
+                            )}
+                        </Link>
+                    ) : (
+                        <button
+                            onClick={() => alert('Войдите в аккаунт для доступа к корзине')}
+                            aria-label="Корзина"
+                            className="relative text-white/60 hover:text-[var(--color-accent)] transition-colors duration-200 md:hidden cursor-pointer"
+                        >
+                            <FaShoppingCart className="w-5 h-5" />
+                        </button>
+                    )}
+                    {isAuthenticated ? (
+                        <Link
+                            href="/client/dashboard/profile"
+                            aria-label="Профиль"
+                            className="text-[var(--color-background)] hover:text-[var(--color-accent)] transition-colors duration-200"
+                        >
+                            <FaUserCircle className="w-6 h-6" />
+                        </Link>
+                    ) : (
+                        <div className="flex items-center space-x-2">
+                            <Link
+                                href="/client/sign-in"
+                                className="text-[var(--color-background)] hover:text-[var(--color-accent)] transition-colors duration-200 text-sm font-medium"
+                            >
+                                <T>Sign In</T>
+                            </Link>
+                            <span className="text-[var(--color-background)]">|</span>
+                            <Link
+                                href="/client/register"
+                                className="text-[var(--color-background)] hover:text-[var(--color-accent)] transition-colors duration-200 text-sm font-medium"
+                            >
+                                <T>Register</T>
+                            </Link>
+                        </div>
+                    )}
                 </div>
             </div>
             {/* Search input field */}
             <div
                 className={`
-                    absolute top-full left-0 w-full bg-[var(--color-primary)] px-8 py-3 overflow-hidden transition-all duration-300 ease-in-out
+                    absolute top-full left-0 w-full bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-accent)] px-8 py-3 overflow-hidden transition-all duration-300 ease-in-out
                     ${
                         isSearchOpen
                             ? "max-h-20 opacity-100"
@@ -192,28 +232,36 @@ export default function Header() {
                 <nav className="flex flex-col py-4 px-8 space-y-4">
                     <Link
                         href="/client/dashboard/home"
-                        className={`${getLinkClassName("/client/dashboard/home")} py-2 border-b border-[var(--color-background)]/20`}
+                        className={`${getLinkClassName(
+                            "/client/dashboard/home"
+                        )} py-2 border-b border-[var(--color-background)]/20`}
                         onClick={() => setIsMobileMenuOpen(false)}
                     >
                         <T>Home</T>
                     </Link>
                     <Link
                         href="/client/dashboard/products"
-                        className={`${getLinkClassName("/client/dashboard/products")} py-2 border-b border-[var(--color-background)]/20`}
+                        className={`${getLinkClassName(
+                            "/client/dashboard/products"
+                        )} py-2 border-b border-[var(--color-background)]/20`}
                         onClick={() => setIsMobileMenuOpen(false)}
                     >
                         <T>Products</T>
                     </Link>
                     <Link
                         href="/client/dashboard/service"
-                        className={`${getLinkClassName("/client/dashboard/service")} py-2 border-b border-[var(--color-background)]/20`}
+                        className={`${getLinkClassName(
+                            "/client/dashboard/service"
+                        )} py-2 border-b border-[var(--color-background)]/20`}
                         onClick={() => setIsMobileMenuOpen(false)}
                     >
                         <T>Service</T>
                     </Link>
                     <Link
                         href="/client/dashboard/about"
-                        className={`${getLinkClassName("/client/dashboard/about")} py-2`}
+                        className={`${getLinkClassName(
+                            "/client/dashboard/about"
+                        )} py-2`}
                         onClick={() => setIsMobileMenuOpen(false)}
                     >
                         <T>About us</T>

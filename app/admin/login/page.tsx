@@ -1,11 +1,11 @@
 // admin/login/page.tsx
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Shield, Eye, EyeOff, Lock, Mail } from "lucide-react";
 import { T } from "../../components/T";
-import { loginAdmin, initializeDefaultAdmin } from "../../lib/firebase/admin";
+import { loginAdmin } from "../../lib/firebase/admin";
 
 export default function AdminLogin() {
     const [credentials, setCredentials] = useState({
@@ -17,10 +17,7 @@ export default function AdminLogin() {
     const [isLoading, setIsLoading] = useState(false);
     const router = useRouter();
 
-    useEffect(() => {
-        // Initialize default admin on first load
-        initializeDefaultAdmin();
-    }, []);
+    // Removed automatic admin initialization
 
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -139,19 +136,8 @@ export default function AdminLogin() {
                         </button>
                     </form>
 
-                    {/* Demo Credentials */}
-                    <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-xl">
-                        <p className="text-sm text-blue-700 font-medium mb-2">
-                            <T>Demo Credentials:</T>
-                        </p>
-                        <div className="text-sm text-blue-600 space-y-1">
-                            <p><strong>Email:</strong> admin@oniksvinyl.com</p>
-                            <p><strong>Password:</strong> admin123456</p>
-                        </div>
-                        <p className="text-xs text-blue-500 mt-2">
-                            <T>Default admin will be created automatically on first load</T>
-                        </p>
-                    </div>
+                    
+                    
                 </div>
 
                 {/* Back to Site */}

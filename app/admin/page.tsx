@@ -2,10 +2,11 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { 
-    Users, 
-    Package, 
-    ShoppingCart, 
+import { useRouter } from "next/navigation";
+import {
+    Users,
+    Package,
+    ShoppingCart,
     DollarSign,
     TrendingUp,
     Activity,
@@ -13,6 +14,22 @@ import {
     BarChart3
 } from "lucide-react";
 import { T } from "../components/T";
+
+import {
+    Product,
+    getAllProducts,
+} from "../lib/firebase/firestore";
+
+import {
+    getAllUsers,
+    User,
+} from "../lib/firebase/users";
+
+import {
+    getAllOrders, 
+    Order
+} from "../lib/firebase/orders";
+
 
 interface StatsData {
     totalUsers: number;
@@ -22,6 +39,10 @@ interface StatsData {
 }
 
 export default function AdminDashboard() {
+    const [products, setProducts] = useState<Product[]>([]);
+    const [users,setUser]= useState<User[]>([]);
+    const [orders, setOrders] = useState<Order[]>([]);
+    const router = useRouter();
     const [stats, setStats] = useState<StatsData>({
         totalUsers: 0,
         totalProducts: 0,
@@ -32,16 +53,35 @@ export default function AdminDashboard() {
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
-        // Simulate loading data
-        setTimeout(() => {
-            setStats({
-                totalUsers: 247,
-                totalProducts: 3,
-                totalOrders: 84,
-                totalRevenue: 12580
-            });
-            setIsLoading(false);
-        }, 1000);
+        // Load products from database
+        const loadData = async () => {
+            try {
+                const productsData = await getAllProducts();
+                setProducts(productsData);
+                const ordersData = await getAllOrders();
+                setOrders(ordersData);
+                const usersData = await getAllUsers();
+                setUser(usersData);
+
+                // Вычисляем доход из доставленных заказов
+                const revenue = ordersData
+                    .filter(order => order.status === 'delivered')
+                    .reduce((sum, order) => sum + parseFloat(order.totalPrice), 0);
+
+                setStats({
+                    totalUsers: usersData.length,
+                    totalProducts: productsData.length,
+                    totalOrders: ordersData.length,
+                    totalRevenue: revenue
+                });
+                setIsLoading(false);
+            } catch (error) {
+                console.error("Error loading data:", error);
+                setIsLoading(false);
+            }
+        };
+
+        loadData();
     }, []);
 
     const statsCards = [
@@ -208,7 +248,7 @@ export default function AdminDashboard() {
                 </h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                     {[
-                        { title: "Add Product", icon: Package, href: "/admin/products/new" },
+                        { title: "Add Product", icon: Package, href: "/admin/products" },
                         { title: "View Orders", icon: ShoppingCart, href: "/admin/orders" },
                         { title: "Manage Users", icon: Users, href: "/admin/users" },
                         { title: "View Reports", icon: BarChart3, href: "/admin/reports" }
@@ -217,6 +257,7 @@ export default function AdminDashboard() {
                         return (
                             <button
                                 key={index}
+                                onClick={() => router.push(action.href)}
                                 className="flex items-center gap-3 p-4 rounded-xl border border-[var(--color-text)]/20 hover:bg-[var(--color-secondary)]/30 hover:border-[var(--color-accent)]/50 transition-all duration-200 group"
                             >
                                 <Icon className="w-5 h-5 text-[var(--color-accent)] group-hover:scale-110 transition-transform" />

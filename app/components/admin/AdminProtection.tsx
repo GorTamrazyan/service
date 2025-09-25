@@ -23,12 +23,12 @@ export default function AdminProtection({ children }: AdminProtectionProps) {
 
         const checkAuth = () => {
             try {
-                const isAdmin = localStorage.getItem("isAdmin");
+                const sessionToken = localStorage.getItem("adminSessionToken");
                 const adminUser = localStorage.getItem("adminUser");
-                
-                console.log("Checking auth:", { isAdmin, adminUser });
-                
-                if (isAdmin === "true" && adminUser) {
+
+                console.log("Checking auth:", { sessionToken, adminUser });
+
+                if (sessionToken && adminUser) {
                     try {
                         const userData = JSON.parse(adminUser);
                         const loginTime = new Date(userData.loginTime);
@@ -44,13 +44,13 @@ export default function AdminProtection({ children }: AdminProtectionProps) {
                         } else {
                             console.log("Session expired");
                             // Clear expired session
-                            localStorage.removeItem("isAdmin");
+                            localStorage.removeItem("adminSessionToken");
                             localStorage.removeItem("adminUser");
                             setIsAuthenticated(false);
                         }
                     } catch (parseError) {
                         console.error("Error parsing admin user data:", parseError);
-                        localStorage.removeItem("isAdmin");
+                        localStorage.removeItem("adminSessionToken");
                         localStorage.removeItem("adminUser");
                         setIsAuthenticated(false);
                     }

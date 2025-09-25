@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { LanguageProvider } from "./contexts/LanguageContext";
+import { CartProvider } from "./client/context/CartContext";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -29,9 +30,11 @@ export default function RootLayout({
               className={`${geistSans.variable} ${geistMono.variable} antialiased`}
           >
               <LanguageProvider>
-                  <main>
-                      {children}
-                  </main>
+                  <CartProvider>
+                      <main>
+                          {children}
+                      </main>
+                  </CartProvider>
               </LanguageProvider>
           </body>
       </html>

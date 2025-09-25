@@ -10,6 +10,7 @@ import SidebarNavigation from "../../../components/profile/SidebarNavigation";
 import ProfileContent from "../../../components/profile/ProfileContent";
 import { UserProfile } from "../../../types/profile";
 import { useLanguage } from "../../../contexts/LanguageContext";
+import { T } from "@/app/components/T";
 
 export default function ProfilePage() {
     const { t } = useLanguage();
@@ -134,7 +135,7 @@ export default function ProfilePage() {
     const handleLogout = async () => {
         try {
             await auth.signOut();
-            router.push("/client/sign-in");
+            router.push("/");
         } catch (err: any) {
             setError("Ошибка при выходе: " + err.message);
             console.error(err);
@@ -162,7 +163,7 @@ export default function ProfilePage() {
     if (loading) {
         return (
             <div className="flex justify-center items-center min-h-screen bg-[var(--color-background)]">
-                <p className="text-xl text-[var(--color-text)]">{t('common.profile.loading')}</p>
+                <p className="text-xl text-[var(--color-text)]"><T>Loading profile...</T></p>
             </div>
         );
     }

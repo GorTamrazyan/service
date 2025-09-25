@@ -1,9 +1,10 @@
 // app/layout.tsx
-import { Inter } from "next/font/google"; // Пример импорта шрифта
-import FirebaseAnalyticsInitializer from "../../components/FirebaseAnalyticsInitializer"; // <--- Импортируем наш новый компонент
+import { Inter } from "next/font/google"; 
+import FirebaseAnalyticsInitializer from "../../components/FirebaseAnalyticsInitializer"; 
 import { CartProvider } from "../context/CartContext";
-import Header from "../../components/Header"; // Если у вас есть общий Header
-import Footer from "../../components/Footer"; // Импортируем Footer
+import Header from "../../components/Header"; 
+import Footer from "../../components/Footer"; 
+import GuestBrowsingWrapper from "../../components/GuestBrowsingWrapper";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -19,17 +20,16 @@ export default function RootLayout({
 }) {
     return (
        <div className="min-h-screen flex flex-col">
-                <CartProvider>
-                    <Header /> {/* Если у вас есть общий Header */}
-                    <main className="flex-1 p-10">
-                        {children}
-                    </main>
-                    <Footer />
-                </CartProvider>
-                {/* <Suspense fallback={null}> */}
+                <GuestBrowsingWrapper>
+                    <CartProvider>
+                        <Header />
+                        <main className="flex-1 p-10">
+                            {children}
+                        </main>
+                        <Footer />
+                    </CartProvider>
+                </GuestBrowsingWrapper>
                 <FirebaseAnalyticsInitializer />{" "}
-                {/* <--- ДОБАВЛЕНО: Инициализация Analytics здесь */}
-                {/* </Suspense> */}
             </div>
     );
 }

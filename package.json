@@ -10,7 +10,8 @@
     "translate": "node scripts/smart-translate.js",
     "translate:add": "node scripts/smart-translate.js add",
     "migrate:firestore": "node scripts/client-migrate-to-firestore.js",
-    "migrate:firestore:clear": "node scripts/client-migrate-to-firestore.js --clear"
+    "migrate:firestore:clear": "node scripts/client-migrate-to-firestore.js --clear",
+    "create-admin": "node app/scripts/create-admin.js"
   },
   "dependencies": {
     "@prisma/client": "^6.12.0",

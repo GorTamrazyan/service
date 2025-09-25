@@ -3,26 +3,41 @@
 import { useState } from "react";
 import React from "react";
 import { auth } from "../../lib/firebase/firebase";
-import { createUserWithEmailAndPassword } from "firebase/auth";
+import { createUserWithEmailAndPassword, sendEmailVerification } from "firebase/auth";
 import {
     GoogleAuthProvider,
     signInWithPopup,
     OAuthProvider,
 } from "firebase/auth";
-import { doc, setDoc, getDoc } from "firebase/firestore";
+import { doc, setDoc, getDoc, query, where, collection, getDocs } from "firebase/firestore";
 import { db } from "../../lib/firebase/firebase";
 import { FcGoogle } from "react-icons/fc";
 import { FaApple } from "react-icons/fa";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import EmailDiagnostics from "../../components/EmailDiagnostics";
 
 export default function RegisterPage() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
     const [error, setError] = useState("");
+    const [verificationSent, setVerificationSent] = useState(false);
 
     const router = useRouter();
+
+    // Функция для проверки существования email в базе данных
+    const checkEmailExists = async (email: string) => {
+        try {
+            const usersRef = collection(db, "users");
+            const q = query(usersRef, where("email", "==", email));
+            const querySnapshot = await getDocs(q);
+            return !querySnapshot.empty;
+        } catch (error) {
+            console.error("Ошибка при проверке email:", error);
+            return false;
+        }
+    };
 
     // Функция для создания профиля пользователя в Firestore (если не существует)
     const createUserProfile = async (userId: string, email: string) => {
@@ -68,6 +83,13 @@ export default function RegisterPage() {
         setError("");
 
         try {
+            // Проверяем, существует ли уже email в базе данных
+            const emailExists = await checkEmailExists(email);
+            if (emailExists) {
+                setError("Пользователь с таким email уже существует.");
+                return;
+            }
+
             const userCredential = await createUserWithEmailAndPassword(
                 auth,
                 email,
@@ -75,13 +97,34 @@ export default function RegisterPage() {
             );
             const user = userCredential.user;
             console.log("Успешная регистрация через Email/Пароль:", user);
-            
+
             // Создаем профиль пользователя в Firestore
             await createUserProfile(user.uid, email);
-            
-            router.push("/client/dashboard/home");
+
+            // Отправляем email для верификации
+            try {
+                await sendEmailVerification(user, {
+                    url: `${window.location.origin}/client/dashboard/home`,
+                    handleCodeInApp: false, // Изменено на false
+                });
+
+                setVerificationSent(true);
+                console.log("✅ Email для верификации успешно отправлен на:", email);
+                console.log("📧 Проверьте папку 'Входящие' и 'Спам'");
+            } catch (emailError: any) {
+                console.error("❌ Ошибка отправки email:", emailError);
+                setError(`Регистрация успешна, но не удалось отправить email для подтверждения: ${emailError.message}`);
+                // Не устанавливаем verificationSent как true при ошибке
+            }
+
+            // Не перенаправляем сразу на dashboard, пока email не подтвержден
+
         } catch (firebaseError: any) {
-            setError(firebaseError.message);
+            if (firebaseError.code === 'auth/email-already-in-use') {
+                setError("Пользователь с таким email уже существует.");
+            } else {
+                setError(firebaseError.message);
+            }
             console.error(
                 "Ошибка регистрации через Email/Пароль:",
                 firebaseError
@@ -251,6 +294,33 @@ export default function RegisterPage() {
                             </div>
                         )}
 
+                        {/* Verification sent message */}
+                        {verificationSent && (
+                            <div className="space-y-4">
+                                <div className="bg-green-50 border border-green-200 text-green-600 px-4 py-3 rounded-lg text-sm">
+                                    <p className="mb-3">Регистрация успешна! Проверьте вашу почту и перейдите по ссылке для подтверждения email.</p>
+                                    <div className="flex gap-2">
+                                        <Link
+                                            href="/client/sign-in"
+                                            className="inline-block bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded transition duration-150 ease-in-out"
+                                        >
+                                            Перейти к входу
+                                        </Link>
+                                    </div>
+                                </div>
+
+                                {/* Email Diagnostics */}
+                                <details className="mt-4">
+                                    <summary className="cursor-pointer text-blue-600 hover:text-blue-800 font-medium">
+                                        🔧 Не получили email? Нажмите для диагностики
+                                    </summary>
+                                    <div className="mt-3">
+                                        <EmailDiagnostics />
+                                    </div>
+                                </details>
+                            </div>
+                        )}
+
                         {/* Register button */}
                         <div className="pt-4">
                             <button
@@ -266,7 +336,7 @@ export default function RegisterPage() {
                             <button
                                 type="button"
                                 onClick={handleGoogleSignIn}
-                                className="w-full flex items-center justify-center py-3 px-4 m-0 border-2 border-[var(--color-text)]/30 rounded-lg bg-[var(--color-background)] hover:bg-[var(--color-secondary)]/20 transition duration-150 ease-in-out"
+                                className="w-full flex items-center justify-center py-3 px-4 m-1 border-2 border-[var(--color-text)]/30 rounded-lg bg-[var(--color-background)] hover:bg-[var(--color-secondary)]/20 transition duration-150 ease-in-out"
                             >
                                 <FcGoogle className="h-6 w-6 mr-3" />
                                 <span className="text-[var(--color-text)] font-medium">
@@ -277,7 +347,7 @@ export default function RegisterPage() {
                             <button
                                 type="button"
                                 onClick={handleAppleSignIn}
-                                className="w-full flex items-center justify-center py-3 px-4 border-2 border-[var(--color-text)]/30 rounded-lg bg-[var(--color-background)] hover:bg-[var(--color-secondary)]/20 transition duration-150 ease-in-out"
+                                className="w-full flex items-center justify-center py-3 px-4 m-1 border-2 border-[var(--color-text)]/30 rounded-lg bg-[var(--color-background)] hover:bg-[var(--color-secondary)]/20 transition duration-150 ease-in-out"
                             >
                                 <FaApple className="h-6 w-6 mr-3 text-[var(--color-text)]" />
                                 <span className="text-[var(--color-text)] font-medium">
