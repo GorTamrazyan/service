@@ -371,19 +371,44 @@ export default function SettingsPanel() {
                                 }
                                 className="appearance-none bg-gradient-to-r from-[var(--color-background)] to-[var(--color-secondary)]/20 border-2 border-[var(--color-accent)]/30 rounded-xl px-4 py-3 pr-10 focus:ring-4 focus:ring-[var(--color-accent)]/20 focus:border-[var(--color-accent)] text-[var(--color-text)] font-medium shadow-lg hover:shadow-xl hover:border-[var(--color-accent)]/50 transition-all duration-300 cursor-pointer min-w-[10px]"
                             >
-                                <option value="en" className="bg-[var(--color-background)] text-[var(--color-text)] py-2">
+                                <option
+                                    value="en"
+                                    className="bg-[var(--color-background)] text-[var(--color-text)] py-2"
+                                >
                                     🇺🇸 English
                                 </option>
-                                <option value="ru" className="bg-[var(--color-background)] text-[var(--color-text)] py-2">
+                                <option
+                                    value="es"
+                                    className="bg-[var(--color-background)] text-[var(--color-text)] py-2"
+                                >
+                                    🇪🇸 Español
+                                </option>
+                                <option
+                                    value="ru"
+                                    className="bg-[var(--color-background)] text-[var(--color-text)] py-2"
+                                >
                                     🇷🇺 Русский
                                 </option>
-                                <option value="hy" className="bg-[var(--color-background)] text-[var(--color-text)] py-2">
+                                <option
+                                    value="hy"
+                                    className="bg-[var(--color-background)] text-[var(--color-text)] py-2"
+                                >
                                     🇦🇲 Հայերեն
                                 </option>
                             </select>
                             <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
-                                <svg className="w-5 h-5 text-[var(--color-accent)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                                <svg
+                                    className="w-5 h-5 text-[var(--color-accent)]"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                >
+                                    <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        strokeWidth={2}
+                                        d="M19 9l-7 7-7-7"
+                                    />
                                 </svg>
                             </div>
                         </div>

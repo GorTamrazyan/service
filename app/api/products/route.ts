@@ -1,11 +1,14 @@
 // app/api/products/route.ts
 import { NextResponse } from "next/server";
-import { 
-    getAllProducts, 
-    getFilteredProducts, 
-    createProduct, 
-    getProductById 
-} from "../../lib/firebase/firestore";
+import {
+    getAllProducts,
+    getFilteredProducts,
+    createProduct,
+    getProductById,
+    getAllProductsEnriched,
+    getFilteredProductsEnriched,
+    getProductByIdEnriched,
+} from "../../lib/firebase/products";
 
 /**
  * Обработчик GET-запроса для получения всех продуктов с возможностью фильтрации.
@@ -18,23 +21,37 @@ export async function GET(request: Request) {
     try {
         const { searchParams } = new URL(request.url);
 
-        const category = searchParams.get("category");
+        const categoryId = searchParams.get("categoryId");
+        const typeOfProductId = searchParams.get("typeOfProductId");
+        const materialId = searchParams.get("materialId");
+        const colorIds = searchParams.get("colorIds")?.split(",").filter(Boolean);
         const minPrice = searchParams.get("minPrice");
         const maxPrice = searchParams.get("maxPrice");
 
-        // Используем Firestore helper функции для получения продуктов
+        // Используем Firestore helper функции для получения продуктов с полными данными
         let products;
-        
-        if (category || minPrice || maxPrice) {
-            // Получаем продукты с фильтрацией
-            products = await getFilteredProducts({
-                category: category || undefined,
-                minPrice: minPrice || undefined,
-                maxPrice: maxPrice || undefined
+
+        const hasFilters = categoryId || typeOfProductId || materialId || minPrice || maxPrice;
+
+        if (hasFilters) {
+            // Получаем продукты с фильтрацией и полными данными материалов/цветов
+            products = await getFilteredProductsEnriched({
+                categoryId: categoryId || undefined,
+                typeOfProductId: typeOfProductId || undefined,
+                materialId: materialId || undefined,
+                minPrice: minPrice ? parseFloat(minPrice) : undefined,
+                maxPrice: maxPrice ? parseFloat(maxPrice) : undefined,
             });
         } else {
-            // Получаем все продукты
-            products = await getAllProducts();
+            // Получаем все продукты с полными данными материалов/цветов
+            products = await getAllProductsEnriched();
+        }
+
+        // Фильтруем по colorIds на сервере (после получения)
+        if (colorIds && colorIds.length > 0) {
+            products = products.filter((product) =>
+                colorIds.some((colorId) => product.colorIds?.includes(colorId))
+            );
         }
 
         return NextResponse.json(products, { status: 200 });
@@ -52,7 +69,7 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
     try {
         const body = await request.json();
-        const { name, description, price, imageUrl, category, inStock } = body;
+        const { name, description, price, categoryId, typeOfProductId, materialId, colorIds, featured, discount } = body;
 
         // Базовая валидация входных данных
         if (!name || !price) {
@@ -63,13 +80,11 @@ export async function POST(request: Request) {
         }
 
         if (
-            typeof price !== "string" ||
-            isNaN(parseFloat(price)) ||
-            parseFloat(price) <= 0
+            typeof price !== "number" || price <= 0
         ) {
             return NextResponse.json(
                 {
-                    message: "Цена должна быть корректной строкой-числом и быть положительной",
+                    message: "Цена должна быть положительным числом",
                 },
                 { status: 400 }
             );
@@ -79,15 +94,18 @@ export async function POST(request: Request) {
         const newProductId = await createProduct({
             name,
             description: description || undefined,
-            price: parseFloat(price).toFixed(2),
-            imageUrl: imageUrl || undefined,
-            category: category || undefined,
-            inStock: inStock !== undefined ? inStock : true
+            price,
+            categoryId: categoryId || undefined,
+            typeOfProductId: typeOfProductId || undefined,
+            materialId: materialId || undefined,
+            colorIds: colorIds || [],
+            featured: featured || false,
+            discount: discount || 0,
         });
 
         // Получаем созданный продукт для возврата
         const newProduct = await getProductById(newProductId);
-        
+
         return NextResponse.json(newProduct, { status: 201 });
     } catch (error) {
         console.error("Ошибка при создании продукта:", error);

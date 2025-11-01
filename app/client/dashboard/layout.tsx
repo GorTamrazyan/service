@@ -19,17 +19,17 @@ export default function RootLayout({
     children: React.ReactNode;
 }) {
     return (
-       <div className="min-h-screen flex flex-col">
+       <div className="min-h-screen flex flex-col bg-[var(--color-background)]">
                 <GuestBrowsingWrapper>
                     <CartProvider>
                         <Header />
-                        <main className="flex-1 p-10">
+                        <main className="flex-1 pt-10 sm:p-10">
                             {children}
                         </main>
                         <Footer />
                     </CartProvider>
                 </GuestBrowsingWrapper>
-                <FirebaseAnalyticsInitializer />{" "}
+                <FirebaseAnalyticsInitializer />
             </div>
     );
 }

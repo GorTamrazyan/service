@@ -1,0 +1,173 @@
+import {
+  collection,
+  doc,
+  getDocs,
+  getDoc,
+  addDoc,
+  updateDoc,
+  deleteDoc,
+  query,
+  where,
+  orderBy,
+  DocumentData,
+  QuerySnapshot,
+  DocumentSnapshot,
+  Timestamp
+} from "firebase/firestore";
+import { db } from "../firebase";
+import { Image } from "./types";
+
+// Преобразование Firestore документа в Image объект
+export const firestoreToImage = (doc: DocumentSnapshot<DocumentData>): Image | null => {
+  if (!doc.exists()) return null;
+
+  const data = doc.data();
+  return {
+    id: doc.id,
+    url: data.url,
+    alt: data.alt,
+    productId: data.productId,
+    isPrimary: data.isPrimary,
+    order: data.order,
+    createdAt: data.createdAt?.toDate()
+  };
+};
+
+// Преобразование Image объекта для Firestore
+export const imageToFirestore = (image: Omit<Image, 'id'>): DocumentData => {
+  return {
+    url: image.url,
+    alt: image.alt || null,
+    productId: image.productId,
+    isPrimary: image.isPrimary || false,
+    order: image.order || 0,
+    createdAt: image.createdAt ? Timestamp.fromDate(image.createdAt) : Timestamp.now()
+  };
+};
+
+// Получить все изображения продукта
+export const getImagesByProductId = async (productId: string): Promise<Image[]> => {
+  try {
+    const imagesRef = collection(db, 'images');
+    const q = query(
+      imagesRef,
+      where('productId', '==', productId),
+      orderBy('order', 'asc')
+    );
+    const querySnapshot: QuerySnapshot<DocumentData> = await getDocs(q);
+
+    return querySnapshot.docs
+      .map(doc => firestoreToImage(doc))
+      .filter((image): image is Image => image !== null);
+  } catch (error) {
+    console.error('Ошибка при получении изображений продукта:', error);
+    throw error;
+  }
+};
+
+// Получить основное изображение продукта
+export const getPrimaryImageByProductId = async (productId: string): Promise<Image | null> => {
+  try {
+    const imagesRef = collection(db, 'images');
+    const q = query(
+      imagesRef,
+      where('productId', '==', productId),
+      where('isPrimary', '==', true)
+    );
+    const querySnapshot: QuerySnapshot<DocumentData> = await getDocs(q);
+
+    if (querySnapshot.empty) return null;
+
+    return firestoreToImage(querySnapshot.docs[0]);
+  } catch (error) {
+    console.error('Ошибка при получении основного изображения:', error);
+    throw error;
+  }
+};
+
+// Получить изображение по ID
+export const getImageById = async (id: string): Promise<Image | null> => {
+  try {
+    const imageRef = doc(db, 'images', id);
+    const docSnap: DocumentSnapshot<DocumentData> = await getDoc(imageRef);
+    return firestoreToImage(docSnap);
+  } catch (error) {
+    console.error('Ошибка при получении изображения:', error);
+    throw error;
+  }
+};
+
+// Создать новое изображение
+export const createImage = async (
+  image: Omit<Image, 'id' | 'createdAt'>
+): Promise<string> => {
+  try {
+    const now = new Date();
+    const imageData: Omit<Image, 'id'> = {
+      ...image,
+      createdAt: now
+    };
+
+    const imagesRef = collection(db, 'images');
+    const docRef = await addDoc(imagesRef, imageToFirestore(imageData));
+    return docRef.id;
+  } catch (error) {
+    console.error('Ошибка при создании изображения:', error);
+    throw error;
+  }
+};
+
+// Обновить изображение
+export const updateImage = async (
+  id: string,
+  image: Partial<Omit<Image, 'id' | 'createdAt'>>
+): Promise<void> => {
+  try {
+    const imageRef = doc(db, 'images', id);
+    await updateDoc(imageRef, image);
+  } catch (error) {
+    console.error('Ошибка при обновлении изображения:', error);
+    throw error;
+  }
+};
+
+// Удалить изображение
+export const deleteImage = async (id: string): Promise<void> => {
+  try {
+    const imageRef = doc(db, 'images', id);
+    await deleteDoc(imageRef);
+  } catch (error) {
+    console.error('Ошибка при удалении изображения:', error);
+    throw error;
+  }
+};
+
+// Удалить все изображения продукта
+export const deleteImagesByProductId = async (productId: string): Promise<void> => {
+  try {
+    const images = await getImagesByProductId(productId);
+    const deletePromises = images.map(image => deleteImage(image.id!));
+    await Promise.all(deletePromises);
+  } catch (error) {
+    console.error('Ошибка при удалении изображений продукта:', error);
+    throw error;
+  }
+};
+
+// Установить основное изображение (сбросить другие isPrimary)
+export const setPrimaryImage = async (imageId: string, productId: string): Promise<void> => {
+  try {
+    // Сбросить isPrimary у всех изображений продукта
+    const images = await getImagesByProductId(productId);
+    const resetPromises = images.map(image =>
+      updateImage(image.id!, { isPrimary: false })
+    );
+    await Promise.all(resetPromises);
+
+    // Установить isPrimary для выбранного изображения
+    await updateImage(imageId, { isPrimary: true });
+  } catch (error) {
+    console.error('Ошибка при установке основного изображения:', error);
+    throw error;
+  }
+};

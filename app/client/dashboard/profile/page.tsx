@@ -190,17 +190,19 @@ export default function ProfilePage() {
 
     // Основной интерфейс
     return (
-        <div className="min-h-screen bg-[var(--color-background)] flex pt-20">
+        <div className="min-h-screen bg-[var(--color-background)] flex flex-col lg:flex-row sm:pt-20 pt-7 ">
             {/* Боковая навигация */}
-            <SidebarNavigation
-                profile={profile}
-                activeSection={activeSection}
-                onSectionChange={handleSectionChange}
-                onLogout={handleLogout}
-            />
+            <div className="lg:w-80 lg:min-w-80 bg-[var(--color-secondary)]">
+                <SidebarNavigation
+                    profile={profile}
+                    activeSection={activeSection}
+                    onSectionChange={handleSectionChange}
+                    onLogout={handleLogout}
+                />
+            </div>
 
             {/* Основной контент */}
-            <div className="flex-1 p-8 overflow-auto bg-[var(--color-background)]">
+            <div className="flex-1 p-4 sm:p-6 lg:p-8 overflow-auto bg-[var(--color-background)]">
                 <ProfileContent
                     profile={profile}
                     activeSection={activeSection}

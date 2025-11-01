@@ -1,204 +1,373 @@
 // app/client/components/ProductFilters.tsx
 "use client";
 
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect } from "react";
+import { X } from "lucide-react";
 import { T } from "./T";
-import Link from "next/link";
+import type { Material, Color, Category, TypeOfProduct } from "../lib/firebase/products/types";
 
 interface ProductFiltersProps {
-    // Пропсы, которые ProductFilters будет передавать родительскому компоненту
-    onApplyFilters: (
-        category: string,
-        minPrice: string,
-        maxPrice: string
-    ) => void;
-    onResetFilters: () => void;
-    // Пропсы для инициализации фильтров и отображения состояния
-    initialCategory: string;
-    initialMinPrice: string;
-    initialMaxPrice: string;
-    availableCategories: string[]; // Все доступные категории
+    isOpen: boolean;
+    onClose: () => void;
+    onApplyFilters: (filters: FilterState) => void;
+    initialFilters: FilterState;
+}
+
+export interface FilterState {
+    categoryId?: string;
+    typeOfProductId?: string;
+    materialId?: string;
+    colorIds: string[];
+    minPrice: string;
+    maxPrice: string;
 }
 
 export default function ProductFilters({
+    isOpen,
+    onClose,
     onApplyFilters,
-    onResetFilters,
-    initialCategory,
-    initialMinPrice,
-    initialMaxPrice,
-    availableCategories,
+    initialFilters,
 }: ProductFiltersProps) {
-    // Состояния для значений в инпутах (что пользователь вводит)
-    const [tempSelectedCategory, setTempSelectedCategory] =
-        useState<string>(initialCategory);
-    const [tempMinPrice, setTempMinPrice] = useState<string>(initialMinPrice);
-    const [tempMaxPrice, setTempMaxPrice] = useState<string>(initialMaxPrice);
+    const [filters, setFilters] = useState<FilterState>(initialFilters);
 
-    // Эффект для синхронизации temp-состояний с initial-пропсами
-    // Это важно, когда родитель (ProductPage) сбрасывает или инициализирует фильтры
+    // Загружаем данные для фильтров
+    const [categories, setCategories] = useState<Category[]>([]);
+    const [materials, setMaterials] = useState<Material[]>([]);
+    const [colors, setColors] = useState<Color[]>([]);
+    const [typeOfProducts, setTypeOfProducts] = useState<TypeOfProduct[]>([]);
+    const [loading, setLoading] = useState(true);
+
+    // Загрузка данных для фильтров
     useEffect(() => {
-        setTempSelectedCategory(initialCategory);
-        setTempMinPrice(initialMinPrice);
-        setTempMaxPrice(initialMaxPrice);
-    }, [initialCategory, initialMinPrice, initialMaxPrice]);
+        async function loadFilterData() {
+            setLoading(true);
+            try {
+                const [categoriesRes, materialsRes, colorsRes, typesRes] = await Promise.all([
+                    fetch("/api/categories"),
+                    fetch("/api/materials"),
+                    fetch("/api/colors"),
+                    fetch("/api/type-of-products"),
+                ]);
 
-    // Функция для применения фильтров, вызывающая колбэк
-    const handleApply = useCallback(() => {
-        onApplyFilters(tempSelectedCategory, tempMinPrice, tempMaxPrice);
-    }, [onApplyFilters, tempSelectedCategory, tempMinPrice, tempMaxPrice]);
+                const [categoriesData, materialsData, colorsData, typesData] = await Promise.all([
+                    categoriesRes.json(),
+                    materialsRes.json(),
+                    colorsRes.json(),
+                    typesRes.json(),
+                ]);
 
-    // Обработчик нажатия Enter
-    const handlePriceKeyDown = useCallback(
-        (e: React.KeyboardEvent<HTMLInputElement>) => {
-            if (e.key === "Enter") {
-                handleApply();
+                setCategories(categoriesData);
+                setMaterials(materialsData);
+                setColors(colorsData);
+                setTypeOfProducts(typesData);
+            } catch (error) {
+                console.error("Error loading filter data:", error);
+            } finally {
+                setLoading(false);
             }
-        },
-        [handleApply]
-    );
+        }
 
-    // Проверяем, есть ли изменения, требующие применения
-    const hasPendingChanges =
-        tempSelectedCategory !== initialCategory ||
-        tempMinPrice !== initialMinPrice ||
-        tempMaxPrice !== initialMaxPrice;
+        if (isOpen) {
+            loadFilterData();
+        }
+    }, [isOpen]);
 
-    // Проверяем, применены ли какие-либо фильтры (для кнопки сброса)
-    const areAnyFiltersApplied =
-        initialCategory !== "all" ||
-        initialMinPrice !== "" ||
-        initialMaxPrice !== "";
+    // Синхронизация с initialFilters
+    useEffect(() => {
+        setFilters(initialFilters);
+    }, [initialFilters]);
+
+    const handleColorToggle = (colorId: string) => {
+        setFilters((prev) => ({
+            ...prev,
+            colorIds: prev.colorIds.includes(colorId)
+                ? prev.colorIds.filter((id) => id !== colorId)
+                : [...prev.colorIds, colorId],
+        }));
+    };
+
+    const handleApply = () => {
+        onApplyFilters(filters);
+        onClose();
+    };
+
+    const handleReset = () => {
+        const resetFilters: FilterState = {
+            categoryId: undefined,
+            typeOfProductId: undefined,
+            materialId: undefined,
+            colorIds: [],
+            minPrice: "",
+            maxPrice: "",
+        };
+        setFilters(resetFilters);
+        onApplyFilters(resetFilters);
+    };
+
+    const hasActiveFilters =
+        filters.categoryId ||
+        filters.typeOfProductId ||
+        filters.materialId ||
+        filters.colorIds.length > 0 ||
+        filters.minPrice ||
+        filters.maxPrice;
+
+    if (!isOpen) return null;
 
     return (
-        <section className="mb-10 p-6 bg-white rounded-lg shadow-md flex flex-col md:flex-row gap-4 justify-center items-center">
-            <div className="relative flex flex-col w-full md:w-auto">
-                <label
-                    htmlFor="category-filter"
-                    className="text-sm font-medium text-gray-700 mb-1"
-                >
-                    <T>Category:</T>
-                </label>
-                <select
-                    id="category-filter"
-                    className="
-            block w-full
-            appearance-none focus:outline-none focus:ring-0 focus:border-0 // Отключаем дефолтный внешний вид
-            pl-4 pr-10 py-2 // Отступы, чтобы было место для стрелки
-            text-base font-semibold // Более жирный текст
-            bg-white // Фон белый
-            border border-gray-300 rounded-lg // Аккуратная рамка и скругление
-            shadow-sm // Небольшая тень
-            cursor-pointer // Курсор-указатель
-            hover:border-[var(--color-accent)] // При наведении меняем цвет рамки
-            transition-all duration-200 ease-in-out // Плавный переход
-        "
-                    value={tempSelectedCategory}
-                    onChange={(e) => setTempSelectedCategory(e.target.value)}
-                >
-                    {availableCategories.map((cat) => (
-                        <option key={cat} value={cat}>
-                            {cat === "all"
-                                ? "All categories"
-                                : cat.charAt(0).toUpperCase() + cat.slice(1)}
-                        </option>
-                    ))}
-                </select>
-                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3 bottom-0 top-[calc(1.5rem+8px)]">
-                    {" "}
-                    {/* Позиционирование стрелки */}
-                    <svg
-                        className="h-5 w-5 text-gray-400"
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 20 20"
-                        fill="currentColor"
-                        aria-hidden="true"
+        <>
+            {/* Overlay */}
+            <div
+                className="fixed inset-0 bg-black/50 z-40 transition-opacity"
+                onClick={onClose}
+            />
+
+            {/* Sidebar */}
+            <div className="fixed left-0 top-0 h-full w-80 bg-[var(--color-background)] z-50 shadow-2xl overflow-y-auto">
+                {/* Header */}
+                <div className="sticky top-0 bg-[var(--color-background)] border-b border-[var(--color-border)] px-6 py-4 flex items-center justify-between z-10">
+                    <h2 className="text-xl font-bold text-[var(--color-primary)]">
+                        <T>Filters</T>
+                    </h2>
+                    <button
+                        onClick={onClose}
+                        className="p-2 hover:bg-[var(--color-secondary)]/20 rounded-full transition-colors"
                     >
-                        <path
-                            fillRule="evenodd"
-                            d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-                            clipRule="evenodd"
-                        />
-                    </svg>
+                        <X className="w-5 h-5" />
+                    </button>
+                </div>
+
+                {/* Content */}
+                <div className="p-6 space-y-6">
+                    {loading ? (
+                        <div className="text-center py-4">
+                            <p className="text-[var(--color-text)]">
+                                <T>Loading filters...</T>
+                            </p>
+                        </div>
+                    ) : (
+                        <>
+                            {/* Type of Product */}
+                            <div className="space-y-3">
+                                <h3 className="font-semibold text-[var(--color-primary)] text-sm uppercase">
+                                    <T>Product Type</T>
+                                </h3>
+                                <div className="space-y-2">
+                                    <label className="flex items-center space-x-2 cursor-pointer">
+                                        <input
+                                            type="radio"
+                                            name="typeOfProduct"
+                                            checked={!filters.typeOfProductId}
+                                            onChange={() =>
+                                                setFilters({ ...filters, typeOfProductId: undefined })
+                                            }
+                                            className="w-4 h-4 text-[var(--color-accent)]"
+                                        />
+                                        <span className="text-[var(--color-text)]">
+                                            <T>All</T>
+                                        </span>
+                                    </label>
+                                    {typeOfProducts.map((type) => (
+                                        <label
+                                            key={type.id}
+                                            className="flex items-center space-x-2 cursor-pointer"
+                                        >
+                                            <input
+                                                type="radio"
+                                                name="typeOfProduct"
+                                                checked={filters.typeOfProductId === type.id}
+                                                onChange={() =>
+                                                    setFilters({ ...filters, typeOfProductId: type.id })
+                                                }
+                                                className="w-4 h-4 text-[var(--color-accent)]"
+                                            />
+                                            <span className="text-[var(--color-text)]">
+                                                <T>{type.name}</T>
+                                            </span>
+                                        </label>
+                                    ))}
+                                </div>
+                            </div>
+
+                            <hr className="border-[var(--color-border)]" />
+
+                            {/* Category */}
+                            <div className="space-y-3">
+                                <h3 className="font-semibold text-[var(--color-primary)] text-sm uppercase">
+                                    <T>Category</T>
+                                </h3>
+                                <div className="space-y-2">
+                                    <label className="flex items-center space-x-2 cursor-pointer">
+                                        <input
+                                            type="radio"
+                                            name="category"
+                                            checked={!filters.categoryId}
+                                            onChange={() =>
+                                                setFilters({ ...filters, categoryId: undefined })
+                                            }
+                                            className="w-4 h-4 text-[var(--color-accent)]"
+                                        />
+                                        <span className="text-[var(--color-text)]">
+                                            <T>All</T>
+                                        </span>
+                                    </label>
+                                    {categories.map((category) => (
+                                        <label
+                                            key={category.id}
+                                            className="flex items-center space-x-2 cursor-pointer"
+                                        >
+                                            <input
+                                                type="radio"
+                                                name="category"
+                                                checked={filters.categoryId === category.id}
+                                                onChange={() =>
+                                                    setFilters({ ...filters, categoryId: category.id })
+                                                }
+                                                className="w-4 h-4 text-[var(--color-accent)]"
+                                            />
+                                            <span className="text-[var(--color-text)]">
+                                                <T>{category.name}</T>
+                                            </span>
+                                        </label>
+                                    ))}
+                                </div>
+                            </div>
+
+                            <hr className="border-[var(--color-border)]" />
+
+                            {/* Material */}
+                            <div className="space-y-3">
+                                <h3 className="font-semibold text-[var(--color-primary)] text-sm uppercase">
+                                    <T>Material</T>
+                                </h3>
+                                <div className="space-y-2">
+                                    <label className="flex items-center space-x-2 cursor-pointer">
+                                        <input
+                                            type="radio"
+                                            name="material"
+                                            checked={!filters.materialId}
+                                            onChange={() =>
+                                                setFilters({ ...filters, materialId: undefined })
+                                            }
+                                            className="w-4 h-4 text-[var(--color-accent)]"
+                                        />
+                                        <span className="text-[var(--color-text)]">
+                                            <T>All</T>
+                                        </span>
+                                    </label>
+                                    {materials.map((material) => (
+                                        <label
+                                            key={material.id}
+                                            className="flex items-center space-x-2 cursor-pointer"
+                                        >
+                                            <input
+                                                type="radio"
+                                                name="material"
+                                                checked={filters.materialId === material.id}
+                                                onChange={() =>
+                                                    setFilters({ ...filters, materialId: material.id })
+                                                }
+                                                className="w-4 h-4 text-[var(--color-accent)]"
+                                            />
+                                            <span className="text-[var(--color-text)]">
+                                                <T>{material.name}</T>
+                                            </span>
+                                        </label>
+                                    ))}
+                                </div>
+                            </div>
+
+                            <hr className="border-[var(--color-border)]" />
+
+                            {/* Colors */}
+                            <div className="space-y-3">
+                                <h3 className="font-semibold text-[var(--color-primary)] text-sm uppercase">
+                                    <T>Colors</T>
+                                </h3>
+                                <div className="space-y-2">
+                                    {colors.map((color) => (
+                                        <label
+                                            key={color.id}
+                                            className="flex items-center space-x-2 cursor-pointer"
+                                        >
+                                            <input
+                                                type="checkbox"
+                                                checked={filters.colorIds.includes(color.id || "")}
+                                                onChange={() => handleColorToggle(color.id || "")}
+                                                className="w-4 h-4 text-[var(--color-accent)]"
+                                            />
+                                            <div
+                                                className="w-6 h-6 rounded-full border-2 border-gray-300"
+                                                style={{ backgroundColor: color.hexCode }}
+                                            />
+                                            <span className="text-[var(--color-text)]">
+                                                <T>{color.name}</T>
+                                            </span>
+                                        </label>
+                                    ))}
+                                </div>
+                            </div>
+
+                            <hr className="border-[var(--color-border)]" />
+
+                            {/* Price Range */}
+                            <div className="space-y-3">
+                                <h3 className="font-semibold text-[var(--color-primary)] text-sm uppercase">
+                                    <T>Price Range</T>
+                                </h3>
+                                <div className="space-y-3">
+                                    <div>
+                                        <label className="text-sm text-[var(--color-text)] mb-1 block">
+                                            <T>Min Price</T>
+                                        </label>
+                                        <input
+                                            type="number"
+                                            value={filters.minPrice}
+                                            onChange={(e) =>
+                                                setFilters({ ...filters, minPrice: e.target.value })
+                                            }
+                                            placeholder="0"
+                                            className="w-full px-3 py-2 border border-[var(--color-border)] rounded-lg bg-[var(--color-input-bg)] text-[var(--color-text)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="text-sm text-[var(--color-text)] mb-1 block">
+                                            <T>Max Price</T>
+                                        </label>
+                                        <input
+                                            type="number"
+                                            value={filters.maxPrice}
+                                            onChange={(e) =>
+                                                setFilters({ ...filters, maxPrice: e.target.value })
+                                            }
+                                            placeholder="1000"
+                                            className="w-full px-3 py-2 border border-[var(--color-border)] rounded-lg bg-[var(--color-input-bg)] text-[var(--color-text)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                        </>
+                    )}
+                </div>
+
+                {/* Footer */}
+                <div className="sticky bottom-0 bg-[var(--color-background)] border-t border-[var(--color-border)] px-6 py-4 space-y-3">
+                    <button
+                        onClick={handleApply}
+                        className="w-full bg-[var(--color-accent)] text-[var(--color-primary)] font-semibold py-3 px-4 rounded-lg hover:opacity-90 transition-opacity"
+                    >
+                        <T>Apply Filters</T>
+                    </button>
+                    {hasActiveFilters && (
+                        <button
+                            onClick={handleReset}
+                            className="w-full bg-gray-200 dark:bg-gray-700 text-[var(--color-text)] font-semibold py-3 px-4 rounded-lg hover:opacity-90 transition-opacity"
+                        >
+                            <T>Reset All</T>
+                        </button>
+                    )}
                 </div>
             </div>
-
-            <div className="flex flex-col w-full md:w-auto">
-                <label
-                    htmlFor="min-price"
-                    className="text-sm font-medium text-gray-700 mb-1"
-                >
-                    <T>Minimal price:</T>
-                </label>
-                <input
-                    type="number"
-                    id="min-price"
-                    className="
-                        mt-1 block w-full
-                        px-4 py-2 // Увеличенные отступы
-                        text-base font-semibold text-[var(--color-text)] // Цвет текста и жирность
-                        bg-white // Фон белый
-                        border border-gray-300 rounded-lg // Аккуратная рамка и скругление
-                        shadow-sm // Небольшая тень
-                        focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] focus:border-transparent // Фокус с кольцом
-                        placeholder-gray-400 // Стиль для плейсхолдера
-                        transition-all duration-200 ease-in-out // Плавный переход
-                    "
-                    value={tempMinPrice}
-                    onChange={(e) => setTempMinPrice(e.target.value)}
-                    onKeyDown={handlePriceKeyDown}
-                    placeholder="From"
-                    min="0"
-                />
-            </div>
-
-            <div className="flex flex-col w-full md:w-auto">
-                <label
-                    htmlFor="max-price"
-                    className="text-sm font-medium text-gray-700 mb-1"
-                >
-                    <T>Maximal price:</T>
-                </label>
-                <input
-                    type="number"
-                    id="max-price"
-                    className="
-                        mt-1 block w-full
-                        px-4 py-2 // Увеличенные отступы
-                        text-base font-semibold text-[var(--color-text)] // Цвет текста и жирность
-                        bg-white // Фон белый
-                        border border-gray-300 rounded-lg // Аккуратная рамка и скругление
-                        shadow-sm // Небольшая тень
-                        focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] focus:border-transparent // Фокус с кольцом
-                        placeholder-gray-400 // Стиль для плейсхолдера
-                        transition-all duration-200 ease-in-out // Плавный переход
-                    "
-                    value={tempMaxPrice}
-                    onChange={(e) => setTempMaxPrice(e.target.value)}
-                    onKeyDown={handlePriceKeyDown}
-                    placeholder="To"
-                    min="0"
-                />
-            </div>
-
-            {/* Кнопка "Применить фильтры" */}
-            {hasPendingChanges && (
-                <button
-                    onClick={handleApply}
-                    className="mt-4 md:mt-0 bg-[var(--color-accent)] text-[var(--color-primary)] font-bold py-2 px-4 rounded-md hover:bg-opacity-90 transition-colors duration-200 text-sm"
-                >
-                    <T>Apply filters</T>
-                </button>
-            )}
-
-            {/* Кнопка сброса фильтров */}
-            {areAnyFiltersApplied && (
-                    <button
-                        onClick={onResetFilters} // Вызываем колбэк для сброса
-                        className="mt-4 md:mt-0 bg-gray-200 text-gray-800 py-2 px-4 rounded-md hover:bg-gray-300 transition-colors duration-200 text-sm"
-                    >
-                        <T>Reset filters</T>
-                    </button>
-            )}
-        </section>
+        </>
     );
 }

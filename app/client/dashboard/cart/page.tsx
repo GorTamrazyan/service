@@ -20,7 +20,7 @@ export default function CartPage() {
     } = useCart();
 
     const [user] = useAuthState();
-    const { profile } = useProfile();
+    const {profile} = useProfile();
     const [showCheckoutModal, setShowCheckoutModal] = useState(false);
     const [customerInfo, setCustomerInfo] = useState({
         name: '',
@@ -65,7 +65,8 @@ export default function CartPage() {
                     id: item.id,
                     name: item.name,
                     price: item.price,
-                    quantity: item.quantity
+                    quantity: item.quantity,
+                    color: item.color
                 })),
                 totalPrice: getTotalPrice().toFixed(2),
                 status: 'pending' as const,
@@ -103,7 +104,7 @@ export default function CartPage() {
                 <h1 className="text-3xl md:text-4xl font-bold text-[var(--color-primary)] mb-4">
                     <T>Your cart is empty</T>
                 </h1>
-                <p className="text-lg text-gray-600 mb-6">
+                <p className="text-lg text-[var(--color-gray-600)] mb-6">
                     <T>Add something to start placing your order!</T>
                 </p>
                 <Link
@@ -123,96 +124,133 @@ export default function CartPage() {
                     <T>Your Shopping Cart</T>
                 </h1>
 
-                <div className="bg-white rounded-lg shadow-xl p-6 md:p-8">
+                <div className="bg-[var(--color-card-bg)] rounded-lg shadow-xl p-6 md:p-8">
                     {cartItems.map((item) => (
                         <div
                             key={item.id}
-                            className="flex items-center border-b border-gray-200 py-4 last:border-b-0"
+                            className="flex flex-col sm:flex-row sm:items-center border-b border-[var(--color-border)] py-4 last:border-b-0 gap-4"
                         >
-                            {item.imageUrl && (
-                                <Image
-                                    src={item.imageUrl}
-                                    alt={item.name}
-                                    width={96} // w-24 (96px)
-                                    height={96} // h-24 (96px)
-                                    className="w-24 h-24 object-cover rounded-md mr-4"
-                                />
-                            )}
-                            <div className="flex-grow">
-                                <h2 className="text-lg font-semibold text-[var(--color-primary)]">
-                                    {item.name}
-                                </h2>
-                                <p className="text-gray-600">
-                                    <T>Price</T>: ${parseFloat(item.price).toFixed(2)}
-                                </p>
-                                <div className="flex items-center mt-2 gap-4">
-                                    <div className="flex items-center gap-2">
-                                        <span className="text-sm text-gray-600 mr-2">
-                                            <T>Quantity:</T>
-                                        </span>
-                                        {/* Кнопка уменьшения количества */}
-                                        <button
-                                            onClick={() => decrementQuantity(item.id, item.quantity)}
-                                            disabled={item.quantity <= 1}
-                                            className={`
-                                                flex items-center justify-center
-                                                w-9 h-9 rounded-lg border-2 
-                                                font-bold text-xl
-                                                transition-all duration-200 ease-in-out
-                                                shadow-sm hover:shadow-md
-                                                ${item.quantity <= 1 
-                                                    ? 'border-gray-300 text-gray-300 cursor-not-allowed bg-gray-50' 
-                                                    : 'border-[var(--color-accent)] text-[var(--color-accent)] hover:bg-[var(--color-accent)] hover:text-white cursor-pointer bg-white hover:scale-105 active:scale-95'
-                                                }
-                                            `}
-                                        >
-                                            −
-                                        </button>
-                                        
-                                        {/* Отображение текущего количества */}
-                                        <div className="mx-4 px-3 py-1 bg-gray-50 rounded-lg ">
-                                            <span className="text-lg font-bold text-[var(--color-text)]">
-                                                {item.quantity}
-                                            </span>
-                                        </div>
-                                        
-                                        {/* Кнопка увеличения количества */}
-                                        <button
-                                            onClick={() => incrementQuantity(item.id, item.quantity)}
-                                            disabled={item.quantity >= 100}
-                                            className={`
-                                                flex items-center justify-center
-                                                w-9 h-9 rounded-lg border-2 
-                                                font-bold text-xl
-                                                transition-all duration-200 ease-in-out
-                                                shadow-sm hover:shadow-md
-                                                ${item.quantity >= 100
-                                                    ? 'border-gray-300 text-gray-300 cursor-not-allowed bg-gray-50' 
-                                                    : 'border-[var(--color-accent)] text-[var(--color-accent)] hover:bg-[var(--color-accent)] hover:text-white cursor-pointer bg-white hover:scale-105 active:scale-95'
-                                                }
-                                            `}
-                                        >
-                                            +
-                                        </button>
+                            <div className="flex items-start sm:items-center gap-4 flex-1">
+                                {item.imageUrl && (
+                                    <Image
+                                        src={item.imageUrl}
+                                        alt={item.name}
+                                        width={96}
+                                        height={96}
+                                        className="w-16 h-16 sm:w-24 sm:h-24 object-cover rounded-md flex-shrink-0"
+                                    />
+                                )}
+                                <div className="flex-grow min-w-0">
+                                    <h2 className="text-base sm:text-lg font-semibold text-[var(--color-primary)] truncate">
+                                        {item.name}
+                                    </h2>
+                                    <p className="text-sm sm:text-base text-[var(--color-gray-600)]">
+                                        <T>Price</T>: ${parseFloat(item.price).toFixed(2)}
+                                    </p>
+                                    <div className="sm:hidden mt-2">
+                                        <p className="text-base font-bold text-[var(--color-accent)]">
+                                            ${(parseFloat(item.price) * item.quantity).toFixed(2)}
+                                        </p>
                                     </div>
+                                </div>
+                            </div>
+                            <div>
+                                <button
+                                    key={item.id}
+                                    onClick={() =>
+                                        setSelectedColor(color.id || null)
+                                    }
+                                    className={`flex items-center gap-2 p-3 rounded-xl border-2 transition-all ${
+                                        selectedColor === color.id
+                                            ? "border-[var(--color-accent)] bg-[var(--color-accent)]/10 shadow-md"
+                                            : "border-[var(--color-border)] hover:border-[var(--color-accent)]/50"
+                                    }`}
+                                >
+                                    <div
+                                        className="w-8 h-8 rounded-full border-2 border-gray-300 shadow-sm flex-shrink-0"
+                                        style={{
+                                            backgroundColor:
+                                                color.hexCode,
+                                        }}
+                                    ></div>
+                                    <div className="text-left flex-1 min-w-0">
+                                        <p className="text-sm font-semibold text-[var(--color-primary)] truncate">
+                                            <T>{color.name}</T>
+                                        </p>
+                                        <p className="text-xs text-[var(--color-text)]/60">
+                                            {color.hexCode}
+                                        </p>
+                                    </div>
+                                </button>
+                            </div>
+
+                            <div className="flex items-center justify-between sm:justify-end gap-4 sm:gap-6">
+                                <div className="flex items-center gap-2">
+                                    <span className="text-xs sm:text-sm text-[var(--color-gray-600)] whitespace-nowrap">
+                                        <T>Quantity:</T>
+                                    </span>
+                                    <button
+                                        onClick={() => decrementQuantity(item.id, item.quantity)}
+                                        disabled={item.quantity <= 1}
+                                        className={`
+                                            flex items-center justify-center
+                                            w-8 h-8 sm:w-9 sm:h-9 rounded-lg border-2
+                                            font-bold text-lg sm:text-xl
+                                            transition-all duration-200 ease-in-out
+                                            shadow-sm hover:shadow-md flex-shrink-0
+                                            ${item.quantity <= 1
+                                                ? 'border-[var(--color-gray-300)] text-[var(--color-gray-300)] cursor-not-allowed bg-[var(--color-gray-50)]'
+                                                : 'border-[var(--color-accent)] text-[var(--color-accent)] hover:bg-[var(--color-accent)] hover:text-white cursor-pointer bg-[var(--color-card-bg)] hover:scale-105 active:scale-95'
+                                            }
+                                        `}
+                                    >
+                                        −
+                                    </button>
+
+                                    <div className="mx-2 sm:mx-4 px-2 sm:px-3 py-1 bg-[var(--color-gray-50)] rounded-lg flex-shrink-0">
+                                        <span className="text-sm sm:text-lg font-bold text-[var(--color-text)]">
+                                            {item.quantity}
+                                        </span>
+                                    </div>
+
+                                    <button
+                                        onClick={() => incrementQuantity(item.id, item.quantity)}
+                                        disabled={item.quantity >= 100}
+                                        className={`
+                                            flex items-center justify-center
+                                            w-8 h-8 sm:w-9 sm:h-9 rounded-lg border-2
+                                            font-bold text-lg sm:text-xl
+                                            transition-all duration-200 ease-in-out
+                                            shadow-sm hover:shadow-md flex-shrink-0
+                                            ${item.quantity >= 100
+                                                ? 'border-[var(--color-gray-300)] text-[var(--color-gray-300)] cursor-not-allowed bg-[var(--color-gray-50)]'
+                                                : 'border-[var(--color-accent)] text-[var(--color-accent)] hover:bg-[var(--color-accent)] hover:text-white cursor-pointer bg-[var(--color-card-bg)] hover:scale-105 active:scale-95'
+                                            }
+                                        `}
+                                    >
+                                        +
+                                    </button>
+                                </div>
+
+                                <div className="flex items-center gap-4">
                                     <button
                                         onClick={() => removeFromCart(item.id)}
-                                        className="text-red-600 hover:text-red-800 text-sm font-semibold transition-colors duration-200"
+                                        className="text-[var(--color-error)] hover:opacity-80 text-xs sm:text-sm font-semibold transition-colors duration-200 whitespace-nowrap"
                                     >
                                         <T>Remove</T>
                                     </button>
+
+                                    <div className="hidden sm:block">
+                                        <p className="text-lg font-bold text-[var(--color-accent)] whitespace-nowrap">
+                                            ${(parseFloat(item.price) * item.quantity).toFixed(2)}
+                                        </p>
+                                    </div>
                                 </div>
                             </div>
-                            <p className="text-lg font-bold text-[var(--color-accent)]">
-                                $
-                                {(
-                                    parseFloat(item.price) * item.quantity
-                                ).toFixed(2)}
-                            </p>
                         </div>
                     ))}
 
-                    <div className="flex justify-between items-center mt-8 pt-4 border-t border-gray-300">
+                    <div className="flex justify-between items-center mt-8 pt-4 border-t border-[var(--color-gray-300)]">
                         <h2 className="text-xl font-bold text-[var(--color-primary)]">
                             <T>Total:</T>
                         </h2>
@@ -224,7 +262,7 @@ export default function CartPage() {
                     <div className="mt-8 flex flex-col sm:flex-row justify-end space-y-4 sm:space-y-0 sm:space-x-4">
                         <button
                             onClick={clearCart}
-                            className="px-6 py-3 bg-gray-200 text-gray-800 rounded-md font-semibold hover:bg-gray-300 transition-colors duration-200"
+                            className="px-6 py-3 bg-[var(--color-gray-200)] text-[var(--color-gray-800)] rounded-md font-semibold hover:bg-[var(--color-gray-300)] transition-colors duration-200"
                         >
                             <T>Clear cart</T>
                         </button>
@@ -239,16 +277,16 @@ export default function CartPage() {
 
                 {/* Модальное окно оформления заказа */}
                 {showCheckoutModal && (
-                    <div className="fixed inset-0 bg-red-700/70 flex items-center justify-center z-50 p-4">
-                        <div className="bg-white rounded-lg max-w-md w-full max-h-[90vh] overflow-y-auto">
-                            <div className="p-6">
+                    <div className="fixed inset-0 bg-[var(--color-modal-overlay)] flex items-center justify-center z-50 p-4">
+                        <div className="bg-[var(--color-card-bg)] rounded-lg max-w-md w-full max-h-[90vh] overflow-y-auto mx-4">
+                            <div className="p-4 sm:p-6">
                                 <div className="flex justify-between items-center mb-4">
                                     <h2 className="text-2xl font-bold text-[var(--color-primary)]">
                                         <T>Checkout</T>
                                     </h2>
                                     <button
                                         onClick={() => setShowCheckoutModal(false)}
-                                        className="text-gray-500 hover:text-gray-700 text-2xl"
+                                        className="text-[var(--color-gray-500)] hover:text-[var(--color-gray-700)] text-2xl"
                                     >
                                         ×
                                     </button>
@@ -257,7 +295,7 @@ export default function CartPage() {
                                 <form onSubmit={handleSubmitOrder}>
                                     <div className="space-y-4">
                                         <div>
-                                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                                            <label className="block text-sm font-medium text-[var(--color-gray-700)] mb-1">
                                                 <T>Full Name</T> *
                                             </label>
                                             <input
@@ -265,12 +303,12 @@ export default function CartPage() {
                                                 required
                                                 value={customerInfo.name}
                                                 onChange={(e) => setCustomerInfo({...customerInfo, name: e.target.value})}
-                                                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
+                                                className="w-full px-3 py-2 border border-[var(--color-input-border)] bg-[var(--color-input-bg)] text-[var(--color-text)] rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
                                             />
                                         </div>
 
                                         <div>
-                                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                                            <label className="block text-sm font-medium text-[var(--color-gray-700)] mb-1">
                                                 <T>Email</T> *
                                             </label>
                                             <input
@@ -278,24 +316,24 @@ export default function CartPage() {
                                                 required
                                                 value={customerInfo.email}
                                                 onChange={(e) => setCustomerInfo({...customerInfo, email: e.target.value})}
-                                                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
+                                                className="w-full px-3 py-2 border border-[var(--color-input-border)] bg-[var(--color-input-bg)] text-[var(--color-text)] rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
                                             />
                                         </div>
 
                                         <div>
-                                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                                            <label className="block text-sm font-medium text-[var(--color-gray-700)] mb-1">
                                                 <T>Phone</T>
                                             </label>
                                             <input
                                                 type="tel"
                                                 value={customerInfo.phone}
                                                 onChange={(e) => setCustomerInfo({...customerInfo, phone: e.target.value})}
-                                                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
+                                                className="w-full px-3 py-2 border border-[var(--color-input-border)] bg-[var(--color-input-bg)] text-[var(--color-text)] rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
                                             />
                                         </div>
 
                                         <div>
-                                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                                            <label className="block text-sm font-medium text-[var(--color-gray-700)] mb-1">
                                                 <T>Address</T> *
                                             </label>
                                             <textarea
@@ -303,7 +341,7 @@ export default function CartPage() {
                                                 value={customerInfo.address}
                                                 onChange={(e) => setCustomerInfo({...customerInfo, address: e.target.value})}
                                                 rows={3}
-                                                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
+                                                className="w-full px-3 py-2 border border-[var(--color-input-border)] bg-[var(--color-input-bg)] text-[var(--color-text)] rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
                                             />
                                         </div>
 
@@ -319,11 +357,11 @@ export default function CartPage() {
                                         </div>
                                     </div>
 
-                                    <div className="flex space-x-4 mt-6">
+                                    <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-4 mt-6">
                                         <button
                                             type="button"
                                             onClick={() => setShowCheckoutModal(false)}
-                                            className="flex-1 px-4 py-2 bg-gray-200 text-gray-800 rounded-md font-semibold hover:bg-gray-300 transition-colors"
+                                            className="flex-1 px-4 py-2 bg-[var(--color-gray-200)] text-[var(--color-gray-800)] rounded-md font-semibold hover:bg-[var(--color-gray-300)] transition-colors"
                                         >
                                             <T>Cancel</T>
                                         </button>

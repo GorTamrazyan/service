@@ -13,6 +13,7 @@ const LanguageContext = createContext<LanguageContextType | undefined>(undefined
 
 // Простой кэш для переводов
 const translationCache: Record<string, Record<string, string>> = {
+    es: {},
     ru: {},
     hy: {},
     en: {}
@@ -24,7 +25,7 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
     // Загружаем язык из localStorage при монтировании
     useEffect(() => {
         const savedLanguage = localStorage.getItem('preferred-language');
-        if (savedLanguage && ['en', 'ru', 'hy'].includes(savedLanguage)) {
+        if (savedLanguage && ['en','es', 'ru', 'hy'].includes(savedLanguage)) {
             setLanguage(savedLanguage);
         }
     }, []);
@@ -37,11 +38,11 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
     // Добавляем функцию setLanguage в глобальную область для DevTools
     useEffect(() => {
         (window as any).setLanguage = (lang: string) => {
-            if (['en', 'ru', 'hy'].includes(lang)) {
+            if (['en','es', 'ru', 'hy'].includes(lang)) {
                 setLanguage(lang);
                 console.log(`🌍 Language switched to: ${lang}`);
             } else {
-                console.warn('Supported languages: en, ru, hy');
+                console.warn('Supported languages: en,es, ru, hy');
             }
         };
     }, []);
@@ -64,12 +65,13 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
         }
 
         try {
-            // Определяем целевой язык
             let targetLanguage = language;
             if (language === 'hy') {
-                targetLanguage = 'hy'; // Армянский
+                targetLanguage = 'hy';
             } else if (language === 'ru') {
-                targetLanguage = 'ru'; // Русский  
+                targetLanguage = 'ru';
+            } else if (language === 'es'){
+                targetLanguage = 'es';
             }
 
             // Делаем запрос к Google Translate API

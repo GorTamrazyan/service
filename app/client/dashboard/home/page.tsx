@@ -1,8 +1,10 @@
 // app/client/dashboard/home/page.tsx
 "use client";
 
+
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import {
     FaShieldAlt,
     FaTools,
@@ -16,16 +18,22 @@ import {
 // ПРАВИЛЬНЫЙ импорт ProductCard из компонента ProductList
 import { ProductCard } from "../../../components/ProductList";
 import { T } from "../../../components/T";
+import type { Material, Color } from "../../../lib/firebase/products/types";
 
-// Интерфейс для продукта
 interface Product {
     id: string;
     name: string;
     description: string | null;
     price: string;
     imageUrl: string | null;
-    category: string | null;
+    categorId: string | null;
     inStock: boolean;
+    materialId?: string;
+    material?: Material;
+    colorIds?: string[];
+    colors?: Color[];
+    tags?: string[];
+    images?: string[]; // Массив URL изображений
 }
 
 export default function HomePage() {
@@ -63,43 +71,39 @@ export default function HomePage() {
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 {/* Hero Section */}
                 <section className="text-center mb-16 md:mb-20 bg-[var(--color-primary)] text-white p-8 md:p-12 rounded-lg shadow-xl relative overflow-hidden">
-                    <div
-                        className="absolute inset-0 bg-cover bg-center opacity-30"
-                        style={{
-                            backgroundImage: "url('/')",
-                        }}
-                    ></div>
-                    <div className="relative z-10">
-                        <h1 className="text-4xl md:text-6xl font-extrabold leading-tight mb-4">
-                            <T>High Quality Fences for Your</T>{" "}
-                            <span className="text-[var(--color-accent)]">
-                                <T>Home and Business</T>
-                            </span>
-                            !
-                        </h1>
-                        <p className="text-xl md:text-2xl max-w-4xl mx-auto mb-8">
-                            <T>
-                                We offer a full range of fencing solutions, from
-                                design and manufacturing to professional
-                                installation. Our products combine reliability,
-                                aesthetics and functionality.
-                            </T>
-                        </p>
-                        <div className="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-6">
-                            <Link
-                                href="/client/dashboard/products"
-                                className="inline-block bg-[var(--color-accent)] hover:bg-opacity-90 text-[var(--color-primary)] font-bold py-3 px-8 rounded-full text-lg transition-colors duration-300 shadow-lg"
-                            >
-                                <T>View Products</T>
-                            </Link>
-                            <Link
-                                href="/contact"
-                                className="inline-block border-2 border-white hover:border-[var(--color-accent)] text-white hover:text-[var(--color-accent)] font-bold py-3 px-8 rounded-full text-lg transition-colors duration-300 shadow-lg"
-                            >
-                                <T>Get Free Quote</T>
-                            </Link>
+                        <Image src={"/images/vinyl_fence_classic.jpeg"} alt="background" fill className="object-cover absolute inset-0 z-0" />
+                        <div className="relative z-10">
+                            <h1 className="text-4xl md:text-6xl font-extrabold leading-tight mb-4">
+                                <T>High Quality Fences for Your</T>{" "}
+                                <span className="text-[var(--color-accent)]">
+                                    <T>Home and Business</T>
+                                </span>
+                                !
+                            </h1>
+                            <p className="text-xl md:text-2xl max-w-4xl mx-auto mb-8">
+                                <T>
+                                    We offer a full range of fencing solutions,
+                                    from design and manufacturing to
+                                    professional installation. Our products
+                                    combine reliability, aesthetics and
+                                    functionality.
+                                </T>
+                            </p>
+                            <div className="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-6">
+                                <Link
+                                    href="/client/dashboard/products"
+                                    className="inline-block bg-[var(--color-accent)] hover:bg-opacity-90 text-[var(--color-primary)] font-bold py-3 px-8 rounded-full text-lg transition-colors duration-300 shadow-lg"
+                                >
+                                    <T>View Products</T>
+                                </Link>
+                                <Link
+                                    href="/contact"
+                                    className="inline-block border-2 border-white hover:border-[var(--color-accent)] text-white hover:text-[var(--color-accent)] font-bold py-3 px-8 rounded-full text-lg transition-colors duration-300 shadow-lg"
+                                >
+                                    <T>Get Free Quote</T>
+                                </Link>
+                            </div>
                         </div>
-                    </div>
                 </section>
 
                 <hr className="border-[var(--color-accent)] my-12" />
@@ -121,10 +125,10 @@ export default function HomePage() {
 
                     {error && (
                         <div className="text-center py-10">
-                            <p className="text-xl text-red-600">
+                            <p className="text-xl text-[var(--color-error)]">
                                 <T>Error loading products</T>: {error}
                             </p>
-                            <p className="text-sm text-gray-500 mt-2">
+                            <p className="text-sm text-[var(--color-gray-500)] mt-2">
                                 Попробуйте обновить страницу или свяжитесь с
                                 нами
                             </p>
@@ -133,14 +137,14 @@ export default function HomePage() {
 
                     {!loading && products.length === 0 && (
                         <div className="text-center py-10">
-                            <p className="text-2xl text-gray-600">
+                            <p className="text-2xl text-[var(--color-gray-600)]">
                                 <T>Error loading products</T>
                             </p>
                         </div>
                     )}
 
                     {products.length > 0 && (
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                             {products.slice(0, 4).map((product) => (
                                 <ProductCard
                                     key={product.id}
@@ -163,7 +167,7 @@ export default function HomePage() {
                 <hr className="border-[var(--color-accent)] my-12" />
 
                 {/* Benefits Section */}
-                <section className="mb-16 md:mb-20 bg-white shadow-lg rounded-lg p-8 md:p-10">
+                <section className="mb-16 md:mb-20 bg-[var(--color-card-bg)] shadow-lg rounded-lg p-8 md:p-10">
                     <h2 className="text-3xl md:text-4xl font-bold text-[var(--color-primary)] mb-8 text-center">
                         <T>Why customers choose our company</T>
                     </h2>

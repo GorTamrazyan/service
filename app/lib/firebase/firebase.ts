@@ -5,6 +5,7 @@ import { initializeApp, getApps, getApp } from "firebase/app";
 
 import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
+import { getStorage } from "firebase/storage";
 
 const firebaseConfig = {
     apiKey: "AIzaSyDQh8gM-8gX4dbQ9MiBjN8WYO0dCJ6Gm1I",
@@ -20,8 +21,9 @@ const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
 
 export const auth = getAuth(app);
 export const db = getFirestore(app);
+export const storage = getStorage(app);
 
 // <--- УДАЛИТЬ: const analytics = getAnalytics(app);
 // <--- УДАЛИТЬ: export { app, analytics };
 
-export { app }; // Экспортируем только app, auth, db
+export { app }; // Экспортируем только app, auth, db, storage

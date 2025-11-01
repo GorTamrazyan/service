@@ -75,7 +75,7 @@ export default function AdminHeader() {
             <div className="mt-4 flex items-center justify-between">
                 <div>
                     <p className="text-sm text-[var(--color-text)]/60">
-                        <T>Today:</T> {new Date().toLocaleDateString('ru-RU', {
+                        <T>Today:</T> {new Date().toLocaleDateString('en-US', {
                             weekday: 'long',
                             year: 'numeric',
                             month: 'long',

@@ -114,12 +114,10 @@ export default function Header() {
                     >
                         <T>About us</T>
                     </Link>
-                    {/* Cart icon in desktop navigation */}
                 </nav>
 
                 {/* Icons (for mobile/tablet and other actions) */}
                 <div className="flex-shrink-0 flex items-center space-x-6">
-                    {/* Cart icon - hidden on mobile since it's duplicated below */}
                     {isAuthenticated ? (
                         <Link
                             href="/client/dashboard/cart"
@@ -214,7 +212,7 @@ export default function Header() {
                 <input
                     type="text"
                     placeholder="What are you looking for?"
-                    className="p-2 rounded-md border border-gray-300 w-full max-w-lg bg-[var(--color-background)] text-[var(--color-text)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
+                    className="p-2 rounded-md border border-[var(--color-input-border)] w-full max-w-lg bg-[var(--color-input-bg)] text-[var(--color-text)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
                 />
             </div>
 

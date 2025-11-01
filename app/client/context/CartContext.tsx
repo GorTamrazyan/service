@@ -18,6 +18,7 @@ interface CartItem {
     price: string;
     imageUrl: string | null;
     quantity: number;
+    color: string[];
 }
 
 // Интерфейс для значений контекста корзины
@@ -28,6 +29,7 @@ interface CartContextType {
         name: string;
         price: string;
         imageUrl: string | null;
+        color:string[];
     }) => void;
     removeFromCart: (id: string) => void;
     updateQuantity: (id: string, newQuantity: number) => void;
@@ -95,6 +97,7 @@ export const CartProvider = ({ children }: CartProviderProps) => {
             name: string;
             price: string;
             imageUrl: string | null;
+            color: string[];
         }) => {
             if (!isAuthenticated) {
                 showAuthRequired();

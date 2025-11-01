@@ -84,7 +84,7 @@ export default function AboutUsPage() {
                     >
                         {carouselImages.map((item, index) => (
                             <SwiperSlide key={index}>
-                                <div className="relative w-full h-auto min-h-[400px] md:min-h-[550px] bg-gray-200 rounded-lg overflow-hidden flex flex-col md:flex-row items-center justify-center">
+                                <div className="relative w-full h-auto min-h-[400px] md:min-h-[550px] bg-[var(--color-gray-200)] rounded-lg overflow-hidden flex flex-col md:flex-row items-center justify-center">
                                     {/* Изображение "ДО" */}
                                     <div className="w-full md:w-1/2 h-full relative">
                                         <img
@@ -122,7 +122,7 @@ export default function AboutUsPage() {
                 <hr className="border-[var(--color-accent)] my-8" />
 
                 {/* Наша Миссия */}
-                <section className="mb-12 md:mb-16 bg-white shadow-lg rounded-lg p-8">
+                <section className="mb-12 md:mb-16 bg-[var(--color-card-bg)] shadow-lg rounded-lg p-8">
                     <h2 className="text-3xl md:text-4xl font-bold text-[var(--color-primary)] mb-4 text-center">
                         <T>Our Mission</T>
                     </h2>
@@ -177,7 +177,7 @@ export default function AboutUsPage() {
                         <T>Why choose us?</T>
                     </h2>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-                        <div className="bg-white p-6 rounded-lg shadow-lg text-center hover:shadow-xl transition-shadow duration-300">
+                        <div className="bg-[var(--color-card-bg)] p-6 rounded-lg shadow-lg text-center hover:shadow-xl transition-shadow duration-300">
                             <FaShieldAlt className="text-[var(--color-accent)] w-12 h-12 mx-auto mb-4" />
                             <h3 className="text-xl font-semibold text-[var(--color-primary)] mb-2">
                                 <T>Experience and Expertise</T>
@@ -186,7 +186,7 @@ export default function AboutUsPage() {
                                 <T>Our team consists of highly qualified specialists with many years of experience in designing, manufacturing and installing fences of any complexity.</T>
                             </p>
                         </div>
-                        <div className="bg-white p-6 rounded-lg shadow-lg text-center hover:shadow-xl transition-shadow duration-300">
+                        <div className="bg-[var(--color-card-bg)] p-6 rounded-lg shadow-lg text-center hover:shadow-xl transition-shadow duration-300">
                             <FaTools className="text-[var(--color-accent)] w-12 h-12 mx-auto mb-4" />
                             <h3 className="text-xl font-semibold text-[var(--color-primary)] mb-2">
                                 <T>Material Quality</T>
@@ -195,7 +195,7 @@ export default function AboutUsPage() {
                                 <T>We use only certified, durable materials from trusted suppliers, which guarantees the strength and durability of every installed fence.</T>
                             </p>
                         </div>
-                        <div className="bg-white p-6 rounded-lg shadow-lg text-center hover:shadow-xl transition-shadow duration-300">
+                        <div className="bg-[var(--color-card-bg)] p-6 rounded-lg shadow-lg text-center hover:shadow-xl transition-shadow duration-300">
                             <FaHandshake className="text-[var(--color-accent)] w-12 h-12 mx-auto mb-4" />
                             <h3 className="text-xl font-semibold text-[var(--color-primary)] mb-2">
                                 <T>Individual Approach</T>
@@ -204,7 +204,7 @@ export default function AboutUsPage() {
                                 <T>We understand that every project is unique. We listen carefully to your needs and offer individual solutions.</T>
                             </p>
                         </div>
-                        <div className="bg-white p-6 rounded-lg shadow-lg text-center hover:shadow-xl transition-shadow duration-300">
+                        <div className="bg-[var(--color-card-bg)] p-6 rounded-lg shadow-lg text-center hover:shadow-xl transition-shadow duration-300">
                             <FaLightbulb className="text-[var(--color-accent)] w-12 h-12 mx-auto mb-4" />
                             <h3 className="text-xl font-semibold text-[var(--color-primary)] mb-2">
                                 <T>Excellent Service</T>
@@ -219,7 +219,7 @@ export default function AboutUsPage() {
                 <hr className="border-[var(--color-accent)] my-8" />
 
                 {/* Наши Ценности */}
-                <section className="mb-12 md:mb-16 bg-white shadow-lg rounded-lg p-8">
+                <section className="mb-12 md:mb-16 bg-[var(--color-card-bg)] shadow-lg rounded-lg p-8">
                     <h2 className="text-3xl md:text-4xl font-bold text-[var(--color-primary)] mb-6 text-center">
                         <T>Our Values</T>
                     </h2>

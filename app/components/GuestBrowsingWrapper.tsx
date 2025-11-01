@@ -27,7 +27,6 @@ export default function GuestBrowsingWrapper({
                 setIsVerified(false);
             }
         } else {
-            // Разрешаем гостевой просмотр
             setIsVerified(true);
         }
     }, [user]);
@@ -52,11 +51,9 @@ export default function GuestBrowsingWrapper({
         );
     }
 
-    // Если пользователь авторизован но не верифицирован - показываем проверку верификации
     if (user && !isVerified) {
         return <EmailVerificationChecker user={user} onVerified={handleVerified} />;
     }
 
-    // Разрешаем доступ как авторизованным, так и гостям
     return <>{children}</>;
 }

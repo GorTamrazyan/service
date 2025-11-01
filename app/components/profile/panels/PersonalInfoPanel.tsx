@@ -23,37 +23,37 @@ export default function PersonalInfoPanel({
     // Используем T компонент для переводов
     
     return (
-        <div className="space-y-8">
+        <div className="space-y-6 sm:space-y-8">
             {/* Header */}
-            <div className="flex justify-between items-start">
+            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4">
                 <div className="space-y-1">
-                    <h1 className="text-3xl font-bold text-[var(--color-primary)]">
+                    <h1 className="text-2xl sm:text-3xl font-bold text-[var(--color-primary)]">
                         <T>Personal Information</T>
                     </h1>
-                    <p className="text-[var(--color-text)]/70">
+                    <p className="text-sm sm:text-base text-[var(--color-text)]/70">
                         <T>Manage your personal details and information</T>
                     </p>
                 </div>
                 {!isEditing ? (
                     <button
                         onClick={onEdit}
-                        className="inline-flex items-center gap-2 bg-gradient-to-r from-[var(--color-accent)] to-[var(--color-primary)] text-white px-6 py-3 rounded-xl font-medium hover:opacity-90 transform hover:scale-105 transition-all duration-200 shadow-lg"
+                        className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-[var(--color-accent)] to-[var(--color-primary)] text-white px-4 sm:px-6 py-2.5 sm:py-3 rounded-xl font-medium hover:opacity-90 transform hover:scale-105 transition-all duration-200 shadow-lg w-full sm:w-auto"
                     >
                         <Edit className="w-4 h-4" />
                         <T>Edit</T>
                     </button>
                 ) : (
-                    <div className="flex gap-3">
+                    <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 w-full sm:w-auto">
                         <button
                             onClick={onSave}
-                            className="inline-flex items-center gap-2 bg-gradient-to-r from-green-600 to-emerald-600 text-white px-6 py-3 rounded-xl font-medium hover:opacity-90 transform hover:scale-105 transition-all duration-200 shadow-lg"
+                            className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-green-600 to-emerald-600 text-white px-4 sm:px-6 py-2.5 sm:py-3 rounded-xl font-medium hover:opacity-90 transform hover:scale-105 transition-all duration-200 shadow-lg"
                         >
                             <Save className="w-4 h-4" />
                             <T>Save</T>
                         </button>
                         <button
                             onClick={onCancel}
-                            className="inline-flex items-center gap-2 bg-gradient-to-r from-gray-500 to-gray-600 text-white px-6 py-3 rounded-xl font-medium hover:opacity-90 transform hover:scale-105 transition-all duration-200 shadow-lg"
+                            className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-gray-500 to-gray-600 text-white px-4 sm:px-6 py-2.5 sm:py-3 rounded-xl font-medium hover:opacity-90 transform hover:scale-105 transition-all duration-200 shadow-lg"
                         >
                             <X className="w-4 h-4" />
                             <T>Cancel</T>
@@ -64,12 +64,16 @@ export default function PersonalInfoPanel({
 
             {/* Personal Info Card */}
             <div className="bg-[var(--color-background)] rounded-2xl shadow-xl border border-[var(--color-text)]/10 overflow-hidden">
-                <div className="bg-gradient-to-r from-[var(--color-secondary)] to-[var(--color-secondary)]/80 px-8 py-6 border-b border-[var(--color-text)]/10">
-                    <h3 className="text-xl font-semibold text-[var(--color-primary)]"><T>Personal Information</T></h3>
-                    <p className="text-[var(--color-text)]/70 mt-1"><T>Manage your personal details and information</T></p>
+                <div className="bg-gradient-to-r from-[var(--color-secondary)] to-[var(--color-secondary)]/80 px-4 sm:px-6 lg:px-8 py-4 sm:py-5 lg:py-6 border-b border-[var(--color-text)]/10">
+                    <h3 className="text-lg sm:text-xl font-semibold text-[var(--color-primary)]">
+                        <T>Personal Information</T>
+                    </h3>
+                    <p className="text-sm sm:text-base text-[var(--color-text)]/70 mt-1">
+                        <T>Manage your personal details and information</T>
+                    </p>
                 </div>
-                
-                <div className="p-8 space-y-6">
+
+                <div className="p-4 sm:p-6 lg:p-8 space-y-4 sm:space-y-6">
                     {/* Email (read-only) */}
                     <div className="space-y-2">
                         <label className="block text-sm font-medium text-[var(--color-text)]">
@@ -80,7 +84,7 @@ export default function PersonalInfoPanel({
                                 {profile.email}
                             </div>
                             <div className="absolute right-3 top-3">
-                                <span className="inline-flex items-center gap-1 text-xs text-[var(--color-text)]/60 bg-[var(--color-secondary)]/30 px-2 py-1 rounded-md">
+                                <span className="hidden sm:inline-flex items-center gap-1 text-xs text-[var(--color-text)]/60 bg-[var(--color-secondary)]/30 px-2 py-1 rounded-md  ">
                                     Verified
                                 </span>
                             </div>
@@ -90,7 +94,10 @@ export default function PersonalInfoPanel({
                     {/* Name Fields */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div className="space-y-2">
-                            <label htmlFor="firstName" className="block text-sm font-medium text-[var(--color-text)]">
+                            <label
+                                htmlFor="firstName"
+                                className="block text-sm font-medium text-[var(--color-text)]"
+                            >
                                 <T>First Name</T>
                             </label>
                             <input
@@ -110,7 +117,10 @@ export default function PersonalInfoPanel({
                         </div>
 
                         <div className="space-y-2">
-                            <label htmlFor="lastName" className="block text-sm font-medium text-[var(--color-text)]">
+                            <label
+                                htmlFor="lastName"
+                                className="block text-sm font-medium text-[var(--color-text)]"
+                            >
                                 <T>Last Name</T>
                             </label>
                             <input
@@ -132,7 +142,10 @@ export default function PersonalInfoPanel({
 
                     {/* Phone */}
                     <div className="space-y-2">
-                        <label htmlFor="phone" className="block text-sm font-medium text-[var(--color-text)]">
+                        <label
+                            htmlFor="phone"
+                            className="block text-sm font-medium text-[var(--color-text)]"
+                        >
                             <T>Phone</T>
                         </label>
                         <input
@@ -155,15 +168,22 @@ export default function PersonalInfoPanel({
 
             {/* Address Card */}
             <div className="bg-[var(--color-background)] rounded-2xl shadow-xl border border-[var(--color-text)]/10 overflow-hidden">
-                <div className="bg-gradient-to-r from-[var(--color-secondary)] to-[var(--color-secondary)]/80 px-8 py-6 border-b border-[var(--color-text)]/10">
-                    <h3 className="text-xl font-semibold text-[var(--color-primary)]"><T>Address Information</T></h3>
-                    <p className="text-[var(--color-text)]/70 mt-1"><T>Manage your personal details and information</T></p>
+                <div className="bg-gradient-to-r from-[var(--color-secondary)] to-[var(--color-secondary)]/80 px-4 sm:px-6 lg:px-8 py-4 sm:py-5 lg:py-6 border-b border-[var(--color-text)]/10">
+                    <h3 className="text-lg sm:text-xl font-semibold text-[var(--color-primary)]">
+                        <T>Address Information</T>
+                    </h3>
+                    <p className="text-sm sm:text-base text-[var(--color-text)]/70 mt-1">
+                        <T>Manage your personal details and information</T>
+                    </p>
                 </div>
-                
-                <div className="p-8 space-y-6">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+                <div className="p-4 sm:p-6 lg:p-8 space-y-4 sm:space-y-6">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                         <div className="space-y-2">
-                            <label htmlFor="address.street" className="block text-sm font-medium text-[var(--color-text)]">
+                            <label
+                                htmlFor="address.street"
+                                className="block text-sm font-medium text-[var(--color-text)]"
+                            >
                                 <T>Street</T>
                             </label>
                             <input
@@ -183,7 +203,10 @@ export default function PersonalInfoPanel({
                         </div>
 
                         <div className="space-y-2">
-                            <label htmlFor="address.houseNumber" className="block text-sm font-medium text-[var(--color-text)]">
+                            <label
+                                htmlFor="address.houseNumber"
+                                className="block text-sm font-medium text-[var(--color-text)]"
+                            >
                                 <T>House Number</T>
                             </label>
                             <input
@@ -203,7 +226,10 @@ export default function PersonalInfoPanel({
                         </div>
 
                         <div className="space-y-2">
-                            <label htmlFor="address.apartmentNumber" className="block text-sm font-medium text-[var(--color-text)]">
+                            <label
+                                htmlFor="address.apartmentNumber"
+                                className="block text-sm font-medium text-[var(--color-text)]"
+                            >
                                 <T>Apartment Number</T>
                             </label>
                             <input
@@ -223,7 +249,10 @@ export default function PersonalInfoPanel({
                         </div>
 
                         <div className="space-y-2">
-                            <label htmlFor="address.city" className="block text-sm font-medium text-[var(--color-text)]">
+                            <label
+                                htmlFor="address.city"
+                                className="block text-sm font-medium text-[var(--color-text)]"
+                            >
                                 <T>City</T>
                             </label>
                             <input
@@ -243,7 +272,10 @@ export default function PersonalInfoPanel({
                         </div>
 
                         <div className="space-y-2">
-                            <label htmlFor="address.zipCode" className="block text-sm font-medium text-[var(--color-text)]">
+                            <label
+                                htmlFor="address.zipCode"
+                                className="block text-sm font-medium text-[var(--color-text)]"
+                            >
                                 <T>Zip Code</T>
                             </label>
                             <input

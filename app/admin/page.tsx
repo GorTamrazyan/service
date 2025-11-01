@@ -11,25 +11,15 @@ import {
     TrendingUp,
     Activity,
     Calendar,
-    BarChart3
+    BarChart3,
 } from "lucide-react";
 import { T } from "../components/T";
 
-import {
-    Product,
-    getAllProducts,
-} from "../lib/firebase/firestore";
+import { Product, getAllProducts } from "../lib/firebase/products";
 
-import {
-    getAllUsers,
-    User,
-} from "../lib/firebase/users";
+import { getAllUsers, User } from "../lib/firebase/users";
 
-import {
-    getAllOrders, 
-    Order
-} from "../lib/firebase/orders";
-
+import { getAllOrders, Order } from "../lib/firebase/orders";
 
 interface StatsData {
     totalUsers: number;
@@ -40,14 +30,14 @@ interface StatsData {
 
 export default function AdminDashboard() {
     const [products, setProducts] = useState<Product[]>([]);
-    const [users,setUser]= useState<User[]>([]);
+    const [users, setUser] = useState<User[]>([]);
     const [orders, setOrders] = useState<Order[]>([]);
     const router = useRouter();
     const [stats, setStats] = useState<StatsData>({
         totalUsers: 0,
         totalProducts: 0,
         totalOrders: 0,
-        totalRevenue: 0
+        totalRevenue: 0,
     });
 
     const [isLoading, setIsLoading] = useState(true);
@@ -65,14 +55,17 @@ export default function AdminDashboard() {
 
                 // Вычисляем доход из доставленных заказов
                 const revenue = ordersData
-                    .filter(order => order.status === 'delivered')
-                    .reduce((sum, order) => sum + parseFloat(order.totalPrice), 0);
+                    .filter((order) => order.status === "delivered")
+                    .reduce(
+                        (sum, order) => sum + parseFloat(order.totalPrice),
+                        0
+                    );
 
                 setStats({
                     totalUsers: usersData.length,
                     totalProducts: productsData.length,
                     totalOrders: ordersData.length,
-                    totalRevenue: revenue
+                    totalRevenue: revenue,
                 });
                 setIsLoading(false);
             } catch (error) {
@@ -90,29 +83,29 @@ export default function AdminDashboard() {
             value: stats.totalUsers.toLocaleString(),
             icon: Users,
             color: "from-blue-500 to-blue-600",
-            textColor: "text-blue-600"
+            textColor: "text-blue-600",
         },
         {
             title: "Products",
             value: stats.totalProducts.toLocaleString(),
             icon: Package,
-            color: "from-green-500 to-green-600", 
-            textColor: "text-green-600"
+            color: "from-green-500 to-green-600",
+            textColor: "text-green-600",
         },
         {
             title: "Orders",
             value: stats.totalOrders.toLocaleString(),
             icon: ShoppingCart,
             color: "from-purple-500 to-purple-600",
-            textColor: "text-purple-600"
+            textColor: "text-purple-600",
         },
         {
             title: "Revenue",
             value: `$${stats.totalRevenue.toLocaleString()}`,
             icon: DollarSign,
             color: "from-yellow-500 to-yellow-600",
-            textColor: "text-yellow-600"
-        }
+            textColor: "text-yellow-600",
+        },
     ];
 
     if (isLoading) {
@@ -131,7 +124,10 @@ export default function AdminDashboard() {
                     <T>Admin Dashboard</T>
                 </h1>
                 <p className="text-[var(--color-text)]/70">
-                    <T>Welcome to the admin panel. Here's an overview of your business.</T>
+                    <T>
+                        Welcome to the admin panel. Here's an overview of your
+                        business.
+                    </T>
                 </p>
             </div>
 
@@ -154,13 +150,19 @@ export default function AdminDashboard() {
                                             {card.value}
                                         </p>
                                     </div>
-                                    <div className={`bg-gradient-to-r ${card.color} rounded-xl p-3`}>
+                                    <div
+                                        className={`bg-gradient-to-r ${card.color} rounded-xl p-3`}
+                                    >
                                         <Icon className="w-6 h-6 text-white" />
                                     </div>
                                 </div>
                                 <div className="flex items-center mt-4 text-sm">
-                                    <TrendingUp className={`w-4 h-4 ${card.textColor} mr-1`} />
-                                    <span className={`${card.textColor} font-medium`}>
+                                    <TrendingUp
+                                        className={`w-4 h-4 ${card.textColor} mr-1`}
+                                    />
+                                    <span
+                                        className={`${card.textColor} font-medium`}
+                                    >
                                         +12%
                                     </span>
                                     <span className="text-[var(--color-text)]/70 ml-2">
@@ -193,7 +195,9 @@ export default function AdminDashboard() {
                     <div className="h-64 flex items-center justify-center text-[var(--color-text)]/50">
                         <div className="text-center">
                             <BarChart3 className="w-16 h-16 mx-auto mb-4" />
-                            <p><T>Chart will be implemented here</T></p>
+                            <p>
+                                <T>Chart will be implemented here</T>
+                            </p>
                         </div>
                     </div>
                 </div>
@@ -215,14 +219,33 @@ export default function AdminDashboard() {
                     </div>
                     <div className="space-y-4">
                         {[
-                            { action: "New user registered", time: "2 minutes ago", icon: Users },
-                            { action: "Order #1234 completed", time: "15 minutes ago", icon: ShoppingCart },
-                            { action: "Product updated", time: "1 hour ago", icon: Package },
-                            { action: "Payment received", time: "2 hours ago", icon: DollarSign }
+                            {
+                                action: "New user registered",
+                                time: "2 minutes ago",
+                                icon: Users,
+                            },
+                            {
+                                action: "Order #1234 completed",
+                                time: "15 minutes ago",
+                                icon: ShoppingCart,
+                            },
+                            {
+                                action: "Product updated",
+                                time: "1 hour ago",
+                                icon: Package,
+                            },
+                            {
+                                action: "Payment received",
+                                time: "2 hours ago",
+                                icon: DollarSign,
+                            },
                         ].map((activity, index) => {
                             const Icon = activity.icon;
                             return (
-                                <div key={index} className="flex items-center gap-3 p-3 rounded-lg hover:bg-[var(--color-secondary)]/30 transition-colors">
+                                <div
+                                    key={index}
+                                    className="flex items-center gap-3 p-3 rounded-lg hover:bg-[var(--color-secondary)]/30 transition-colors"
+                                >
                                     <div className="bg-[var(--color-accent)]/10 rounded-full p-2">
                                         <Icon className="w-4 h-4 text-[var(--color-accent)]" />
                                     </div>
@@ -248,10 +271,26 @@ export default function AdminDashboard() {
                 </h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                     {[
-                        { title: "Add Product", icon: Package, href: "/admin/products" },
-                        { title: "View Orders", icon: ShoppingCart, href: "/admin/orders" },
-                        { title: "Manage Users", icon: Users, href: "/admin/users" },
-                        { title: "View Reports", icon: BarChart3, href: "/admin/reports" }
+                        {
+                            title: "Add Product",
+                            icon: Package,
+                            href: "/admin/products",
+                        },
+                        {
+                            title: "View Orders",
+                            icon: ShoppingCart,
+                            href: "/admin/orders",
+                        },
+                        {
+                            title: "Manage Users",
+                            icon: Users,
+                            href: "/admin/users",
+                        },
+                        {
+                            title: "View Reports",
+                            icon: BarChart3,
+                            href: "/admin/reports",
+                        },
                     ].map((action, index) => {
                         const Icon = action.icon;
                         return (
