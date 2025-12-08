@@ -4,13 +4,13 @@
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Shield, Eye, EyeOff, Lock, Mail } from "lucide-react";
-import { T } from "../../components/T";
+import { T } from "../../client/components/T";
 import { loginAdmin } from "../../lib/firebase/admin";
 
 export default function AdminLogin() {
     const [credentials, setCredentials] = useState({
         email: "",
-        password: ""
+        password: "",
     });
     const [showPassword, setShowPassword] = useState(false);
     const [error, setError] = useState("");
@@ -25,19 +25,25 @@ export default function AdminLogin() {
         setIsLoading(true);
 
         try {
-            const { admin, sessionToken } = await loginAdmin(credentials.email, credentials.password);
-            
+            const { admin, sessionToken } = await loginAdmin(
+                credentials.email,
+                credentials.password
+            );
+
             // Store admin session in localStorage
             localStorage.setItem("adminSessionToken", sessionToken);
-            localStorage.setItem("adminUser", JSON.stringify({
-                id: admin.id,
-                email: admin.email,
-                username: admin.username,
-                role: admin.role,
-                permissions: admin.permissions,
-                loginTime: new Date().toISOString()
-            }));
-            
+            localStorage.setItem(
+                "adminUser",
+                JSON.stringify({
+                    id: admin.id,
+                    email: admin.email,
+                    username: admin.username,
+                    role: admin.role,
+                    permissions: admin.permissions,
+                    loginTime: new Date().toISOString(),
+                })
+            );
+
             console.log("✅ Admin logged in successfully:", admin);
             router.push("/admin");
         } catch (error: any) {
@@ -79,7 +85,12 @@ export default function AdminLogin() {
                                 <input
                                     type="email"
                                     value={credentials.email}
-                                    onChange={(e) => setCredentials(prev => ({...prev, email: e.target.value}))}
+                                    onChange={(e) =>
+                                        setCredentials((prev) => ({
+                                            ...prev,
+                                            email: e.target.value,
+                                        }))
+                                    }
                                     className="w-full pl-10 pr-4 py-3 border border-[var(--color-text)]/30 rounded-xl bg-[var(--color-background)] text-[var(--color-text)] focus:ring-2 focus:ring-[var(--color-accent)] focus:border-[var(--color-accent)] transition-all"
                                     placeholder="Введите email администратора"
                                     required
@@ -97,17 +108,28 @@ export default function AdminLogin() {
                                 <input
                                     type={showPassword ? "text" : "password"}
                                     value={credentials.password}
-                                    onChange={(e) => setCredentials(prev => ({...prev, password: e.target.value}))}
+                                    onChange={(e) =>
+                                        setCredentials((prev) => ({
+                                            ...prev,
+                                            password: e.target.value,
+                                        }))
+                                    }
                                     className="w-full pl-10 pr-12 py-3 border border-[var(--color-text)]/30 rounded-xl bg-[var(--color-background)] text-[var(--color-text)] focus:ring-2 focus:ring-[var(--color-accent)] focus:border-[var(--color-accent)] transition-all"
                                     placeholder="Введите пароль"
                                     required
                                 />
                                 <button
                                     type="button"
-                                    onClick={() => setShowPassword(!showPassword)}
+                                    onClick={() =>
+                                        setShowPassword(!showPassword)
+                                    }
                                     className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--color-text)]/60 hover:text-[var(--color-text)] transition-colors"
                                 >
-                                    {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                                    {showPassword ? (
+                                        <EyeOff className="w-5 h-5" />
+                                    ) : (
+                                        <Eye className="w-5 h-5" />
+                                    )}
                                 </button>
                             </div>
                         </div>
@@ -135,9 +157,6 @@ export default function AdminLogin() {
                             )}
                         </button>
                     </form>
-
-                    
-                    
                 </div>
 
                 {/* Back to Site */}

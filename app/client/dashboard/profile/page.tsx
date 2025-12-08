@@ -6,15 +6,15 @@ import { auth, db } from "../../../lib/firebase/firebase";
 import { doc, getDoc, setDoc } from "firebase/firestore";
 import { User } from "firebase/auth";
 import { useRouter } from "next/navigation";
-import SidebarNavigation from "../../../components/profile/SidebarNavigation";
-import ProfileContent from "../../../components/profile/ProfileContent";
+import SidebarNavigation from "../../components/profile/SidebarNavigation";
+import ProfileContent from "../../components/profile/ProfileContent";
 import { UserProfile } from "../../../types/profile";
 import { useLanguage } from "../../../contexts/LanguageContext";
-import { T } from "@/app/components/T";
+import { T } from "@/app/client/components/T";
 
 export default function ProfilePage() {
     const { t } = useLanguage();
-    
+
     // Состояния
     const [user, setUser] = useState<User | null>(null);
     const [profile, setProfile] = useState<UserProfile | null>(null);
@@ -50,8 +50,8 @@ export default function ProfilePage() {
                 const data = docSnap.data() as UserProfile;
                 // Убеждаемся, что email синхронизирован с Firebase Auth
                 data.email = user?.email || data.email;
-                console.log('✅ Loaded profile:', data);
-                console.log('🔐 User email from auth:', user?.email);
+                console.log("✅ Loaded profile:", data);
+                console.log("🔐 User email from auth:", user?.email);
                 setProfile(data);
             } else {
                 // Профиль не существует - создаем новый
@@ -68,8 +68,8 @@ export default function ProfilePage() {
                     },
                     email: user?.email || "",
                 };
-                console.log('🆕 Created new profile:', newProfile);
-                console.log('🔐 User email from auth:', user?.email);
+                console.log("🆕 Created new profile:", newProfile);
+                console.log("🔐 User email from auth:", user?.email);
                 setProfile(newProfile);
 
                 // Сохраняем базовый профиль в Firebase
@@ -115,10 +115,10 @@ export default function ProfilePage() {
             // Убеждаемся что email всегда актуальный перед сохранением
             const updatedProfile = {
                 ...profile,
-                email: user.email || profile.email
+                email: user.email || profile.email,
             };
-            console.log('💾 Saving profile:', updatedProfile);
-            
+            console.log("💾 Saving profile:", updatedProfile);
+
             const userDocRef = doc(db, "users", user.uid);
             await setDoc(userDocRef, updatedProfile, { merge: true });
             setProfile(updatedProfile); // Обновляем локальное состояние
@@ -163,7 +163,9 @@ export default function ProfilePage() {
     if (loading) {
         return (
             <div className="flex justify-center items-center min-h-screen bg-[var(--color-background)]">
-                <p className="text-xl text-[var(--color-text)]"><T>Loading profile...</T></p>
+                <p className="text-xl text-[var(--color-text)]">
+                    <T>Loading profile...</T>
+                </p>
             </div>
         );
     }
@@ -182,7 +184,7 @@ export default function ProfilePage() {
         return (
             <div className="flex justify-center items-center min-h-screen bg-[var(--color-background)]">
                 <p className="text-xl text-[var(--color-text)]">
-                    {t('common.profile.notFound')}
+                    {t("common.profile.notFound")}
                 </p>
             </div>
         );

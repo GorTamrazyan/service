@@ -4,7 +4,7 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { FaShieldAlt, FaTools, FaHandshake, FaLightbulb } from "react-icons/fa";
-import { T } from "../../../components/T";
+import { T } from "../../components/T";
 
 // Импортируем Swiper React компоненты
 import { Swiper, SwiperSlide } from "swiper/react";
@@ -23,14 +23,12 @@ export default function AboutUsPage() {
         {
             before: "https://via.placeholder.com/800x600?text=До+Забора+1",
             after: "https://via.placeholder.com/800x600?text=После+Забора+1",
-            description:
-                "Old wooden fence replaced with modern vinyl.",
+            description: "Old wooden fence replaced with modern vinyl.",
         },
         {
             before: "https://via.placeholder.com/800x600?text=До+Забора+2",
             after: "https://via.placeholder.com/800x600?text=После+Забора+2",
-            description:
-                "Installation of new metal fencing for security.",
+            description: "Installation of new metal fencing for security.",
         },
         {
             before: "https://via.placeholder.com/800x600?text=До+Забора+3",
@@ -46,10 +44,19 @@ export default function AboutUsPage() {
                 {/* Заголовок и Введение */}
                 <section className="text-center mb-12 md:mb-16">
                     <h1 className="text-4xl md:text-5xl font-extrabold text-[var(--color-primary)] leading-tight mb-4">
-                        <T>About Us: Your Reliable Partner for Fences in America</T>
+                        <T>
+                            About Us: Your Reliable Partner for Fences in
+                            America
+                        </T>
                     </h1>
                     <p className="text-lg md:text-xl max-w-3xl mx-auto">
-                        <T>Welcome to [Your Company Name] – a leader in manufacturing and installing quality fences across America. We specialize in providing durable and aesthetically appealing fencing solutions that protect your property and improve its appearance.</T>
+                        <T>
+                            Welcome to [Your Company Name] – a leader in
+                            manufacturing and installing quality fences across
+                            America. We specialize in providing durable and
+                            aesthetically appealing fencing solutions that
+                            protect your property and improve its appearance.
+                        </T>
                     </p>
                     <p className="text-lg md:text-xl max-w-3xl mx-auto mt-2">
                         <T>From</T>{" "}
@@ -60,7 +67,10 @@ export default function AboutUsPage() {
                         <strong className="text-[var(--color-accent)]">
                             <T>metal and decorative</T>
                         </strong>{" "}
-                        <T>— we offer a wide range of materials and designs to meet any need.</T>
+                        <T>
+                            — we offer a wide range of materials and designs to
+                            meet any need.
+                        </T>
                     </p>
                 </section>
 
@@ -127,7 +137,13 @@ export default function AboutUsPage() {
                         <T>Our Mission</T>
                     </h2>
                     <p className="text-lg text-center max-w-4xl mx-auto">
-                        <T>Our mission is to provide our clients with high-quality, reliable and beautiful fences, while providing exceptional service. We strive to exceed expectations by creating safe and stylish spaces for homes and businesses across the United States.</T>
+                        <T>
+                            Our mission is to provide our clients with
+                            high-quality, reliable and beautiful fences, while
+                            providing exceptional service. We strive to exceed
+                            expectations by creating safe and stylish spaces for
+                            homes and businesses across the United States.
+                        </T>
                     </p>
                 </section>
 
@@ -156,14 +172,26 @@ export default function AboutUsPage() {
                                 <strong className="text-[var(--color-primary)]">
                                     <T>[Your Company Name]</T>
                                 </strong>{" "}
-                                <T>quickly gained a reputation as a reliable supplier and installer of fences. We grew out of a passion for quality, innovation and a desire to provide first-class services that exceed our clients' expectations.</T>
+                                <T>
+                                    quickly gained a reputation as a reliable
+                                    supplier and installer of fences. We grew
+                                    out of a passion for quality, innovation and
+                                    a desire to provide first-class services
+                                    that exceed our clients' expectations.
+                                </T>
                             </p>
                             <p className="text-lg leading-relaxed">
                                 <T>With more than</T>{" "}
                                 <strong className="text-[var(--color-accent)]">
                                     <T>[Number]</T>
                                 </strong>{" "}
-                                <T>years of experience in the industry, we are proud of our heritage in fence manufacturing and installation. We constantly improve our methods and expand our range to offer the most modern and effective fencing solutions.</T>
+                                <T>
+                                    years of experience in the industry, we are
+                                    proud of our heritage in fence manufacturing
+                                    and installation. We constantly improve our
+                                    methods and expand our range to offer the
+                                    most modern and effective fencing solutions.
+                                </T>
                             </p>
                         </div>
                     </div>
@@ -183,7 +211,12 @@ export default function AboutUsPage() {
                                 <T>Experience and Expertise</T>
                             </h3>
                             <p className="text-base">
-                                <T>Our team consists of highly qualified specialists with many years of experience in designing, manufacturing and installing fences of any complexity.</T>
+                                <T>
+                                    Our team consists of highly qualified
+                                    specialists with many years of experience in
+                                    designing, manufacturing and installing
+                                    fences of any complexity.
+                                </T>
                             </p>
                         </div>
                         <div className="bg-[var(--color-card-bg)] p-6 rounded-lg shadow-lg text-center hover:shadow-xl transition-shadow duration-300">
@@ -192,7 +225,12 @@ export default function AboutUsPage() {
                                 <T>Material Quality</T>
                             </h3>
                             <p className="text-base">
-                                <T>We use only certified, durable materials from trusted suppliers, which guarantees the strength and durability of every installed fence.</T>
+                                <T>
+                                    We use only certified, durable materials
+                                    from trusted suppliers, which guarantees the
+                                    strength and durability of every installed
+                                    fence.
+                                </T>
                             </p>
                         </div>
                         <div className="bg-[var(--color-card-bg)] p-6 rounded-lg shadow-lg text-center hover:shadow-xl transition-shadow duration-300">
@@ -201,7 +239,11 @@ export default function AboutUsPage() {
                                 <T>Individual Approach</T>
                             </h3>
                             <p className="text-base">
-                                <T>We understand that every project is unique. We listen carefully to your needs and offer individual solutions.</T>
+                                <T>
+                                    We understand that every project is unique.
+                                    We listen carefully to your needs and offer
+                                    individual solutions.
+                                </T>
                             </p>
                         </div>
                         <div className="bg-[var(--color-card-bg)] p-6 rounded-lg shadow-lg text-center hover:shadow-xl transition-shadow duration-300">
@@ -210,7 +252,12 @@ export default function AboutUsPage() {
                                 <T>Excellent Service</T>
                             </h3>
                             <p className="text-base">
-                                <T>From the first consultation to completion of installation, we guarantee a smooth and professional process. Your satisfaction is our top priority.</T>
+                                <T>
+                                    From the first consultation to completion of
+                                    installation, we guarantee a smooth and
+                                    professional process. Your satisfaction is
+                                    our top priority.
+                                </T>
                             </p>
                         </div>
                     </div>
@@ -229,7 +276,12 @@ export default function AboutUsPage() {
                                 <T>Quality</T>
                             </h3>
                             <p className="text-base">
-                                <T>We strive for excellence in everything we do, from material selection to final installation, so that every fence serves for decades.</T>
+                                <T>
+                                    We strive for excellence in everything we
+                                    do, from material selection to final
+                                    installation, so that every fence serves for
+                                    decades.
+                                </T>
                             </p>
                         </div>
                         <div>
@@ -237,7 +289,12 @@ export default function AboutUsPage() {
                                 <T>Honesty</T>
                             </h3>
                             <p className="text-base">
-                                <T>We build long-term relationships with clients based on trust, transparency and open communication at every stage of the project.</T>
+                                <T>
+                                    We build long-term relationships with
+                                    clients based on trust, transparency and
+                                    open communication at every stage of the
+                                    project.
+                                </T>
                             </p>
                         </div>
                         <div>
@@ -245,7 +302,11 @@ export default function AboutUsPage() {
                                 <T>Customer Focus</T>
                             </h3>
                             <p className="text-base">
-                                <T>Your needs and satisfaction are the driving force of our entire business. We are here to turn your ideas into reality.</T>
+                                <T>
+                                    Your needs and satisfaction are the driving
+                                    force of our entire business. We are here to
+                                    turn your ideas into reality.
+                                </T>
                             </p>
                         </div>
                         <div>
@@ -253,7 +314,12 @@ export default function AboutUsPage() {
                                 <T>Innovation</T>
                             </h3>
                             <p className="text-base">
-                                <T>We constantly search for new and better ways to provide you with the most modern and effective fencing solutions, following the latest industry trends.</T>
+                                <T>
+                                    We constantly search for new and better ways
+                                    to provide you with the most modern and
+                                    effective fencing solutions, following the
+                                    latest industry trends.
+                                </T>
                             </p>
                         </div>
                     </div>
@@ -265,7 +331,10 @@ export default function AboutUsPage() {
                         <T>Ready to discuss your project?</T>
                     </h2>
                     <p className="text-xl mb-6">
-                        <T>Contact us today to get a free consultation and estimate for your future fence!</T>
+                        <T>
+                            Contact us today to get a free consultation and
+                            estimate for your future fence!
+                        </T>
                     </p>
                     <Link
                         href="/contact"

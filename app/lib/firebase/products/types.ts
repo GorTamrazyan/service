@@ -82,3 +82,26 @@ export interface Product {
   createdAt: Date;
   updatedAt: Date;
 }
+
+
+export interface Service {
+    id: string;
+    icon: string;
+    title: string;
+    description: string;
+    features: string[]; // Массив строк
+    price: string;
+    createdAt: Date;
+    updatedAt: Date;
+}
+
+// Тип для консультаций (Consultation)
+export interface Consultation {
+    id: string;
+    title: string;
+    description: string;
+    price: string; // Строка (например, "2 000 $")
+    features: string[]; // Массив строк
+    createdAt: Date;
+    updatedAt: Date;
+}

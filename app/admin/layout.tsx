@@ -3,8 +3,8 @@
 
 import React, { useEffect, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
-import AdminSidebar from "../components/admin/AdminSidebar";
-import AdminHeader from "../components/admin/AdminHeader";
+import AdminSidebar from "./components/AdminSidebar";
+import AdminHeader from "./components/AdminHeader";
 import { Shield } from "lucide-react";
 
 export default function AdminLayout({
@@ -12,7 +12,9 @@ export default function AdminLayout({
 }: {
     children: React.ReactNode;
 }) {
-    const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
+    const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(
+        null
+    );
     const router = useRouter();
     const pathname = usePathname();
 
@@ -34,8 +36,10 @@ export default function AdminLayout({
                         const userData = JSON.parse(adminUser);
                         const loginTime = new Date(userData.loginTime);
                         const now = new Date();
-                        const hoursSinceLogin = (now.getTime() - loginTime.getTime()) / (1000 * 60 * 60);
-                        
+                        const hoursSinceLogin =
+                            (now.getTime() - loginTime.getTime()) /
+                            (1000 * 60 * 60);
+
                         // Session valid for 8 hours
                         if (hoursSinceLogin < 8) {
                             setIsAuthenticated(true);
@@ -46,7 +50,7 @@ export default function AdminLayout({
                     }
                 }
             }
-            
+
             // Clear invalid session and redirect
             localStorage.removeItem("adminSessionToken");
             localStorage.removeItem("adminUser");
@@ -76,7 +80,9 @@ export default function AdminLayout({
             <div className="min-h-screen bg-[var(--color-background)] flex items-center justify-center">
                 <div className="text-center">
                     <Shield className="w-16 h-16 text-[var(--color-accent)] mx-auto mb-4" />
-                    <p className="text-[var(--color-text)]/70">Redirecting to login...</p>
+                    <p className="text-[var(--color-text)]/70">
+                        Redirecting to login...
+                    </p>
                 </div>
             </div>
         );
@@ -92,13 +98,11 @@ export default function AdminLayout({
         <div className="min-h-screen bg-[var(--color-background)] flex">
             {/* Sidebar */}
             <AdminSidebar />
-            
+
             {/* Main Content */}
             <div className="flex-1 flex flex-col">
                 <AdminHeader />
-                <main className="flex-1 p-8 overflow-y-auto">
-                    {children}
-                </main>
+                <main className="flex-1 p-8 overflow-y-auto">{children}</main>
             </div>
         </div>
     );

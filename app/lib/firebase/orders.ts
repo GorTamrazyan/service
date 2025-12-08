@@ -16,6 +16,14 @@ import {
     DocumentSnapshot
 } from "firebase/firestore";
 import { db } from "./firebase";
+import { createOrderNotification } from "./notifications";
+
+export interface Product {
+    id: string;
+    name: string;
+    price: string;
+    quantity: number;
+}
 
 export interface Order {
     id?: string;
@@ -69,6 +77,7 @@ export const orderToFirestore = (order: Omit<Order, 'id'>): DocumentData => {
 };
 
 // Создать новый заказ
+// В lib/firebase/orders.ts
 export const createOrder = async (order: Omit<Order, 'id' | 'createdAt' | 'updatedAt'>): Promise<string> => {
     try {
         const now = new Date();
@@ -80,9 +89,15 @@ export const createOrder = async (order: Omit<Order, 'id' | 'createdAt' | 'updat
 
         const ordersRef = collection(db, 'orders');
         const docRef = await addDoc(ordersRef, orderToFirestore(orderData));
-        return docRef.id;
+        
+        const orderId = docRef.id;
+        
+        // Создаем простое уведомление
+        await createOrderNotification(orderId, order.customerInfo.name);
+        
+        return orderId;
     } catch (error) {
-        console.error('Ошибка при создании заказа:', error);
+        console.error('Error creating order:', error);
         throw error;
     }
 };

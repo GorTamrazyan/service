@@ -45,7 +45,7 @@
   --color-error: #F87171;
   --color-success: #4ADE80;
   --color-warning: #FACC15;
-  --color-info: #60A5FA;
+  --color-info: #2571cf;
   --color-gray-50: #1F2937;
   --color-gray-100: #374151;
   --color-gray-200: #4B5563;
@@ -62,4 +62,27 @@
 
 body {
   font-family: Arial, Helvetica, sans-serif;
+}
+
+/* Добавьте в ваш globals.css */
+.notification-dropdown {
+  backdrop-filter: blur(10px);
+}
+
+/* Стили для скроллбара */
+.max-h-96::-webkit-scrollbar {
+  width: 4px;
+}
+
+.max-h-96::-webkit-scrollbar-track {
+  background: var(--color-secondary);
+}
+
+.max-h-96::-webkit-scrollbar-thumb {
+  background: var(--color-text)/20;
+  border-radius: 2px;
+}
+
+.max-h-96::-webkit-scrollbar-thumb:hover {
+  background: var(--color-text)/40;
 }

@@ -14,13 +14,13 @@ import {
     Upload,
     Image as ImageIcon,
 } from "lucide-react";
-import { T } from "../../components/T";
+import { T } from "../../client/components/T";
 import {
     CategoryModal,
     MaterialModal,
     ColorModal,
     TypeModal,
-} from "../../components/admin/modals";
+} from "../components/modals";
 import {
     getAllProducts,
     createProduct,
@@ -161,7 +161,10 @@ export default function AdminProductsPage() {
 
             // Загружаем изображения в Storage если они есть
             if (newProductImages.length > 0) {
-                const imageUrls = await uploadProductImages(newProductImages, productId);
+                const imageUrls = await uploadProductImages(
+                    newProductImages,
+                    productId
+                );
 
                 // Сохраняем информацию об изображениях в Firestore
                 for (let i = 0; i < imageUrls.length; i++) {
@@ -191,7 +194,9 @@ export default function AdminProductsPage() {
             loadProducts();
         } catch (error) {
             console.error("Error adding product:", error);
-            setError(error instanceof Error ? error.message : "Failed to add product");
+            setError(
+                error instanceof Error ? error.message : "Failed to add product"
+            );
         } finally {
             setIsLoading(false);
         }
@@ -207,7 +212,11 @@ export default function AdminProductsPage() {
                 loadProducts();
             } catch (error) {
                 console.error("Error deleting product:", error);
-                setError(error instanceof Error ? error.message : "Failed to delete product");
+                setError(
+                    error instanceof Error
+                        ? error.message
+                        : "Failed to delete product"
+                );
             }
         }
     };
@@ -252,7 +261,10 @@ export default function AdminProductsPage() {
 
             // Загружаем новые изображения если они есть
             if (editProductImages.length > 0) {
-                const imageUrls = await uploadProductImages(editProductImages, editingProduct.id);
+                const imageUrls = await uploadProductImages(
+                    editProductImages,
+                    editingProduct.id
+                );
 
                 // Сохраняем информацию о новых изображениях в Firestore
                 for (let i = 0; i < imageUrls.length; i++) {
@@ -272,7 +284,11 @@ export default function AdminProductsPage() {
             loadProducts();
         } catch (error) {
             console.error("Error updating product:", error);
-            setError(error instanceof Error ? error.message : "Failed to update product");
+            setError(
+                error instanceof Error
+                    ? error.message
+                    : "Failed to update product"
+            );
         } finally {
             setIsLoading(false);
         }
@@ -283,7 +299,8 @@ export default function AdminProductsPage() {
             .toLowerCase()
             .includes(searchQuery.toLowerCase());
         const matchesCategory =
-            selectedCategory === "all" || product.categoryId === selectedCategory;
+            selectedCategory === "all" ||
+            product.categoryId === selectedCategory;
         return matchesSearch && matchesCategory;
     });
 
@@ -394,8 +411,11 @@ export default function AdminProductsPage() {
             </div>
 
             {/* Products Table */}
-            {categories.map((categorie)=>(
-                <div key={categorie.id} className="bg-[var(--color-background)] rounded-2xl shadow-xl border border-[var(--color-text)]/10 overflow-hidden">
+            {categories.map((categorie) => (
+                <div
+                    key={categorie.id}
+                    className="bg-[var(--color-background)] rounded-2xl shadow-xl border border-[var(--color-text)]/10 overflow-hidden"
+                >
                     <div className="overflow-x-auto">
                         <table className="w-full">
                             <thead className="bg-[var(--color-secondary)]">
@@ -447,10 +467,16 @@ export default function AdminProductsPage() {
                                                     </div>
                                                 </div>
                                             </td>
-                                            
+
                                             <td className="p-6">
                                                 <span className="capitalize text-[var(--color-text)]">
-                                                    {materials.find(material => material.id === product.materialId)?.name}
+                                                    {
+                                                        materials.find(
+                                                            (material) =>
+                                                                material.id ===
+                                                                product.materialId
+                                                        )?.name
+                                                    }
                                                 </span>
                                             </td>
                                             <td className="p-6">
@@ -462,7 +488,9 @@ export default function AdminProductsPage() {
                                                 <span className="text-sm text-[var(--color-text)]/60">
                                                     {new Date(
                                                         product.createdAt
-                                                    ).toLocaleDateString("ru-RU")}
+                                                    ).toLocaleDateString(
+                                                        "ru-RU"
+                                                    )}
                                                 </span>
                                             </td>
                                             <td className="p-6">
@@ -562,8 +590,7 @@ export default function AdminProductsPage() {
                                     onChange={(e) =>
                                         setNewProduct((prev) => ({
                                             ...prev,
-                                            price:
-                                                parseFloat(e.target.value),
+                                            price: parseFloat(e.target.value),
                                         }))
                                     }
                                     min={0}
@@ -656,28 +683,43 @@ export default function AdminProductsPage() {
                                         <label
                                             key={color.id}
                                             className={`flex items-center gap-2 p-2 border rounded-lg cursor-pointer transition-all ${
-                                                newProduct.colorIds.includes(color.id!)
+                                                newProduct.colorIds.includes(
+                                                    color.id!
+                                                )
                                                     ? "border-[var(--color-accent)] bg-[var(--color-accent)]/10"
                                                     : "border-[var(--color-text)]/30 hover:border-[var(--color-accent)]/50"
                                             }`}
                                         >
                                             <input
                                                 type="checkbox"
-                                                checked={newProduct.colorIds.includes(color.id!)}
+                                                checked={newProduct.colorIds.includes(
+                                                    color.id!
+                                                )}
                                                 onChange={(e) => {
                                                     const colorId = color.id!;
                                                     setNewProduct((prev) => ({
                                                         ...prev,
-                                                        colorIds: e.target.checked
-                                                            ? [...prev.colorIds, colorId]
-                                                            : prev.colorIds.filter((id) => id !== colorId),
+                                                        colorIds: e.target
+                                                            .checked
+                                                            ? [
+                                                                  ...prev.colorIds,
+                                                                  colorId,
+                                                              ]
+                                                            : prev.colorIds.filter(
+                                                                  (id) =>
+                                                                      id !==
+                                                                      colorId
+                                                              ),
                                                     }));
                                                 }}
                                                 className="sr-only"
                                             />
                                             <div
                                                 className="w-6 h-6 rounded border-2 border-[var(--color-text)]/20 flex-shrink-0"
-                                                style={{ backgroundColor: color.hexCode }}
+                                                style={{
+                                                    backgroundColor:
+                                                        color.hexCode,
+                                                }}
                                             />
                                             <span className="text-sm text-[var(--color-text)] truncate">
                                                 {color.name}
@@ -697,7 +739,10 @@ export default function AdminProductsPage() {
                                             <div className="flex flex-col items-center justify-center pt-5 pb-6">
                                                 <Upload className="w-8 h-8 mb-2 text-[var(--color-text)]/50" />
                                                 <p className="mb-2 text-sm text-[var(--color-text)]/70">
-                                                    <span className="font-semibold"><T>Click to upload</T></span> <T>or drag and drop</T>
+                                                    <span className="font-semibold">
+                                                        <T>Click to upload</T>
+                                                    </span>{" "}
+                                                    <T>or drag and drop</T>
                                                 </p>
                                                 <p className="text-xs text-[var(--color-text)]/50">
                                                     PNG, JPG, WEBP (MAX. 5MB)
@@ -709,42 +754,63 @@ export default function AdminProductsPage() {
                                                 accept="image/*"
                                                 multiple
                                                 onChange={(e) => {
-                                                    const files = Array.from(e.target.files || []);
-                                                    setNewProductImages((prev) => [...prev, ...files]);
+                                                    const files = Array.from(
+                                                        e.target.files || []
+                                                    );
+                                                    setNewProductImages(
+                                                        (prev) => [
+                                                            ...prev,
+                                                            ...files,
+                                                        ]
+                                                    );
                                                 }}
                                             />
                                         </label>
                                     </div>
                                     {newProductImages.length > 0 && (
                                         <div className="grid grid-cols-3 gap-2 mt-2">
-                                            {newProductImages.map((file, index) => (
-                                                <div
-                                                    key={index}
-                                                    className="relative group aspect-square rounded-lg overflow-hidden border border-[var(--color-text)]/20"
-                                                >
-                                                    <img
-                                                        src={URL.createObjectURL(file)}
-                                                        alt={`Preview ${index + 1}`}
-                                                        className="w-full h-full object-cover"
-                                                    />
-                                                    <button
-                                                        type="button"
-                                                        onClick={() =>
-                                                            setNewProductImages((prev) =>
-                                                                prev.filter((_, i) => i !== index)
-                                                            )
-                                                        }
-                                                        className="absolute top-1 right-1 p-1 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                                            {newProductImages.map(
+                                                (file, index) => (
+                                                    <div
+                                                        key={index}
+                                                        className="relative group aspect-square rounded-lg overflow-hidden border border-[var(--color-text)]/20"
                                                     >
-                                                        <X className="w-3 h-3" />
-                                                    </button>
-                                                    {index === 0 && (
-                                                        <div className="absolute bottom-1 left-1 px-2 py-0.5 bg-[var(--color-accent)] text-white text-xs rounded">
-                                                            <T>Primary</T>
-                                                        </div>
-                                                    )}
-                                                </div>
-                                            ))}
+                                                        <img
+                                                            src={URL.createObjectURL(
+                                                                file
+                                                            )}
+                                                            alt={`Preview ${
+                                                                index + 1
+                                                            }`}
+                                                            className="w-full h-full object-cover"
+                                                        />
+                                                        <button
+                                                            type="button"
+                                                            onClick={() =>
+                                                                setNewProductImages(
+                                                                    (prev) =>
+                                                                        prev.filter(
+                                                                            (
+                                                                                _,
+                                                                                i
+                                                                            ) =>
+                                                                                i !==
+                                                                                index
+                                                                        )
+                                                                )
+                                                            }
+                                                            className="absolute top-1 right-1 p-1 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                                                        >
+                                                            <X className="w-3 h-3" />
+                                                        </button>
+                                                        {index === 0 && (
+                                                            <div className="absolute bottom-1 left-1 px-2 py-0.5 bg-[var(--color-accent)] text-white text-xs rounded">
+                                                                <T>Primary</T>
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                )
+                                            )}
                                         </div>
                                     )}
                                 </div>
@@ -762,7 +828,11 @@ export default function AdminProductsPage() {
                                     disabled={isLoading}
                                     className="flex-1 bg-[var(--color-accent)] text-white px-4 py-2 rounded-xl hover:opacity-90 transition-opacity disabled:opacity-50"
                                 >
-                                    <T>{isLoading ? "Adding..." : "Add Product"}</T>
+                                    <T>
+                                        {isLoading
+                                            ? "Adding..."
+                                            : "Add Product"}
+                                    </T>
                                 </button>
                                 <button
                                     type="button"
@@ -851,8 +921,7 @@ export default function AdminProductsPage() {
                                     onChange={(e) =>
                                         setEditProduct((prev) => ({
                                             ...prev,
-                                            price:
-                                                parseFloat(e.target.value),
+                                            price: parseFloat(e.target.value),
                                         }))
                                     }
                                     min={0}
@@ -945,28 +1014,43 @@ export default function AdminProductsPage() {
                                         <label
                                             key={color.id}
                                             className={`flex items-center gap-2 p-2 border rounded-lg cursor-pointer transition-all ${
-                                                editProduct.colorIds.includes(color.id!)
+                                                editProduct.colorIds.includes(
+                                                    color.id!
+                                                )
                                                     ? "border-[var(--color-accent)] bg-[var(--color-accent)]/10"
                                                     : "border-[var(--color-text)]/30 hover:border-[var(--color-accent)]/50"
                                             }`}
                                         >
                                             <input
                                                 type="checkbox"
-                                                checked={editProduct.colorIds.includes(color.id!)}
+                                                checked={editProduct.colorIds.includes(
+                                                    color.id!
+                                                )}
                                                 onChange={(e) => {
                                                     const colorId = color.id!;
                                                     setEditProduct((prev) => ({
                                                         ...prev,
-                                                        colorIds: e.target.checked
-                                                            ? [...prev.colorIds, colorId]
-                                                            : prev.colorIds.filter((id) => id !== colorId),
+                                                        colorIds: e.target
+                                                            .checked
+                                                            ? [
+                                                                  ...prev.colorIds,
+                                                                  colorId,
+                                                              ]
+                                                            : prev.colorIds.filter(
+                                                                  (id) =>
+                                                                      id !==
+                                                                      colorId
+                                                              ),
                                                     }));
                                                 }}
                                                 className="sr-only"
                                             />
                                             <div
                                                 className="w-6 h-6 rounded border-2 border-[var(--color-text)]/20 flex-shrink-0"
-                                                style={{ backgroundColor: color.hexCode }}
+                                                style={{
+                                                    backgroundColor:
+                                                        color.hexCode,
+                                                }}
                                             />
                                             <span className="text-sm text-[var(--color-text)] truncate">
                                                 {color.name}
@@ -986,7 +1070,10 @@ export default function AdminProductsPage() {
                                             <div className="flex flex-col items-center justify-center pt-5 pb-6">
                                                 <Upload className="w-8 h-8 mb-2 text-[var(--color-text)]/50" />
                                                 <p className="mb-2 text-sm text-[var(--color-text)]/70">
-                                                    <span className="font-semibold"><T>Click to upload</T></span> <T>or drag and drop</T>
+                                                    <span className="font-semibold">
+                                                        <T>Click to upload</T>
+                                                    </span>{" "}
+                                                    <T>or drag and drop</T>
                                                 </p>
                                                 <p className="text-xs text-[var(--color-text)]/50">
                                                     PNG, JPG, WEBP (MAX. 5MB)
@@ -998,42 +1085,63 @@ export default function AdminProductsPage() {
                                                 accept="image/*"
                                                 multiple
                                                 onChange={(e) => {
-                                                    const files = Array.from(e.target.files || []);
-                                                    setEditProductImages((prev) => [...prev, ...files]);
+                                                    const files = Array.from(
+                                                        e.target.files || []
+                                                    );
+                                                    setEditProductImages(
+                                                        (prev) => [
+                                                            ...prev,
+                                                            ...files,
+                                                        ]
+                                                    );
                                                 }}
                                             />
                                         </label>
                                     </div>
                                     {editProductImages.length > 0 && (
                                         <div className="grid grid-cols-3 gap-2 mt-2">
-                                            {editProductImages.map((file, index) => (
-                                                <div
-                                                    key={index}
-                                                    className="relative group aspect-square rounded-lg overflow-hidden border border-[var(--color-text)]/20"
-                                                >
-                                                    <img
-                                                        src={URL.createObjectURL(file)}
-                                                        alt={`Preview ${index + 1}`}
-                                                        className="w-full h-full object-cover"
-                                                    />
-                                                    <button
-                                                        type="button"
-                                                        onClick={() =>
-                                                            setEditProductImages((prev) =>
-                                                                prev.filter((_, i) => i !== index)
-                                                            )
-                                                        }
-                                                        className="absolute top-1 right-1 p-1 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                                            {editProductImages.map(
+                                                (file, index) => (
+                                                    <div
+                                                        key={index}
+                                                        className="relative group aspect-square rounded-lg overflow-hidden border border-[var(--color-text)]/20"
                                                     >
-                                                        <X className="w-3 h-3" />
-                                                    </button>
-                                                    {index === 0 && (
-                                                        <div className="absolute bottom-1 left-1 px-2 py-0.5 bg-[var(--color-accent)] text-white text-xs rounded">
-                                                            <T>Primary</T>
-                                                        </div>
-                                                    )}
-                                                </div>
-                                            ))}
+                                                        <img
+                                                            src={URL.createObjectURL(
+                                                                file
+                                                            )}
+                                                            alt={`Preview ${
+                                                                index + 1
+                                                            }`}
+                                                            className="w-full h-full object-cover"
+                                                        />
+                                                        <button
+                                                            type="button"
+                                                            onClick={() =>
+                                                                setEditProductImages(
+                                                                    (prev) =>
+                                                                        prev.filter(
+                                                                            (
+                                                                                _,
+                                                                                i
+                                                                            ) =>
+                                                                                i !==
+                                                                                index
+                                                                        )
+                                                                )
+                                                            }
+                                                            className="absolute top-1 right-1 p-1 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                                                        >
+                                                            <X className="w-3 h-3" />
+                                                        </button>
+                                                        {index === 0 && (
+                                                            <div className="absolute bottom-1 left-1 px-2 py-0.5 bg-[var(--color-accent)] text-white text-xs rounded">
+                                                                <T>Primary</T>
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                )
+                                            )}
                                         </div>
                                     )}
                                 </div>
@@ -1051,7 +1159,11 @@ export default function AdminProductsPage() {
                                     disabled={isLoading}
                                     className="flex-1 bg-[var(--color-accent)] text-white px-4 py-2 rounded-xl hover:opacity-90 transition-opacity disabled:opacity-50"
                                 >
-                                    <T>{isLoading ? "Updating..." : "Update Product"}</T>
+                                    <T>
+                                        {isLoading
+                                            ? "Updating..."
+                                            : "Update Product"}
+                                    </T>
                                 </button>
                                 <button
                                     type="button"

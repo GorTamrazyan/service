@@ -1,7 +1,6 @@
 // app/client/dashboard/home/page.tsx
 "use client";
 
-
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
@@ -16,8 +15,8 @@ import {
 } from "react-icons/fa";
 
 // ПРАВИЛЬНЫЙ импорт ProductCard из компонента ProductList
-import { ProductCard } from "../../../components/ProductList";
-import { T } from "../../../components/T";
+import { ProductCard } from "../../components/ProductList";
+import { T } from "../../components/T";
 import type { Material, Color } from "../../../lib/firebase/products/types";
 
 interface Product {
@@ -71,39 +70,43 @@ export default function HomePage() {
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 {/* Hero Section */}
                 <section className="text-center mb-16 md:mb-20 bg-[var(--color-primary)] text-white p-8 md:p-12 rounded-lg shadow-xl relative overflow-hidden">
-                        <Image src={"/images/vinyl_fence_classic.jpeg"} alt="background" fill className="object-cover absolute inset-0 z-0" />
-                        <div className="relative z-10">
-                            <h1 className="text-4xl md:text-6xl font-extrabold leading-tight mb-4">
-                                <T>High Quality Fences for Your</T>{" "}
-                                <span className="text-[var(--color-accent)]">
-                                    <T>Home and Business</T>
-                                </span>
-                                !
-                            </h1>
-                            <p className="text-xl md:text-2xl max-w-4xl mx-auto mb-8">
-                                <T>
-                                    We offer a full range of fencing solutions,
-                                    from design and manufacturing to
-                                    professional installation. Our products
-                                    combine reliability, aesthetics and
-                                    functionality.
-                                </T>
-                            </p>
-                            <div className="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-6">
-                                <Link
-                                    href="/client/dashboard/products"
-                                    className="inline-block bg-[var(--color-accent)] hover:bg-opacity-90 text-[var(--color-primary)] font-bold py-3 px-8 rounded-full text-lg transition-colors duration-300 shadow-lg"
-                                >
-                                    <T>View Products</T>
-                                </Link>
-                                <Link
-                                    href="/contact"
-                                    className="inline-block border-2 border-white hover:border-[var(--color-accent)] text-white hover:text-[var(--color-accent)] font-bold py-3 px-8 rounded-full text-lg transition-colors duration-300 shadow-lg"
-                                >
-                                    <T>Get Free Quote</T>
-                                </Link>
-                            </div>
+                    <Image
+                        src={"/images/vinyl_fence_classic.jpeg"}
+                        alt="background"
+                        fill
+                        className="object-cover absolute inset-0 z-0"
+                    />
+                    <div className="relative z-10">
+                        <h1 className="text-4xl md:text-6xl font-extrabold leading-tight mb-4">
+                            <T>High Quality Fences for Your</T>{" "}
+                            <span className="text-[var(--color-accent)]">
+                                <T>Home and Business</T>
+                            </span>
+                            !
+                        </h1>
+                        <p className="text-xl md:text-2xl max-w-4xl mx-auto mb-8">
+                            <T>
+                                We offer a full range of fencing solutions, from
+                                design and manufacturing to professional
+                                installation. Our products combine reliability,
+                                aesthetics and functionality.
+                            </T>
+                        </p>
+                        <div className="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-6">
+                            <Link
+                                href="/client/dashboard/products"
+                                className="inline-block bg-[var(--color-accent)] hover:bg-opacity-90 text-[var(--color-primary)] font-bold py-3 px-8 rounded-full text-lg transition-colors duration-300 shadow-lg"
+                            >
+                                <T>View Products</T>
+                            </Link>
+                            <Link
+                                href="/contact"
+                                className="inline-block border-2 border-white hover:border-[var(--color-accent)] text-white hover:text-[var(--color-accent)] font-bold py-3 px-8 rounded-full text-lg transition-colors duration-300 shadow-lg"
+                            >
+                                <T>Get Free Quote</T>
+                            </Link>
                         </div>
+                    </div>
                 </section>
 
                 <hr className="border-[var(--color-accent)] my-12" />

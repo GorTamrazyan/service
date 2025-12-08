@@ -5,10 +5,11 @@ import React, { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useCart } from "../../context/CartContext";
-import { T } from "../../../components/T";
+import { T } from "../../components/T";
 import { createOrder } from "../../../lib/firebase/orders";
 import { useAuthState } from "../../../hooks/useAuthState";
 import { useProfile } from "../../../hooks/useProfile";
+import { Color } from "@/app/lib/firebase/products";
 
 export default function CartPage() {
     const {
@@ -20,33 +21,39 @@ export default function CartPage() {
     } = useCart();
 
     const [user] = useAuthState();
-    const {profile} = useProfile();
+    const { profile } = useProfile();
     const [showCheckoutModal, setShowCheckoutModal] = useState(false);
     const [customerInfo, setCustomerInfo] = useState({
-        name: '',
-        email: '',
-        phone: '',
-        address: ''
+        name: "",
+        email: "",
+        phone: "",
+        address: "",
     });
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     // Функция для открытия модального окна с предзаполненными данными
     const openCheckoutModal = () => {
         if (profile) {
-            const fullAddress = `${profile.address.city},${profile.address.street} ${profile.address.apartmentNumber } ${profile.address.houseNumber}, ${profile.address.zipCode}`.trim();
+            const fullAddress = `${profile.address.city}, ${
+                profile.address.street
+            } ${profile.address.houseNumber}${
+                profile.address.apartmentNumber
+                    ? `, apt. ${profile.address.apartmentNumber}`
+                    : ""
+            }, ${profile.address.zipCode}`.trim();
 
             setCustomerInfo({
-                name: `${profile.firstName} ${profile.lastName}`.trim() || '',
-                email: profile.email || user?.email || '',
-                phone: profile.phone || '',
-                address: fullAddress || ''
+                name: `${profile.firstName} ${profile.lastName}`.trim() || "",
+                email: profile.email || user?.email || "",
+                phone: profile.phone || "",
+                address: fullAddress || "",
             });
         } else {
             setCustomerInfo({
-                name: '',
-                email: user?.email || '',
-                phone: '',
-                address: ''
+                name: "",
+                email: user?.email || "",
+                phone: "",
+                address: "",
             });
         }
         setShowCheckoutModal(true);
@@ -61,40 +68,42 @@ export default function CartPage() {
         try {
             const orderData = {
                 userId: user.uid,
-                products: cartItems.map(item => ({
+                products: cartItems.map((item) => ({
                     id: item.id,
                     name: item.name,
                     price: item.price,
                     quantity: item.quantity,
-                    color: item.color
+                    color: item.color?.hexCode,
                 })),
                 totalPrice: getTotalPrice().toFixed(2),
-                status: 'pending' as const,
-                customerInfo
+                status: "pending" as const,
+                customerInfo,
             };
 
             await createOrder(orderData);
             clearCart();
             setShowCheckoutModal(false);
-            alert('Заказ успешно оформлен!');
+            alert("Your order has been successfully placed!");
         } catch (error) {
-            console.error('Ошибка при создании заказа:', error);
-            alert('Ошибка при оформлении заказа. Попробуйте еще раз.');
+            console.error("Error creating order:", error);
+            alert("There was an error placing your order. Please try again.");
         } finally {
             setIsSubmitting(false);
         }
     };
 
     // Функции для изменения количества
-    const incrementQuantity = (id: string, currentQuantity: number) => {
-        if (currentQuantity < 100) { // Ограничиваем максимальное количество
-            updateQuantity(id, currentQuantity + 1);
+    const incrementQuantity = (id: string, currentQuantity: number,colorId?:string) => {
+        if (currentQuantity < 100) {
+            // Ограничиваем максимальное количество
+            updateQuantity(id, currentQuantity + 1, colorId);
         }
     };
 
-    const decrementQuantity = (id: string, currentQuantity: number) => {
-        if (currentQuantity > 1) { // Минимальное количество 1
-            updateQuantity(id, currentQuantity - 1);
+    const decrementQuantity = (id: string, currentQuantity: number,colorId?:string) => {
+        if (currentQuantity > 1) {
+            // Минимальное количество 1
+            updateQuantity(id, currentQuantity - 1, colorId);
         }
     };
 
@@ -115,6 +124,12 @@ export default function CartPage() {
                 </Link>
             </div>
         );
+    } else {
+        cartItems.map((item) => color(item.color));
+    }
+
+    function color(color: Color | null) {
+        console.log("Color data:", color);
     }
 
     return (
@@ -127,7 +142,7 @@ export default function CartPage() {
                 <div className="bg-[var(--color-card-bg)] rounded-lg shadow-xl p-6 md:p-8">
                     {cartItems.map((item) => (
                         <div
-                            key={item.id}
+                            key={`${item.id}-${item.color?.id || "default"}`}
                             className="flex flex-col sm:flex-row sm:items-center border-b border-[var(--color-border)] py-4 last:border-b-0 gap-4"
                         >
                             <div className="flex items-start sm:items-center gap-4 flex-1">
@@ -145,43 +160,39 @@ export default function CartPage() {
                                         {item.name}
                                     </h2>
                                     <p className="text-sm sm:text-base text-[var(--color-gray-600)]">
-                                        <T>Price</T>: ${parseFloat(item.price).toFixed(2)}
+                                        <T>Price</T>: $
+                                        {parseFloat(item.price).toFixed(2)}
                                     </p>
+                                    <div className="flex flex-row gap-2">
+                                        <p className="text-sm sm:text-base text-[var(--color-gray-600)]">
+                                            <T>Height</T>: {item.height}m
+                                        </p>
+                                        <p className="text-sm sm:text-base text-[var(--color-gray-600)]">
+                                            <T>Length</T>: {item.length}m
+                                        </p>
+                                    </div>
+                                    <div className="flex items-center gap-2 mt-1">
+                                        <div
+                                            className="w-4 h-4 rounded-full border border-gray-300"
+                                            style={{
+                                                backgroundColor:
+                                                    item.color?.hexCode,
+                                            }}
+                                        ></div>
+                                        <span className="text-xs text-[var(--color-gray-600)]">
+                                            {item.color?.name}
+                                        </span>
+                                    </div>
                                     <div className="sm:hidden mt-2">
                                         <p className="text-base font-bold text-[var(--color-accent)]">
-                                            ${(parseFloat(item.price) * item.quantity).toFixed(2)}
+                                            $
+                                            {(
+                                                parseFloat(item.price) *
+                                                item.quantity
+                                            ).toFixed(2)}
                                         </p>
                                     </div>
                                 </div>
-                            </div>
-                            <div>
-                                <button
-                                    key={item.id}
-                                    onClick={() =>
-                                        setSelectedColor(color.id || null)
-                                    }
-                                    className={`flex items-center gap-2 p-3 rounded-xl border-2 transition-all ${
-                                        selectedColor === color.id
-                                            ? "border-[var(--color-accent)] bg-[var(--color-accent)]/10 shadow-md"
-                                            : "border-[var(--color-border)] hover:border-[var(--color-accent)]/50"
-                                    }`}
-                                >
-                                    <div
-                                        className="w-8 h-8 rounded-full border-2 border-gray-300 shadow-sm flex-shrink-0"
-                                        style={{
-                                            backgroundColor:
-                                                color.hexCode,
-                                        }}
-                                    ></div>
-                                    <div className="text-left flex-1 min-w-0">
-                                        <p className="text-sm font-semibold text-[var(--color-primary)] truncate">
-                                            <T>{color.name}</T>
-                                        </p>
-                                        <p className="text-xs text-[var(--color-text)]/60">
-                                            {color.hexCode}
-                                        </p>
-                                    </div>
-                                </button>
                             </div>
 
                             <div className="flex items-center justify-between sm:justify-end gap-4 sm:gap-6">
@@ -190,7 +201,13 @@ export default function CartPage() {
                                         <T>Quantity:</T>
                                     </span>
                                     <button
-                                        onClick={() => decrementQuantity(item.id, item.quantity)}
+                                        onClick={() =>
+                                            decrementQuantity(
+                                                item.id,
+                                                item.quantity,
+                                                item.color?.id
+                                            )
+                                        }
                                         disabled={item.quantity <= 1}
                                         className={`
                                             flex items-center justify-center
@@ -198,9 +215,10 @@ export default function CartPage() {
                                             font-bold text-lg sm:text-xl
                                             transition-all duration-200 ease-in-out
                                             shadow-sm hover:shadow-md flex-shrink-0
-                                            ${item.quantity <= 1
-                                                ? 'border-[var(--color-gray-300)] text-[var(--color-gray-300)] cursor-not-allowed bg-[var(--color-gray-50)]'
-                                                : 'border-[var(--color-accent)] text-[var(--color-accent)] hover:bg-[var(--color-accent)] hover:text-white cursor-pointer bg-[var(--color-card-bg)] hover:scale-105 active:scale-95'
+                                            ${
+                                                item.quantity <= 1
+                                                    ? "border-[var(--color-gray-300)] text-[var(--color-gray-300)] cursor-not-allowed bg-[var(--color-gray-50)]"
+                                                    : "border-[var(--color-accent)] text-[var(--color-accent)] hover:bg-[var(--color-accent)] hover:text-white cursor-pointer bg-[var(--color-card-bg)] hover:scale-105 active:scale-95"
                                             }
                                         `}
                                     >
@@ -214,7 +232,13 @@ export default function CartPage() {
                                     </div>
 
                                     <button
-                                        onClick={() => incrementQuantity(item.id, item.quantity)}
+                                        onClick={() =>
+                                            incrementQuantity(
+                                                item.id,
+                                                item.quantity,
+                                                item.color?.id
+                                            )
+                                        }
                                         disabled={item.quantity >= 100}
                                         className={`
                                             flex items-center justify-center
@@ -222,9 +246,10 @@ export default function CartPage() {
                                             font-bold text-lg sm:text-xl
                                             transition-all duration-200 ease-in-out
                                             shadow-sm hover:shadow-md flex-shrink-0
-                                            ${item.quantity >= 100
-                                                ? 'border-[var(--color-gray-300)] text-[var(--color-gray-300)] cursor-not-allowed bg-[var(--color-gray-50)]'
-                                                : 'border-[var(--color-accent)] text-[var(--color-accent)] hover:bg-[var(--color-accent)] hover:text-white cursor-pointer bg-[var(--color-card-bg)] hover:scale-105 active:scale-95'
+                                            ${
+                                                item.quantity >= 100
+                                                    ? "border-[var(--color-gray-300)] text-[var(--color-gray-300)] cursor-not-allowed bg-[var(--color-gray-50)]"
+                                                    : "border-[var(--color-accent)] text-[var(--color-accent)] hover:bg-[var(--color-accent)] hover:text-white cursor-pointer bg-[var(--color-card-bg)] hover:scale-105 active:scale-95"
                                             }
                                         `}
                                     >
@@ -234,7 +259,12 @@ export default function CartPage() {
 
                                 <div className="flex items-center gap-4">
                                     <button
-                                        onClick={() => removeFromCart(item.id)}
+                                        onClick={() =>
+                                            removeFromCart(
+                                                item.id,
+                                                item.color?.id
+                                            )
+                                        }
                                         className="text-[var(--color-error)] hover:opacity-80 text-xs sm:text-sm font-semibold transition-colors duration-200 whitespace-nowrap"
                                     >
                                         <T>Remove</T>
@@ -242,7 +272,11 @@ export default function CartPage() {
 
                                     <div className="hidden sm:block">
                                         <p className="text-lg font-bold text-[var(--color-accent)] whitespace-nowrap">
-                                            ${(parseFloat(item.price) * item.quantity).toFixed(2)}
+                                            $
+                                            {(
+                                                parseFloat(item.price) *
+                                                item.quantity
+                                            ).toFixed(2)}
                                         </p>
                                     </div>
                                 </div>
@@ -285,7 +319,9 @@ export default function CartPage() {
                                         <T>Checkout</T>
                                     </h2>
                                     <button
-                                        onClick={() => setShowCheckoutModal(false)}
+                                        onClick={() =>
+                                            setShowCheckoutModal(false)
+                                        }
                                         className="text-[var(--color-gray-500)] hover:text-[var(--color-gray-700)] text-2xl"
                                     >
                                         ×
@@ -302,7 +338,12 @@ export default function CartPage() {
                                                 type="text"
                                                 required
                                                 value={customerInfo.name}
-                                                onChange={(e) => setCustomerInfo({...customerInfo, name: e.target.value})}
+                                                onChange={(e) =>
+                                                    setCustomerInfo({
+                                                        ...customerInfo,
+                                                        name: e.target.value,
+                                                    })
+                                                }
                                                 className="w-full px-3 py-2 border border-[var(--color-input-border)] bg-[var(--color-input-bg)] text-[var(--color-text)] rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
                                             />
                                         </div>
@@ -315,7 +356,12 @@ export default function CartPage() {
                                                 type="email"
                                                 required
                                                 value={customerInfo.email}
-                                                onChange={(e) => setCustomerInfo({...customerInfo, email: e.target.value})}
+                                                onChange={(e) =>
+                                                    setCustomerInfo({
+                                                        ...customerInfo,
+                                                        email: e.target.value,
+                                                    })
+                                                }
                                                 className="w-full px-3 py-2 border border-[var(--color-input-border)] bg-[var(--color-input-bg)] text-[var(--color-text)] rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
                                             />
                                         </div>
@@ -327,7 +373,12 @@ export default function CartPage() {
                                             <input
                                                 type="tel"
                                                 value={customerInfo.phone}
-                                                onChange={(e) => setCustomerInfo({...customerInfo, phone: e.target.value})}
+                                                onChange={(e) =>
+                                                    setCustomerInfo({
+                                                        ...customerInfo,
+                                                        phone: e.target.value,
+                                                    })
+                                                }
                                                 className="w-full px-3 py-2 border border-[var(--color-input-border)] bg-[var(--color-input-bg)] text-[var(--color-text)] rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
                                             />
                                         </div>
@@ -339,7 +390,12 @@ export default function CartPage() {
                                             <textarea
                                                 required
                                                 value={customerInfo.address}
-                                                onChange={(e) => setCustomerInfo({...customerInfo, address: e.target.value})}
+                                                onChange={(e) =>
+                                                    setCustomerInfo({
+                                                        ...customerInfo,
+                                                        address: e.target.value,
+                                                    })
+                                                }
                                                 rows={3}
                                                 className="w-full px-3 py-2 border border-[var(--color-input-border)] bg-[var(--color-input-bg)] text-[var(--color-text)] rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
                                             />
@@ -351,7 +407,8 @@ export default function CartPage() {
                                                     <T>Total:</T>
                                                 </span>
                                                 <span className="text-xl font-bold text-[var(--color-accent)]">
-                                                    ${getTotalPrice().toFixed(2)}
+                                                    $
+                                                    {getTotalPrice().toFixed(2)}
                                                 </span>
                                             </div>
                                         </div>
@@ -360,7 +417,9 @@ export default function CartPage() {
                                     <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-4 mt-6">
                                         <button
                                             type="button"
-                                            onClick={() => setShowCheckoutModal(false)}
+                                            onClick={() =>
+                                                setShowCheckoutModal(false)
+                                            }
                                             className="flex-1 px-4 py-2 bg-[var(--color-gray-200)] text-[var(--color-gray-800)] rounded-md font-semibold hover:bg-[var(--color-gray-300)] transition-colors"
                                         >
                                             <T>Cancel</T>
@@ -370,7 +429,11 @@ export default function CartPage() {
                                             disabled={isSubmitting}
                                             className="flex-1 px-4 py-2 bg-[var(--color-accent)] text-[var(--color-primary)] rounded-md font-semibold hover:bg-opacity-90 transition-colors disabled:opacity-50"
                                         >
-                                            {isSubmitting ? <T>Processing...</T> : <T>Place Order</T>}
+                                            {isSubmitting ? (
+                                                <T>Processing...</T>
+                                            ) : (
+                                                <T>Place Order</T>
+                                            )}
                                         </button>
                                     </div>
                                 </form>

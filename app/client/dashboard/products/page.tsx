@@ -4,10 +4,14 @@
 import React, { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
 import { Filter } from "lucide-react";
-import ProductList from "../../../components/ProductList";
-import ProductFilters, { FilterState } from "../../../components/ProductFilters";
-import { T } from "../../../components/T";
-import type { Material, Color, TypeOfProduct } from "../../../lib/firebase/products/types";
+import ProductList from "../../components/ProductList";
+import ProductFilters, { FilterState } from "../../components/ProductFilters";
+import { T } from "../../components/T";
+import type {
+    Material,
+    Color,
+    TypeOfProduct,
+} from "../../../lib/firebase/products/types";
 
 interface Product {
     id: string;
@@ -70,7 +74,10 @@ export default function ProductPage() {
                 params.append("categoryId", currentFilters.categoryId);
             }
             if (currentFilters.typeOfProductId) {
-                params.append("typeOfProductId", currentFilters.typeOfProductId);
+                params.append(
+                    "typeOfProductId",
+                    currentFilters.typeOfProductId
+                );
             }
             if (currentFilters.materialId) {
                 params.append("materialId", currentFilters.materialId);
@@ -125,10 +132,14 @@ export default function ProductPage() {
 
     // Находим ID типов "fence" и "gate"
     const fenceTypeId = typeOfProducts.find(
-        (t) => t.name.toLowerCase().includes("fence") || t.name.toLowerCase().includes("забор")
+        (t) =>
+            t.name.toLowerCase().includes("fence") ||
+            t.name.toLowerCase().includes("забор")
     )?.id;
     const gateTypeId = typeOfProducts.find(
-        (t) => t.name.toLowerCase().includes("gate") || t.name.toLowerCase().includes("ворота")
+        (t) =>
+            t.name.toLowerCase().includes("gate") ||
+            t.name.toLowerCase().includes("ворота")
     )?.id;
 
     console.log("Type of products:", typeOfProducts);
@@ -185,8 +196,9 @@ export default function ProductPage() {
                     </h1>
                     <p className="text-lg md:text-xl max-w-3xl mx-auto">
                         <T>
-                            Discover our wide range of high-quality fences. We offer
-                            solutions that combine strength, safety and aesthetic appeal.
+                            Discover our wide range of high-quality fences. We
+                            offer solutions that combine strength, safety and
+                            aesthetic appeal.
                         </T>
                     </p>
                 </section>
@@ -203,9 +215,13 @@ export default function ProductPage() {
                         <T>Filters</T>
                         {hasActiveFilters && (
                             <span className="bg-red-500 text-white text-xs px-2 py-1 rounded-full ml-2">
-                                {Object.values(filters).filter((v) =>
-                                    Array.isArray(v) ? v.length > 0 : Boolean(v)
-                                ).length}
+                                {
+                                    Object.values(filters).filter((v) =>
+                                        Array.isArray(v)
+                                            ? v.length > 0
+                                            : Boolean(v)
+                                    ).length
+                                }
                             </span>
                         )}
                     </button>
@@ -224,8 +240,9 @@ export default function ProductPage() {
                                 <div>
                                     <h2 className="text-3xl md:text-4xl font-bold text-[var(--color-primary)] mb-8 text-center">
                                         <T>
-                                            {typeOfProducts.find((t) => t.id === fenceTypeId)?.name ||
-                                                "Fences"}
+                                            {typeOfProducts.find(
+                                                (t) => t.id === fenceTypeId
+                                            )?.name || "Fences"}
                                         </T>
                                     </h2>
                                     <ProductList
@@ -240,8 +257,9 @@ export default function ProductPage() {
                                 <div>
                                     <h2 className="text-3xl md:text-4xl font-bold text-[var(--color-primary)] mb-8 text-center">
                                         <T>
-                                            {typeOfProducts.find((t) => t.id === gateTypeId)?.name ||
-                                                "Gates"}
+                                            {typeOfProducts.find(
+                                                (t) => t.id === gateTypeId
+                                            )?.name || "Gates"}
                                         </T>
                                     </h2>
                                     <ProductList
@@ -252,23 +270,33 @@ export default function ProductPage() {
                             )}
 
                             {/* No products found */}
-                            {fenceProducts.length === 0 && gateProducts.length === 0 && (
-                                <div className="text-center py-10">
-                                    <p className="text-2xl text-[var(--color-text)]">
-                                        <T>No products found matching your filters.</T>
-                                    </p>
-                                </div>
-                            )}
+                            {fenceProducts.length === 0 &&
+                                gateProducts.length === 0 && (
+                                    <div className="text-center py-10">
+                                        <p className="text-2xl text-[var(--color-text)]">
+                                            <T>
+                                                No products found matching your
+                                                filters.
+                                            </T>
+                                        </p>
+                                    </div>
+                                )}
                         </>
                     ) : (
                         <>
                             {/* Filtered products - no grouping */}
                             {fenceProducts.length > 0 ? (
-                                <ProductList products={fenceProducts} showGroupedView={false} />
+                                <ProductList
+                                    products={fenceProducts}
+                                    showGroupedView={false}
+                                />
                             ) : (
                                 <div className="text-center py-10">
                                     <p className="text-2xl text-[var(--color-text)]">
-                                        <T>No products found matching your filters.</T>
+                                        <T>
+                                            No products found matching your
+                                            filters.
+                                        </T>
                                     </p>
                                 </div>
                             )}
@@ -283,8 +311,8 @@ export default function ProductPage() {
                     </h2>
                     <p className="text-xl mb-6">
                         <T>
-                            Contact us to get a custom solution designed specifically for
-                            you!
+                            Contact us to get a custom solution designed
+                            specifically for you!
                         </T>
                     </p>
                     <Link

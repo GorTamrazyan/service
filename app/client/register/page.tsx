@@ -3,19 +3,30 @@
 import { useState } from "react";
 import React from "react";
 import { auth } from "../../lib/firebase/firebase";
-import { createUserWithEmailAndPassword, sendEmailVerification } from "firebase/auth";
+import {
+    createUserWithEmailAndPassword,
+    sendEmailVerification,
+} from "firebase/auth";
 import {
     GoogleAuthProvider,
     signInWithPopup,
     OAuthProvider,
 } from "firebase/auth";
-import { doc, setDoc, getDoc, query, where, collection, getDocs } from "firebase/firestore";
+import {
+    doc,
+    setDoc,
+    getDoc,
+    query,
+    where,
+    collection,
+    getDocs,
+} from "firebase/firestore";
 import { db } from "../../lib/firebase/firebase";
 import { FcGoogle } from "react-icons/fc";
 import { FaApple } from "react-icons/fa";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import EmailDiagnostics from "../../components/EmailDiagnostics";
+import EmailDiagnostics from "../components/EmailDiagnostics";
 
 export default function RegisterPage() {
     const [email, setEmail] = useState("");
@@ -59,11 +70,14 @@ export default function RegisterPage() {
                     },
                     email: email,
                     createdAt: new Date(),
-                    updatedAt: new Date()
+                    updatedAt: new Date(),
                 };
 
                 await setDoc(userDocRef, newProfile);
-                console.log("✅ Профиль пользователя создан в Firestore:", newProfile);
+                console.log(
+                    "✅ Профиль пользователя создан в Firestore:",
+                    newProfile
+                );
             } else {
                 console.log("ℹ️ Профиль пользователя уже существует");
             }
@@ -109,18 +123,22 @@ export default function RegisterPage() {
                 });
 
                 setVerificationSent(true);
-                console.log("✅ Email для верификации успешно отправлен на:", email);
+                console.log(
+                    "✅ Email для верификации успешно отправлен на:",
+                    email
+                );
                 console.log("📧 Проверьте папку 'Входящие' и 'Спам'");
             } catch (emailError: any) {
                 console.error("❌ Ошибка отправки email:", emailError);
-                setError(`Регистрация успешна, но не удалось отправить email для подтверждения: ${emailError.message}`);
+                setError(
+                    `Регистрация успешна, но не удалось отправить email для подтверждения: ${emailError.message}`
+                );
                 // Не устанавливаем verificationSent как true при ошибке
             }
 
             // Не перенаправляем сразу на dashboard, пока email не подтвержден
-
         } catch (firebaseError: any) {
-            if (firebaseError.code === 'auth/email-already-in-use') {
+            if (firebaseError.code === "auth/email-already-in-use") {
                 setError("Пользователь с таким email уже существует.");
             } else {
                 setError(firebaseError.message);
@@ -142,12 +160,12 @@ export default function RegisterPage() {
             const result = await signInWithPopup(auth, provider);
             const user = result.user;
             console.log("Успешная регистрация через Google:", user);
-            
+
             // Создаем профиль пользователя в Firestore, если его еще нет
             if (user.email) {
                 await createUserProfile(user.uid, user.email);
             }
-            
+
             router.push("/client/dashboard/home");
         } catch (firebaseError: any) {
             setError(firebaseError.message);
@@ -161,12 +179,12 @@ export default function RegisterPage() {
             const result = await signInWithPopup(auth, provider);
             const user = result.user;
             console.log("Успешная регистрация через Apple/iCloud:", user);
-            
+
             // Создаем профиль пользователя в Firestore, если его еще нет
             if (user.email) {
                 await createUserProfile(user.uid, user.email);
             }
-            
+
             router.push("/client/dashboard/home");
         } catch (firebaseError: any) {
             setError(firebaseError.message);
@@ -298,7 +316,11 @@ export default function RegisterPage() {
                         {verificationSent && (
                             <div className="space-y-4">
                                 <div className="bg-green-50 border border-green-200 text-green-600 px-4 py-3 rounded-lg text-sm">
-                                    <p className="mb-3">Регистрация успешна! Проверьте вашу почту и перейдите по ссылке для подтверждения email.</p>
+                                    <p className="mb-3">
+                                        Регистрация успешна! Проверьте вашу
+                                        почту и перейдите по ссылке для
+                                        подтверждения email.
+                                    </p>
                                     <div className="flex gap-2">
                                         <Link
                                             href="/client/sign-in"
@@ -312,7 +334,8 @@ export default function RegisterPage() {
                                 {/* Email Diagnostics */}
                                 <details className="mt-4">
                                     <summary className="cursor-pointer text-blue-600 hover:text-blue-800 font-medium">
-                                        🔧 Не получили email? Нажмите для диагностики
+                                        🔧 Не получили email? Нажмите для
+                                        диагностики
                                     </summary>
                                     <div className="mt-3">
                                         <EmailDiagnostics />

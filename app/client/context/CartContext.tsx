@@ -10,6 +10,9 @@ import React, {
     useCallback,
 } from "react";
 import { useAuthState } from "../../hooks/useAuthState";
+import type { Color } from "../../lib/firebase/products/types";
+
+
 
 // Интерфейс для продукта в корзине
 interface CartItem {
@@ -18,7 +21,9 @@ interface CartItem {
     price: string;
     imageUrl: string | null;
     quantity: number;
-    color: string[];
+    color: Color | null;
+    height: number;
+    length:number;
 }
 
 // Интерфейс для значений контекста корзины
@@ -29,10 +34,12 @@ interface CartContextType {
         name: string;
         price: string;
         imageUrl: string | null;
-        color:string[];
+        color: Color | null;
+        height: number;
+        length: number; 
     }) => void;
-    removeFromCart: (id: string) => void;
-    updateQuantity: (id: string, newQuantity: number) => void;
+    removeFromCart: (id: string, colorId?:string) => void;
+    updateQuantity: (id: string, newQuantity: number,colorId?:string) => void;
     clearCart: () => void;
     getTotalItems: () => number;
     getTotalPrice: () => number;
@@ -59,7 +66,22 @@ export const CartProvider = ({ children }: CartProviderProps) => {
         if (typeof window !== "undefined") {
             const savedCart = localStorage.getItem("cart");
             if (savedCart) {
-                setCartItems(JSON.parse(savedCart));
+                try {
+                    const parsedCart = JSON.parse(savedCart);
+                    // Преобразуем даты обратно в объекты Date при загрузке
+                    const cartWithDates = parsedCart.map((item: any) => ({
+                        ...item,
+                        color: item.color ? {
+                            ...item.color,
+                            createdAt: item.color.createdAt ? new Date(item.color.createdAt) : undefined,
+                            updatedAt: item.color.updatedAt ? new Date(item.color.updatedAt) : undefined
+                        } : null
+                    }));
+                    setCartItems(cartWithDates);
+                } catch (error) {
+                    console.error('Error parsing cart from localStorage:', error);
+                    setCartItems([]);
+                }
             }
             setIsClient(true); // <--- Устанавливаем isClient в true
         }
@@ -70,7 +92,11 @@ export const CartProvider = ({ children }: CartProviderProps) => {
     useEffect(() => {
         if (isClient) {
             // <--- Сохраняем только после гидрации
-            localStorage.setItem("cart", JSON.stringify(cartItems));
+            try {
+                localStorage.setItem("cart", JSON.stringify(cartItems));
+            } catch (error) {
+                console.error('Error saving cart to localStorage:', error);
+            }
         }
     }, [cartItems, isClient]); // Зависит от cartItems и isClient
 
@@ -97,7 +123,9 @@ export const CartProvider = ({ children }: CartProviderProps) => {
             name: string;
             price: string;
             imageUrl: string | null;
-            color: string[];
+            color: Color | null;
+            height: number;
+            length: number;
         }) => {
             if (!isAuthenticated) {
                 showAuthRequired();
@@ -105,16 +133,27 @@ export const CartProvider = ({ children }: CartProviderProps) => {
             }
 
             setCartItems((prevItems) => {
-                const existingItem = prevItems.find(
-                    (item) => item.id === product.id
-                );
-                if (existingItem) {
-                    return prevItems.map((item) =>
-                        item.id === product.id
+                // Создаем уникальный ключ для товара с учетом цвета
+                const itemKey = product.color
+                    ? `${product.id}-${product.color.id}`
+                    : product.id;
+
+                const existingItemIndex = prevItems.findIndex((item) => {
+                    const existingItemKey = item.color
+                        ? `${item.id}-${item.color.id}`
+                        : item.id;
+                    return existingItemKey === itemKey;
+                });
+
+                if (existingItemIndex !== -1) {
+                    // Если товар с таким цветом уже есть, увеличиваем количество
+                    return prevItems.map((item, index) =>
+                        index === existingItemIndex
                             ? { ...item, quantity: item.quantity + 1 }
                             : item
                     );
                 } else {
+                    // Добавляем новый товар
                     return [...prevItems, { ...product, quantity: 1 }];
                 }
             });
@@ -122,32 +161,45 @@ export const CartProvider = ({ children }: CartProviderProps) => {
         [isAuthenticated]
     );
 
-    // Удаление продукта из корзины (полностью)
-    const removeFromCart = useCallback((id: string) => {
-        if (!isAuthenticated) {
-            showAuthRequired();
-            return;
-        }
-
-        setCartItems((prevItems) => prevItems.filter((item) => item.id !== id));
-    }, [isAuthenticated]);
-
-    // Обновление количества продукта
-    const updateQuantity = useCallback((id: string, newQuantity: number) => {
-        if (!isAuthenticated) {
-            showAuthRequired();
-            return;
-        }
-
-        setCartItems((prevItems) => {
-            if (newQuantity <= 0) {
-                return prevItems.filter((item) => item.id !== id); // Удаляем, если количество <= 0
+    const removeFromCart = useCallback(
+        (id: string, colorId?: string) => {
+            if (!isAuthenticated) {
+                showAuthRequired();
+                return;
             }
-            return prevItems.map((item) =>
-                item.id === id ? { ...item, quantity: newQuantity } : item
+
+            setCartItems((prevItems) =>
+                prevItems.filter(
+                    (item) => item.id !== id || item.color?.id !== colorId
+                )
             );
-        });
-    }, [isAuthenticated]);
+        },
+        [isAuthenticated, showAuthRequired]
+    );
+
+    const updateQuantity = useCallback(
+        (id: string, newQuantity: number,colorId?: string) => {
+            if (!isAuthenticated) {
+                showAuthRequired();
+                return;
+            }
+
+            setCartItems((prevItems) => {
+                if (newQuantity <= 0) {
+                    return prevItems.filter(
+                        (item) => item.id !== id || item.color?.id !== colorId
+                    );
+                }
+
+                return prevItems.map((item) =>
+                    item.id === id && item.color?.id === colorId
+                        ? { ...item, quantity: newQuantity }
+                        : item
+                );
+            });
+        },
+        [isAuthenticated, showAuthRequired]
+    );
 
     // Очистка всей корзины
     const clearCart = useCallback(() => {

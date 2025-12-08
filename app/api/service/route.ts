@@ -1,20 +1,146 @@
-// app/api/services/route.ts
+// app/api/service/route.ts
 import { NextResponse } from "next/server";
-// Убедитесь, что путь импорта соответствует вашему файлу
-import { getAllServices } from "../../lib/firebase/service";
+import {
+    getAllServices,
+    createService,
+    updateService,
+    deleteService,
+} from "../../lib/firebase/service";
 
-export async function GET() {
+/**
+ * GET handler for retrieving all services
+ */
+export async function GET(request: Request) {
     try {
-        // Вызываем функцию для получения услуг
         const services = await getAllServices();
-
-        // Возвращаем успешный ответ
         return NextResponse.json(services, { status: 200 });
     } catch (error) {
-        console.error("Ошибка при получении услуг:", error);
-        // Возвращаем ошибку 500
+        console.error("Error fetching services:", error);
         return NextResponse.json(
-            { message: "Не удалось загрузить список услуг" },
+            { message: "Failed to load services" },
+            { status: 500 }
+        );
+    }
+}
+
+/**
+ * POST handler for creating a new service
+ */
+export async function POST(request: Request) {
+    try {
+        const body = await request.json();
+        const { icon, title, description, features, price } = body;
+
+        // Validation
+        if (!icon || !title || !description || !Array.isArray(features)) {
+            return NextResponse.json(
+                {
+                    message:
+                        "Icon, title, description and features array are required",
+                },
+                { status: 400 }
+            );
+        }
+
+        // Create service
+        const newServiceId = await createService({
+            icon,
+            title,
+            description,
+            features,
+            price,
+        });
+
+        return NextResponse.json(
+            { message: "Service created successfully", id: newServiceId },
+            { status: 201 }
+        );
+    } catch (error) {
+        console.error("Error creating service:", error);
+        return NextResponse.json(
+            { message: "Failed to create service" },
+            { status: 500 }
+        );
+    }
+}
+
+/**
+ * PUT handler for updating a service
+ */
+export async function PUT(request: Request) {
+    try {
+        const { searchParams } = new URL(request.url);
+        const id = searchParams.get("id");
+
+        if (!id) {
+            return NextResponse.json(
+                { message: "Service ID is required" },
+                { status: 400 }
+            );
+        }
+
+        const body = await request.json();
+        const { icon, title, description, features, price } = body;
+
+        // Validation
+        if (!icon || !title || !description || !Array.isArray(features)) {
+            return NextResponse.json(
+                {
+                    message:
+                        "Icon, title, description and features array are required",
+                },
+                { status: 400 }
+            );
+        }
+
+        // Update service
+        await updateService(id, {
+            icon,
+            title,
+            description,
+            features,
+            price,
+        });
+
+        return NextResponse.json(
+            { message: "Service updated successfully" },
+            { status: 200 }
+        );
+    } catch (error) {
+        console.error("Error updating service:", error);
+        return NextResponse.json(
+            { message: "Failed to update service" },
+            { status: 500 }
+        );
+    }
+}
+
+/**
+ * DELETE handler for deleting a service
+ */
+export async function DELETE(request: Request) {
+    try {
+        const { searchParams } = new URL(request.url);
+        const id = searchParams.get("id");
+
+        if (!id) {
+            return NextResponse.json(
+                { message: "Service ID is required" },
+                { status: 400 }
+            );
+        }
+
+        // Delete service
+        await deleteService(id);
+
+        return NextResponse.json(
+            { message: "Service deleted successfully" },
+            { status: 200 }
+        );
+    } catch (error) {
+        console.error("Error deleting service:", error);
+        return NextResponse.json(
+            { message: "Failed to delete service" },
             { status: 500 }
         );
     }

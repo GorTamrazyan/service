@@ -12,8 +12,9 @@ import {
     Activity,
     Calendar,
     BarChart3,
+    Wrench,
 } from "lucide-react";
-import { T } from "../components/T";
+import { T } from "../client/components/T";
 
 import { Product, getAllProducts } from "../lib/firebase/products";
 
@@ -92,6 +93,7 @@ export default function AdminDashboard() {
             color: "from-green-500 to-green-600",
             textColor: "text-green-600",
         },
+
         {
             title: "Orders",
             value: stats.totalOrders.toLocaleString(),
