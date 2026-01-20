@@ -26,7 +26,6 @@ import { FcGoogle } from "react-icons/fc";
 import { FaApple } from "react-icons/fa";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import EmailDiagnostics from "../components/EmailDiagnostics";
 
 export default function RegisterPage() {
     const [email, setEmail] = useState("");
@@ -334,11 +333,15 @@ export default function RegisterPage() {
                                 {/* Email Diagnostics */}
                                 <details className="mt-4">
                                     <summary className="cursor-pointer text-blue-600 hover:text-blue-800 font-medium">
-                                        🔧 Не получили email? Нажмите для
-                                        диагностики
+                                        🔧 Не получили email? Проверьте папку спам
                                     </summary>
-                                    <div className="mt-3">
-                                        <EmailDiagnostics />
+                                    <div className="mt-3 text-sm text-gray-600">
+                                        <p>Если письмо не пришло:</p>
+                                        <ul className="list-disc list-inside mt-2">
+                                            <li>Проверьте папку "Спам" или "Нежелательная почта"</li>
+                                            <li>Убедитесь, что email адрес введен правильно</li>
+                                            <li>Попробуйте зарегистрироваться снова</li>
+                                        </ul>
                                     </div>
                                 </details>
                             </div>

@@ -1,15 +1,16 @@
 import React, { useState } from "react";
 import {
-    Bell,
-    Shield,
-    Globe,
-    Moon,
-    Sun,
-    Smartphone,
-    Mail,
-    Eye,
-    EyeOff,
-} from "lucide-react";
+    FaBell,
+    FaShieldAlt,
+    FaGlobe,
+    FaMoon,
+    FaSun,
+    FaMobileAlt,
+    FaEnvelope,
+    FaEye,
+    FaEyeSlash,
+    FaCog,
+} from "react-icons/fa";
 import { useTheme } from "../../../../hooks/useTheme";
 import { useLanguage } from "../../../../contexts/LanguageContext";
 import { T } from "../../T";
@@ -56,17 +57,14 @@ export default function SettingsPanel() {
     const { language, setLanguage } = useLanguage();
     const router = useRouter();
 
-    // Handle dark mode toggle
     const handleDarkModeToggle = () => {
         toggleTheme();
     };
 
-    // Handle language change
     const handleLanguageChange = (newLanguage: string) => {
         setLanguage(newLanguage);
     };
 
-    // Handle password change
     const handlePasswordChange = async (e: React.FormEvent) => {
         e.preventDefault();
         setPasswordError("");
@@ -93,14 +91,11 @@ export default function SettingsPanel() {
                 return;
             }
 
-            // Reauthenticate user with current password
             const credential = EmailAuthProvider.credential(
                 user.email,
                 passwordData.currentPassword
             );
             await reauthenticateWithCredential(user, credential);
-
-            // Update password
             await updatePassword(user, passwordData.newPassword);
 
             setPasswordSuccess("Пароль успешно изменен!");
@@ -110,7 +105,6 @@ export default function SettingsPanel() {
                 confirmNewPassword: "",
             });
 
-            // Close modal after success
             setTimeout(() => {
                 setShowPasswordModal(false);
                 setPasswordSuccess("");
@@ -136,7 +130,6 @@ export default function SettingsPanel() {
         }));
     };
 
-    // Handle account deletion
     const handleDeleteAccount = async (e: React.FormEvent) => {
         e.preventDefault();
         setDeleteError("");
@@ -155,14 +148,12 @@ export default function SettingsPanel() {
                 return;
             }
 
-            // Reauthenticate user before deletion
             const credential = EmailAuthProvider.credential(
                 user.email,
                 deleteConfirmPassword
             );
             await reauthenticateWithCredential(user, credential);
 
-            // Delete user profile from Firestore
             try {
                 await deleteDoc(doc(db, "users", user.uid));
                 console.log("Профиль пользователя удален из Firestore");
@@ -173,21 +164,13 @@ export default function SettingsPanel() {
                 );
             }
 
-            // Delete Firebase Auth account
             await deleteUser(user);
-
             console.log("Аккаунт успешно удален");
-
-            // Redirect to home page
             router.push("/");
         } catch (error: any) {
             console.error("Ошибка при удалении аккаунта:", error);
             if (error.code === "auth/wrong-password") {
                 setDeleteError("Неверный пароль");
-            } else if (error.code === "auth/requires-recent-login") {
-                setDeleteError(
-                    "Требуется повторная авторизация. Войдите в систему заново и попробуйте еще раз."
-                );
             } else {
                 setDeleteError("Произошла ошибка при удалении аккаунта");
             }
@@ -197,323 +180,236 @@ export default function SettingsPanel() {
     };
 
     return (
-        <div className="space-y-8">
-            {/* Header */}
-            <div className="space-y-1">
-                <h1 className="text-3xl font-bold text-[var(--color-primary)]">
-                    <T>Settings</T>
-                </h1>
-                <p className="text-[var(--color-text)]/70">
-                    <T>Manage your account preferences</T>
-                </p>
-            </div>
-
-            {/* Notifications Settings */}
-            <div className="bg-[var(--color-background)] rounded-2xl shadow-xl border border-[var(--color-text)]/10 overflow-hidden">
-                <div className="bg-gradient-to-r from-[var(--color-secondary)] to-[var(--color-secondary)]/80 px-8 py-6 border-b border-[var(--color-text)]/10">
-                    <div className="flex items-center gap-3">
-                        <div className="bg-[var(--color-accent)] rounded-xl p-2">
-                            <Bell className="w-5 h-5 text-white" />
-                        </div>
-                        <div>
-                            <h3 className="text-xl font-semibold text-[var(--color-primary)]">
-                                <T>Notifications</T>
-                            </h3>
-                            <p className="text-[var(--color-text)]/70 mt-1">
-                                <T>Manage notification preferences</T>
-                            </p>
-                        </div>
-                    </div>
-                </div>
-
-                <div className="p-8 space-y-6">
-                    <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-3">
-                            <div className="bg-green-100 rounded-lg p-2">
-                                <Mail className="w-5 h-5 text-green-600" />
-                            </div>
-                            <div>
-                                <p className="font-medium text-[var(--color-primary)]">
-                                    <T>Email Notifications</T>
-                                </p>
-                                <p className="text-sm text-[var(--color-text)]/70">
-                                    <T>Receive order updates via email</T>
-                                </p>
-                            </div>
-                        </div>
-                        <label className="relative inline-flex items-center cursor-pointer">
-                            <input
-                                type="checkbox"
-                                checked={notifications.email}
-                                onChange={(e) =>
-                                    setNotifications({
-                                        ...notifications,
-                                        email: e.target.checked,
-                                    })
-                                }
-                                className="sr-only peer"
-                            />
-                            <div className="w-11 h-6 bg-[var(--color-text)]/20 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-[var(--color-accent)]/30 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-[var(--color-text)]/30 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[var(--color-accent)]"></div>
-                        </label>
-                    </div>
-
-                    <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-3">
-                            <div className="bg-purple-100 rounded-lg p-2">
-                                <Smartphone className="w-5 h-5 text-purple-600" />
-                            </div>
-                            <div>
-                                <p className="font-medium text-[var(--color-primary)]">
-                                    <T>Push Notifications</T>
-                                </p>
-                                <p className="text-sm text-[var(--color-text)]/70">
-                                    <T>Get instant mobile notifications</T>
-                                </p>
-                            </div>
-                        </div>
-                        <label className="relative inline-flex items-center cursor-pointer">
-                            <input
-                                type="checkbox"
-                                checked={notifications.push}
-                                onChange={(e) =>
-                                    setNotifications({
-                                        ...notifications,
-                                        push: e.target.checked,
-                                    })
-                                }
-                                className="sr-only peer"
-                            />
-                            <div className="w-11 h-6 bg-[var(--color-text)]/20 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-[var(--color-accent)]/30 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-[var(--color-text)]/30 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[var(--color-accent)]"></div>
-                        </label>
-                    </div>
-
-                    <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-3">
-                            <div className="bg-orange-100 rounded-lg p-2">
-                                <Smartphone className="w-5 h-5 text-orange-600" />
-                            </div>
-                            <div>
-                                <p className="font-medium text-[var(--color-primary)]">
-                                    <T>SMS Notifications</T>
-                                </p>
-                                <p className="text-sm text-[var(--color-text)]/70">
-                                    <T>Receive important updates via SMS</T>
-                                </p>
-                            </div>
-                        </div>
-                        <label className="relative inline-flex items-center cursor-pointer">
-                            <input
-                                type="checkbox"
-                                checked={notifications.sms}
-                                onChange={(e) =>
-                                    setNotifications({
-                                        ...notifications,
-                                        sms: e.target.checked,
-                                    })
-                                }
-                                className="sr-only peer"
-                            />
-                            <div className="w-11 h-6 bg-[var(--color-text)]/20 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-[var(--color-accent)]/30 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-[var(--color-text)]/30 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[var(--color-accent)]"></div>
-                        </label>
-                    </div>
-                </div>
-            </div>
-
+        <div className="space-y-6 animate-fadeIn">
             {/* Appearance Settings */}
-            <div className="bg-[var(--color-background)] rounded-2xl shadow-xl border border-[var(--color-text)]/10 overflow-hidden">
-                <div className="bg-gradient-to-r from-[var(--color-secondary)] to-[var(--color-secondary)]/80 px-8 py-6 border-b border-[var(--color-text)]/10">
-                    <div className="flex items-center gap-3">
-                        <div className="bg-[var(--color-primary)] rounded-xl p-2">
-                            {isDark ? (
-                                <Moon className="w-5 h-5 text-white" />
-                            ) : (
-                                <Sun className="w-5 h-5 text-white" />
-                            )}
-                        </div>
-                        <div>
-                            <h3 className="text-xl font-semibold text-[var(--color-primary)]">
-                                <T>Appearance</T>
-                            </h3>
-                            <p className="text-[var(--color-text)]/70 mt-1">
-                                <T>Customize your visual experience</T>
-                            </p>
-                        </div>
+            <div className="bg-[var(--color-secondary)] rounded-2xl shadow-xl p-6 border border-[var(--color-text)]/10">
+                <div className="flex items-center gap-3 mb-6">
+                    <div className="bg-gradient-to-r from-purple-500 to-indigo-600 rounded-xl p-3">
+                        <FaCog className="w-6 h-6 text-white" />
+                    </div>
+                    <div>
+                        <h3 className="text-xl font-bold text-[var(--color-text)]">
+                            <T>Appearance</T>
+                        </h3>
+                        <p className="text-sm text-[var(--color-text)]/60">
+                            <T>Customize how the app looks</T>
+                        </p>
                     </div>
                 </div>
 
-                <div className="p-8 space-y-6">
-                    <div className="flex items-center justify-between">
+                <div className="space-y-4">
+                    {/* Dark Mode Toggle */}
+                    <div className="flex items-center justify-between p-4 bg-gradient-to-r from-[var(--color-text)]/5 to-[var(--color-text)]/10 rounded-xl hover:shadow-md transition-all">
                         <div className="flex items-center gap-3">
-                            <div
-                                className={`rounded-lg p-2 ${
-                                    isDark ? "bg-slate-800" : "bg-amber-100"
-                                }`}
-                            >
-                                {isDark ? (
-                                    <Moon className="w-5 h-5 text-white" />
-                                ) : (
-                                    <Sun className="w-5 h-5 text-amber-600" />
-                                )}
-                            </div>
+                            {isDark ? (
+                                <FaMoon className="w-5 h-5 text-indigo-600" />
+                            ) : (
+                                <FaSun className="w-5 h-5 text-yellow-600" />
+                            )}
                             <div>
-                                <p className="font-medium text-[var(--color-primary)]">
+                                <p className="font-semibold text-[var(--color-text)]">
                                     <T>Dark Mode</T>
                                 </p>
-                                <p className="text-sm text-[var(--color-text)]/70">
-                                    <T>Switch between light and dark themes</T>
+                                <p className="text-xs text-[var(--color-text)]/60">
+                                    <T>Switch between light and dark theme</T>
                                 </p>
                             </div>
                         </div>
-                        <label className="relative inline-flex items-center cursor-pointer">
-                            <input
-                                type="checkbox"
-                                checked={isDark}
-                                onChange={handleDarkModeToggle}
-                                className="sr-only peer"
+                        <button
+                            onClick={handleDarkModeToggle}
+                            className={`relative w-14 h-7 rounded-full transition-colors duration-300 ${
+                                isDark
+                                    ? "bg-gradient-to-r from-indigo-600 to-purple-600"
+                                    : "bg-[var(--color-text)]/20"
+                            }`}
+                        >
+                            <span
+                                className={`absolute top-1 left-1 w-5 h-5 bg-[var(--color-secondary)] rounded-full shadow-md transform transition-transform duration-300 ${
+                                    isDark ? "translate-x-7" : ""
+                                }`}
                             />
-                            <div className="w-11 h-6 bg-[var(--color-text)]/20 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-[var(--color-accent)]/30 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-[var(--color-text)]/30 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[var(--color-accent)]"></div>
-                        </label>
+                        </button>
                     </div>
 
-                    <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-3">
-                            <div className="bg-blue-100 rounded-lg p-2">
-                                <Globe className="w-5 h-5 text-blue-600" />
-                            </div>
+                    {/* Language Selector */}
+                    <div className="p-4 bg-gradient-to-r from-[var(--color-text)]/5 to-[var(--color-text)]/10 rounded-xl hover:shadow-md transition-all">
+                        <div className="flex items-center gap-3 mb-3">
+                            <FaGlobe className="w-5 h-5 text-blue-600" />
                             <div>
-                                <p className="font-medium text-[var(--color-primary)]">
+                                <p className="font-semibold text-[var(--color-text)]">
                                     <T>Language</T>
                                 </p>
-                                <p className="text-sm text-[var(--color-text)]/70">
+                                <p className="text-xs text-[var(--color-text)]/60">
                                     <T>Choose your preferred language</T>
                                 </p>
                             </div>
                         </div>
-                        <div className="relative">
-                            <select
-                                value={language}
-                                onChange={(e) =>
-                                    handleLanguageChange(e.target.value)
-                                }
-                                className="appearance-none bg-gradient-to-r from-[var(--color-background)] to-[var(--color-secondary)]/20 border-2 border-[var(--color-accent)]/30 rounded-xl px-4 py-3 pr-10 focus:ring-4 focus:ring-[var(--color-accent)]/20 focus:border-[var(--color-accent)] text-[var(--color-text)] font-medium shadow-lg hover:shadow-xl hover:border-[var(--color-accent)]/50 transition-all duration-300 cursor-pointer min-w-[10px]"
-                            >
-                                <option
-                                    value="en"
-                                    className="bg-[var(--color-background)] text-[var(--color-text)] py-2"
+                        <div className="grid grid-cols-3 gap-2 mt-3">
+                            {["en", "ru", "hy"].map((lang) => (
+                                <button
+                                    key={lang}
+                                    onClick={() => handleLanguageChange(lang)}
+                                    className={`px-4 py-2 rounded-lg font-medium transition-all ${
+                                        language === lang
+                                            ? "bg-gradient-to-r from-[var(--color-accent)] to-[var(--color-primary)] text-white shadow-lg transform scale-105"
+                                            : "bg-[var(--color-secondary)] text-[var(--color-text)] hover:bg-[var(--color-text)]/5 border border-[var(--color-text)]/20"
+                                    }`}
                                 >
-                                    🇺🇸 English
-                                </option>
-                                <option
-                                    value="es"
-                                    className="bg-[var(--color-background)] text-[var(--color-text)] py-2"
-                                >
-                                    🇪🇸 Español
-                                </option>
-                                <option
-                                    value="ru"
-                                    className="bg-[var(--color-background)] text-[var(--color-text)] py-2"
-                                >
-                                    🇷🇺 Русский
-                                </option>
-                                <option
-                                    value="hy"
-                                    className="bg-[var(--color-background)] text-[var(--color-text)] py-2"
-                                >
-                                    🇦🇲 Հայերեն
-                                </option>
-                            </select>
-                            <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
-                                <svg
-                                    className="w-5 h-5 text-[var(--color-accent)]"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    viewBox="0 0 24 24"
-                                >
-                                    <path
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        strokeWidth={2}
-                                        d="M19 9l-7 7-7-7"
-                                    />
-                                </svg>
-                            </div>
+                                    {lang === "en"
+                                        ? "English"
+                                        : lang === "ru"
+                                        ? "Русский"
+                                        : "Հայերեն"}
+                                </button>
+                            ))}
                         </div>
                     </div>
                 </div>
             </div>
 
-            {/* Security Settings */}
-            <div className="bg-[var(--color-background)] rounded-2xl shadow-xl border border-[var(--color-text)]/10 overflow-hidden">
-                <div className="bg-gradient-to-r from-[var(--color-secondary)] to-[var(--color-secondary)]/80 px-8 py-6 border-b border-[var(--color-text)]/10">
-                    <div className="flex items-center gap-3">
-                        <div className="bg-red-600 rounded-xl p-2">
-                            <Shield className="w-5 h-5 text-white" />
-                        </div>
-                        <div>
-                            <h3 className="text-xl font-semibold text-[var(--color-primary)]">
-                                <T>Security</T>
-                            </h3>
-                            <p className="text-[var(--color-text)]/70 mt-1">
-                                <T>Protect your account and data</T>
-                            </p>
-                        </div>
+            {/* Notifications */}
+            <div className="bg-[var(--color-secondary)] rounded-2xl shadow-xl p-6 border border-[var(--color-text)]/10">
+                <div className="flex items-center gap-3 mb-6">
+                    <div className="bg-gradient-to-r from-blue-500 to-cyan-600 rounded-xl p-3">
+                        <FaBell className="w-6 h-6 text-white" />
+                    </div>
+                    <div>
+                        <h3 className="text-xl font-bold text-[var(--color-text)]">
+                            <T>Notifications</T>
+                        </h3>
+                        <p className="text-sm text-[var(--color-text)]/60">
+                            <T>Manage your notification preferences</T>
+                        </p>
                     </div>
                 </div>
 
-                <div className="p-8 space-y-6">
+                <div className="space-y-4">
+                    {[
+                        {
+                            key: "email",
+                            icon: FaEnvelope,
+                            label: "Email Notifications",
+                            desc: "Receive updates via email",
+                        },
+                        {
+                            key: "push",
+                            icon: FaMobileAlt,
+                            label: "Push Notifications",
+                            desc: "Get alerts on your device",
+                        },
+                        {
+                            key: "sms",
+                            icon: FaMobileAlt,
+                            label: "SMS Notifications",
+                            desc: "Receive text messages",
+                        },
+                    ].map((item) => (
+                        <div
+                            key={item.key}
+                            className="flex items-center justify-between p-4 bg-gradient-to-r from-[var(--color-text)]/5 to-[var(--color-text)]/10 rounded-xl hover:shadow-md transition-all"
+                        >
+                            <div className="flex items-center gap-3">
+                                <item.icon className="w-5 h-5 text-blue-600" />
+                                <div>
+                                    <p className="font-semibold text-[var(--color-text)]">
+                                        <T>{item.label}</T>
+                                    </p>
+                                    <p className="text-xs text-[var(--color-text)]/60">
+                                        <T>{item.desc}</T>
+                                    </p>
+                                </div>
+                            </div>
+                            <button
+                                onClick={() =>
+                                    setNotifications((prev) => ({
+                                        ...prev,
+                                        [item.key]:
+                                            !prev[
+                                                item.key as keyof typeof prev
+                                            ],
+                                    }))
+                                }
+                                className={`relative w-14 h-7 rounded-full transition-colors duration-300 ${
+                                    notifications[
+                                        item.key as keyof typeof notifications
+                                    ]
+                                        ? "bg-gradient-to-r from-green-500 to-emerald-600"
+                                        : "bg-[var(--color-text)]/20"
+                                }`}
+                            >
+                                <span
+                                    className={`absolute top-1 left-1 w-5 h-5 bg-[var(--color-secondary)] rounded-full shadow-md transform transition-transform duration-300 ${
+                                        notifications[
+                                            item.key as keyof typeof notifications
+                                        ]
+                                            ? "translate-x-7"
+                                            : ""
+                                    }`}
+                                />
+                            </button>
+                        </div>
+                    ))}
+                </div>
+            </div>
+
+            {/* Security */}
+            <div className="bg-[var(--color-secondary)] rounded-2xl shadow-xl p-6 border border-[var(--color-text)]/10">
+                <div className="flex items-center gap-3 mb-6">
+                    <div className="bg-gradient-to-r from-red-500 to-pink-600 rounded-xl p-3">
+                        <FaShieldAlt className="w-6 h-6 text-white" />
+                    </div>
+                    <div>
+                        <h3 className="text-xl font-bold text-[var(--color-text)]">
+                            <T>Security</T>
+                        </h3>
+                        <p className="text-sm text-[var(--color-text)]/60">
+                            <T>Manage your account security</T>
+                        </p>
+                    </div>
+                </div>
+
+                <div className="space-y-3">
                     <button
                         onClick={() => setShowPasswordModal(true)}
-                        className="w-full text-left p-4 rounded-xl border border-[var(--color-text)]/20  hover:bg-green-100 transition-colors duration-200 group"
+                        className="w-full p-4 bg-[var(--color-text)]/5 rounded-xl hover:shadow-lg hover:bg-[var(--color-text)]/10 transition-all text-left border border-[var(--color-border)]"
                     >
                         <div className="flex items-center justify-between">
-                            <div>
-                                <p className="font-medium text-[var(--color-primary)] group-hover:text-[var(--color-accent)] ">
-                                    <T>Change Password</T>
-                                </p>
-                                <p className="text-sm text-[var(--color-text)]/70">
-                                    <T>Update your account password</T>
-                                </p>
+                            <div className="flex items-center gap-3">
+                                <div className="bg-blue-600 rounded-lg p-2">
+                                    <FaShieldAlt className="w-4 h-4 text-white" />
+                                </div>
+                                <div>
+                                    <p className="font-semibold text-[var(--color-text)]">
+                                        <T>Change Password</T>
+                                    </p>
+                                    <p className="text-xs text-[var(--color-text)]/60">
+                                        <T>Update your account password</T>
+                                    </p>
+                                </div>
                             </div>
-                            <div className="text-[var(--color-text)]/60 group-hover:text-[var(--color-accent)]">
-                                →
-                            </div>
-                        </div>
-                    </button>
-
-                    <button className="w-full text-left p-4 rounded-xl border border-[var(--color-text)]/20 hover:bg-[var(--color-secondary)]/30 transition-colors duration-200 group">
-                        <div className="flex items-center justify-between">
-                            <div>
-                                <p className="font-medium text-[var(--color-primary)] group-hover:text-[var(--color-accent)]">
-                                    <T>Two-Factor Authentication</T>
-                                </p>
-                                <p className="text-sm text-[var(--color-text)]/70">
-                                    <T>Add extra security to your account</T>
-                                </p>
-                            </div>
-                            <div className="text-[var(--color-text)]/60 group-hover:text-[var(--color-accent)]">
-                                →
-                            </div>
+                            <span className="text-blue-600">→</span>
                         </div>
                     </button>
 
                     <button
                         onClick={() => setShowDeleteModal(true)}
-                        className="w-full text-left p-4 rounded-xl border border-red-200 hover:bg-red-50 transition-colors duration-200 group"
+                        className="w-full p-4 bg-red-500/10 rounded-xl hover:shadow-lg hover:bg-red-500/20 transition-all text-left border border-red-500/30"
                     >
                         <div className="flex items-center justify-between">
-                            <div>
-                                <p className="font-medium text-red-600">
-                                    <T>Delete Account</T>
-                                </p>
-                                <p className="text-sm text-red-500">
-                                    <T>
-                                        Permanently delete your account and data
-                                    </T>
-                                </p>
+                            <div className="flex items-center gap-3">
+                                <div className="bg-red-600 rounded-lg p-2">
+                                    <FaShieldAlt className="w-4 h-4 text-white" />
+                                </div>
+                                <div>
+                                    <p className="font-semibold text-red-600">
+                                        <T>Delete Account</T>
+                                    </p>
+                                    <p className="text-xs text-[var(--color-text)]/60">
+                                        <T>Permanently delete your account</T>
+                                    </p>
+                                </div>
                             </div>
-                            <div className="text-red-400 group-hover:text-red-600">
-                                →
-                            </div>
+                            <span className="text-red-600">→</span>
                         </div>
                     </button>
                 </div>
@@ -521,37 +417,39 @@ export default function SettingsPanel() {
 
             {/* Password Change Modal */}
             {showPasswordModal && (
-                <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-                    <div className="bg-[var(--color-background)] rounded-2xl shadow-2xl max-w-md w-full max-h-[90vh] overflow-y-auto">
-                        <div className="bg-gradient-to-r from-[var(--color-secondary)] to-[var(--color-secondary)]/80 px-6 py-4 border-b border-[var(--color-text)]/10 flex items-center justify-between ">
-                            <h3 className="text-xl font-semibold text-[var(--color-primary)]">
-                                <T>Change Password</T>
-                            </h3>
-                            <button
-                                onClick={() => {
-                                    setShowPasswordModal(false);
-                                    setPasswordError("");
-                                    setPasswordSuccess("");
-                                    setPasswordData({
-                                        currentPassword: "",
-                                        newPassword: "",
-                                        confirmNewPassword: "",
-                                    });
-                                }}
-                                className="text-[var(--color-text)]/60 hover:text-[var(--color-text)] text-xl"
-                            >
-                                ×
-                            </button>
+                <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fadeIn">
+                    <div className="bg-[var(--color-secondary)] rounded-2xl shadow-2xl max-w-md w-full overflow-hidden">
+                        <div className="bg-gradient-to-r from-[var(--color-accent)] to-[var(--color-primary)] px-6 py-4">
+                            <div className="flex items-center justify-between">
+                                <h3 className="text-xl font-bold text-white">
+                                    <T>Change Password</T>
+                                </h3>
+                                <button
+                                    onClick={() => {
+                                        setShowPasswordModal(false);
+                                        setPasswordError("");
+                                        setPasswordSuccess("");
+                                        setPasswordData({
+                                            currentPassword: "",
+                                            newPassword: "",
+                                            confirmNewPassword: "",
+                                        });
+                                    }}
+                                    className="text-white/80 hover:text-white text-2xl font-bold"
+                                >
+                                    ×
+                                </button>
+                            </div>
                         </div>
 
                         <div className="p-6">
                             <form
                                 onSubmit={handlePasswordChange}
-                                className="space-y-6"
+                                className="space-y-4"
                             >
                                 {/* Current Password */}
                                 <div>
-                                    <label className="block text-sm font-medium text-[var(--color-text)] mb-2">
+                                    <label className="block text-sm font-semibold text-[var(--color-text)] mb-2">
                                         <T>Current Password</T>
                                     </label>
                                     <div className="relative">
@@ -569,8 +467,7 @@ export default function SettingsPanel() {
                                                         e.target.value,
                                                 }))
                                             }
-                                            className="w-full px-4 py-3 border border-[var(--color-text)]/30 rounded-lg bg-[var(--color-background)] text-[var(--color-text)] focus:ring-2 focus:ring-[var(--color-accent)] focus:border-[var(--color-accent)]"
-                                            placeholder="Введите текущий пароль"
+                                            className="w-full px-4 py-3 border border-[var(--color-text)]/30 rounded-xl focus:ring-2 focus:ring-[var(--color-accent)] focus:border-[var(--color-accent)]"
                                             required
                                         />
                                         <button
@@ -580,12 +477,12 @@ export default function SettingsPanel() {
                                                     "current"
                                                 )
                                             }
-                                            className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--color-text)]/60 hover:text-[var(--color-text)]"
+                                            className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--color-text)]/40 hover:text-[var(--color-text)]/70"
                                         >
                                             {showPasswords.current ? (
-                                                <EyeOff className="w-5 h-5" />
+                                                <FaEyeSlash className="w-5 h-5" />
                                             ) : (
-                                                <Eye className="w-5 h-5" />
+                                                <FaEye className="w-5 h-5" />
                                             )}
                                         </button>
                                     </div>
@@ -593,7 +490,7 @@ export default function SettingsPanel() {
 
                                 {/* New Password */}
                                 <div>
-                                    <label className="block text-sm font-medium text-[var(--color-text)] mb-2">
+                                    <label className="block text-sm font-semibold text-[var(--color-text)] mb-2">
                                         <T>New Password</T>
                                     </label>
                                     <div className="relative">
@@ -610,22 +507,20 @@ export default function SettingsPanel() {
                                                     newPassword: e.target.value,
                                                 }))
                                             }
-                                            className="w-full px-4 py-3 border border-[var(--color-text)]/30 rounded-lg bg-[var(--color-background)] text-[var(--color-text)] focus:ring-2 focus:ring-[var(--color-accent)] focus:border-[var(--color-accent)]"
-                                            placeholder="Введите новый пароль"
+                                            className="w-full px-4 py-3 border border-[var(--color-text)]/30 rounded-xl focus:ring-2 focus:ring-[var(--color-accent)] focus:border-[var(--color-accent)]"
                                             required
-                                            minLength={6}
                                         />
                                         <button
                                             type="button"
                                             onClick={() =>
                                                 togglePasswordVisibility("new")
                                             }
-                                            className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--color-text)]/60 hover:text-[var(--color-text)]"
+                                            className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--color-text)]/40 hover:text-[var(--color-text)]/70"
                                         >
                                             {showPasswords.new ? (
-                                                <EyeOff className="w-5 h-5" />
+                                                <FaEyeSlash className="w-5 h-5" />
                                             ) : (
-                                                <Eye className="w-5 h-5" />
+                                                <FaEye className="w-5 h-5" />
                                             )}
                                         </button>
                                     </div>
@@ -633,7 +528,7 @@ export default function SettingsPanel() {
 
                                 {/* Confirm New Password */}
                                 <div>
-                                    <label className="block text-sm font-medium text-[var(--color-text)] mb-2">
+                                    <label className="block text-sm font-semibold text-[var(--color-text)] mb-2">
                                         <T>Confirm New Password</T>
                                     </label>
                                     <div className="relative">
@@ -653,10 +548,8 @@ export default function SettingsPanel() {
                                                         e.target.value,
                                                 }))
                                             }
-                                            className="w-full px-4 py-3 border border-[var(--color-text)]/30 rounded-lg bg-[var(--color-background)] text-[var(--color-text)] focus:ring-2 focus:ring-[var(--color-accent)] focus:border-[var(--color-accent)]"
-                                            placeholder="Повторите новый пароль"
+                                            className="w-full px-4 py-3 border border-[var(--color-text)]/30 rounded-xl focus:ring-2 focus:ring-[var(--color-accent)] focus:border-[var(--color-accent)]"
                                             required
-                                            minLength={6}
                                         />
                                         <button
                                             type="button"
@@ -665,27 +558,25 @@ export default function SettingsPanel() {
                                                     "confirm"
                                                 )
                                             }
-                                            className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--color-text)]/60 hover:text-[var(--color-text)]"
+                                            className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--color-text)]/40 hover:text-[var(--color-text)]/70"
                                         >
                                             {showPasswords.confirm ? (
-                                                <EyeOff className="w-5 h-5" />
+                                                <FaEyeSlash className="w-5 h-5" />
                                             ) : (
-                                                <Eye className="w-5 h-5" />
+                                                <FaEye className="w-5 h-5" />
                                             )}
                                         </button>
                                     </div>
                                 </div>
 
-                                {/* Error Message */}
+                                {/* Error/Success Messages */}
                                 {passwordError && (
-                                    <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-lg text-sm">
+                                    <div className="bg-red-500/10 border border-red-500/30 text-red-600 px-4 py-3 rounded-xl text-sm">
                                         {passwordError}
                                     </div>
                                 )}
-
-                                {/* Success Message */}
                                 {passwordSuccess && (
-                                    <div className="bg-green-50 border border-green-200 text-green-600 px-4 py-3 rounded-lg text-sm">
+                                    <div className="bg-green-500/10 border border-green-500/30 text-green-600 px-4 py-3 rounded-xl text-sm">
                                         {passwordSuccess}
                                     </div>
                                 )}
@@ -704,14 +595,14 @@ export default function SettingsPanel() {
                                                 confirmNewPassword: "",
                                             });
                                         }}
-                                        className="flex-1 px-4 py-3 border border-[var(--color-text)]/30 rounded-lg text-[var(--color-text)] hover:bg-[var(--color-secondary)]/30 transition-colors"
+                                        className="flex-1 px-4 py-3 border-2 border-[var(--color-text)]/30 rounded-xl text-[var(--color-text)] hover:bg-[var(--color-text)]/5 transition-colors font-medium"
                                     >
                                         <T>Cancel</T>
                                     </button>
                                     <button
                                         type="submit"
                                         disabled={isChangingPassword}
-                                        className="flex-1 px-4 py-3 bg-[var(--color-accent)] text-[var(--color-primary)] rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed font-medium"
+                                        className="flex-1 px-4 py-3 bg-gradient-to-r from-[var(--color-accent)] to-[var(--color-primary)] text-white rounded-xl hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed font-bold shadow-lg"
                                     >
                                         {isChangingPassword ? (
                                             "Изменяется..."
@@ -728,48 +619,50 @@ export default function SettingsPanel() {
 
             {/* Delete Account Modal */}
             {showDeleteModal && (
-                <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-                    <div className="bg-[var(--color-background)] rounded-2xl shadow-2xl max-w-md w-full">
-                        <div className="bg-gradient-to-r from-red-600 to-red-700 px-6 py-4 border-b border-red-200 flex items-center justify-between">
-                            <h3 className="text-xl font-semibold text-white">
-                                <T>Delete Account</T>
-                            </h3>
-                            <button
-                                onClick={() => {
-                                    setShowDeleteModal(false);
-                                    setDeleteError("");
-                                    setDeleteConfirmPassword("");
-                                }}
-                                className="text-white/80 hover:text-white text-xl"
-                            >
-                                ×
-                            </button>
+                <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fadeIn">
+                    <div className="bg-[var(--color-secondary)] rounded-2xl shadow-2xl max-w-md w-full overflow-hidden">
+                        <div className="bg-gradient-to-r from-red-600 to-red-700 px-6 py-4">
+                            <div className="flex items-center justify-between">
+                                <h3 className="text-xl font-bold text-white">
+                                    <T>Delete Account</T>
+                                </h3>
+                                <button
+                                    onClick={() => {
+                                        setShowDeleteModal(false);
+                                        setDeleteError("");
+                                        setDeleteConfirmPassword("");
+                                    }}
+                                    className="text-white/80 hover:text-white text-2xl font-bold"
+                                >
+                                    ×
+                                </button>
+                            </div>
                         </div>
 
                         <div className="p-6">
                             <div className="mb-6">
                                 <div className="flex items-center gap-3 mb-4">
                                     <div className="bg-red-100 rounded-full p-3">
-                                        <Shield className="w-6 h-6 text-red-600" />
+                                        <FaShieldAlt className="w-6 h-6 text-red-600" />
                                     </div>
                                     <div>
-                                        <h4 className="font-semibold text-[var(--color-primary)]">
+                                        <h4 className="font-bold text-[var(--color-text)]">
                                             <T>Are you sure?</T>
                                         </h4>
-                                        <p className="text-sm text-[var(--color-text)]/70">
+                                        <p className="text-sm text-[var(--color-text)]/60">
                                             <T>This action cannot be undone</T>
                                         </p>
                                     </div>
                                 </div>
 
-                                <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-                                    <p className="text-sm text-red-700">
+                                <div className="bg-red-500/10 border border-red-500/30 rounded-xl p-4">
+                                    <p className="text-sm text-red-600 font-semibold mb-2">
                                         <T>
                                             Deleting your account will
                                             permanently remove:
                                         </T>
                                     </p>
-                                    <ul className="mt-2 text-sm text-red-600 list-disc list-inside space-y-1">
+                                    <ul className="text-sm text-red-600 list-disc list-inside space-y-1">
                                         <li>
                                             <T>Your profile information</T>
                                         </li>
@@ -791,7 +684,7 @@ export default function SettingsPanel() {
                                 className="space-y-6"
                             >
                                 <div>
-                                    <label className="block text-sm font-medium text-[var(--color-text)] mb-2">
+                                    <label className="block text-sm font-semibold text-[var(--color-text)] mb-2">
                                         <T>Enter your password to confirm:</T>
                                     </label>
                                     <div className="relative">
@@ -807,7 +700,7 @@ export default function SettingsPanel() {
                                                     e.target.value
                                                 )
                                             }
-                                            className="w-full px-4 py-3 border border-red-300 rounded-lg bg-[var(--color-background)] text-[var(--color-text)] focus:ring-2 focus:ring-red-500 focus:border-red-500"
+                                            className="w-full px-4 py-3 border border-red-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-red-500"
                                             placeholder="Введите ваш пароль"
                                             required
                                         />
@@ -818,12 +711,12 @@ export default function SettingsPanel() {
                                                     !showDeletePassword
                                                 )
                                             }
-                                            className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--color-text)]/60 hover:text-[var(--color-text)]"
+                                            className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--color-text)]/40 hover:text-[var(--color-text)]/70"
                                         >
                                             {showDeletePassword ? (
-                                                <EyeOff className="w-5 h-5" />
+                                                <FaEyeSlash className="w-5 h-5" />
                                             ) : (
-                                                <Eye className="w-5 h-5" />
+                                                <FaEye className="w-5 h-5" />
                                             )}
                                         </button>
                                     </div>
@@ -831,7 +724,7 @@ export default function SettingsPanel() {
 
                                 {/* Error Message */}
                                 {deleteError && (
-                                    <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-lg text-sm">
+                                    <div className="bg-red-500/10 border border-red-500/30 text-red-600 px-4 py-3 rounded-xl text-sm">
                                         {deleteError}
                                     </div>
                                 )}
@@ -845,14 +738,14 @@ export default function SettingsPanel() {
                                             setDeleteError("");
                                             setDeleteConfirmPassword("");
                                         }}
-                                        className="flex-1 px-4 py-3 border border-[var(--color-text)]/30 rounded-lg text-[var(--color-text)] hover:bg-green-300 transition-colors"
+                                        className="flex-1 px-4 py-3 border-2 border-[var(--color-text)]/30 rounded-xl text-[var(--color-text)] hover:bg-[var(--color-text)]/5 transition-colors font-medium"
                                     >
                                         <T>Cancel</T>
                                     </button>
                                     <button
                                         type="submit"
                                         disabled={isDeletingAccount}
-                                        className="flex-1 px-4 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-medium"
+                                        className="flex-1 px-4 py-3 bg-gradient-to-r from-red-600 to-red-700 text-white rounded-xl hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed font-bold shadow-lg"
                                     >
                                         {isDeletingAccount ? (
                                             "Удаляется..."

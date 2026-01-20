@@ -99,9 +99,10 @@ export interface Service {
 export interface Consultation {
     id: string;
     title: string;
+    duration: number;
     description: string;
-    price: string; // Строка (например, "2 000 $")
-    features: string[]; // Массив строк
+    price: number; 
+    features: string[]; 
     createdAt: Date;
     updatedAt: Date;
 }

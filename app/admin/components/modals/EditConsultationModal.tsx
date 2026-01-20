@@ -8,7 +8,8 @@ interface EditConsultationModalProps {
         title: string;
         description: string;
         features: string;
-        price: string;
+        price: number;
+        duration: number;
     };
     error: string | null;
     onUpdateConsultation: (e: React.FormEvent) => void;
@@ -141,6 +142,30 @@ const EditConsultationModal: React.FC<EditConsultationModalProps> = ({
                         >
                             Separate features with commas
                         </p>
+                    </div>
+
+                    <div>
+                        <label
+                            htmlFor="consultation-price"
+                            className="block text-sm font-medium mb-1 text-[var(--color-text)]"
+                        >
+                            Duration
+                        </label>
+                        <input
+                            id="consultation-duration"
+                            type="text"
+                            value={editConsultation.duration}
+                            onChange={(e) =>
+                                onEditConsultationChange(
+                                    "duration",
+                                    e.target.value
+                                )
+                            }
+                            className="w-full p-2 border border-[var(--color-border)] rounded-md bg-[var(--color-input-bg)] text-[var(--color-text)]"
+                            placeholder="minute"
+                            required
+                            aria-required="true"
+                        />
                     </div>
 
                     <div>

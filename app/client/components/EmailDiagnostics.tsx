@@ -1,149 +1,85 @@
-// components/EmailDiagnostics.tsx
+// app/client/components/ConsultationCard.tsx
 "use client";
 
-import React, { useState } from "react";
-import { auth } from "../../lib/firebase/firebase";
-import { sendEmailVerification, User } from "firebase/auth";
+import React from "react";
+import { FaCalendarAlt, FaClock, FaVideo, FaArrowRight } from "react-icons/fa";
+import { Consultation } from "../../lib/firebase/products/types";
 
-interface EmailDiagnosticsProps {
-    user?: User;
+interface ConsultationCardProps {
+    consultation: Consultation;
+    onBook: (consultation: Consultation) => void;
 }
 
-export default function EmailDiagnostics({ user }: EmailDiagnosticsProps) {
-    const [testing, setTesting] = useState(false);
-    const [results, setResults] = useState<string[]>([]);
-
-    const addResult = (message: string) => {
-        setResults((prev) => [
-            ...prev,
-            `${new Date().toLocaleTimeString()}: ${message}`,
-        ]);
-    };
-
-    const testEmailSending = async () => {
-        setTesting(true);
-        setResults([]);
-
-        try {
-            const currentUser = user || auth.currentUser;
-
-            if (!currentUser) {
-                addResult("❌ Пользователь не авторизован");
-                setTesting(false);
-                return;
-            }
-
-            addResult(
-                `🔍 Тестирование отправки email для: ${currentUser.email}`
-            );
-            addResult(
-                `📧 Email верифицирован: ${
-                    currentUser.emailVerified ? "Да" : "Нет"
-                }`
-            );
-
-            // Проверяем настройки Firebase
-            addResult("🔧 Проверка настроек Firebase...");
-            addResult(`🆔 UID пользователя: ${currentUser.uid}`);
-            addResult(
-                `📱 Провайдеры: ${currentUser.providerData
-                    .map((p) => p.providerId)
-                    .join(", ")}`
-            );
-
-            // Попытка отправки email
-            addResult("📤 Попытка отправки email...");
-
-            await sendEmailVerification(currentUser, {
-                url: `${window.location.origin}/client/dashboard/home`,
-                handleCodeInApp: false,
-            });
-
-            addResult("✅ Email успешно отправлен!");
-            addResult("📋 Проверьте:");
-            addResult("   • Папку 'Входящие'");
-            addResult("   • Папку 'Спам/Нежелательная почта'");
-            addResult("   • Папку 'Промокции' (Gmail)");
-            addResult("   • Настройки безопасности почты");
-        } catch (error: any) {
-            addResult(`❌ Ошибка отправки: ${error.message}`);
-            addResult(`🔍 Код ошибки: ${error.code || "Неизвестно"}`);
-
-            // Анализ распространенных ошибок
-            if (error.code === "auth/too-many-requests") {
-                addResult("⚠️ Слишком много запросов. Попробуйте позже.");
-            } else if (error.code === "auth/user-not-found") {
-                addResult("⚠️ Пользователь не найден в системе.");
-            } else if (error.code === "auth/invalid-email") {
-                addResult("⚠️ Неверный формат email адреса.");
-            }
-        } finally {
-            setTesting(false);
-        }
-    };
-
-    const clearResults = () => {
-        setResults([]);
-    };
-
+export default function ConsultationCard({ consultation, onBook }: ConsultationCardProps) {
     return (
-        <div className="bg-white rounded-lg shadow-lg p-6 max-w-2xl mx-auto">
-            <div className="mb-4">
-                <h3 className="text-xl font-bold text-gray-900 mb-2">
-                    🔧 Диагностика Email Верификации
-                </h3>
-                <p className="text-gray-600 text-sm">
-                    Этот инструмент поможет определить проблемы с отправкой
-                    email для верификации.
-                </p>
-            </div>
-
-            <div className="flex gap-3 mb-4">
-                <button
-                    onClick={testEmailSending}
-                    disabled={testing}
-                    className="bg-blue-600 hover:bg-blue-700 disabled:bg-blue-300 text-white px-4 py-2 rounded-lg font-medium transition-colors"
-                >
-                    {testing ? "🔄 Тестируется..." : "🧪 Тестировать отправку"}
-                </button>
-
-                <button
-                    onClick={clearResults}
-                    className="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg font-medium transition-colors"
-                >
-                    🗑️ Очистить
-                </button>
-            </div>
-
-            {results.length > 0 && (
-                <div className="bg-gray-50 rounded-lg p-4 max-h-80 overflow-y-auto">
-                    <h4 className="font-semibold text-gray-900 mb-3">
-                        📊 Результаты диагностики:
-                    </h4>
-                    <div className="space-y-1">
-                        {results.map((result, index) => (
-                            <div
-                                key={index}
-                                className="text-sm font-mono text-gray-700"
-                            >
-                                {result}
+        <div className="bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-200 hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+            {/* Верхняя часть с цветным акцентом */}
+            <div className="h-2 bg-gradient-to-r from-blue-500 to-blue-600"></div>
+            
+            {/* Содержимое карточки */}
+            <div className="p-6">
+                {/* Заголовок и иконка */}
+                <div className="flex items-start justify-between mb-4">
+                    <div className="flex items-center">
+                        <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mr-4">
+                            <FaCalendarAlt className="text-blue-600 w-6 h-6" />
+                        </div>
+                        <div>
+                            <h3 className="text-xl font-bold text-gray-800">
+                                {consultation.title}
+                            </h3>
+                            <div className="flex items-center mt-1">
+                                <FaClock className="w-3 h-3 text-gray-500 mr-1" />
+                                <span className="text-sm text-gray-500">
+                                    {consultation.duration} minutes
+                                </span>
                             </div>
-                        ))}
+                        </div>
                     </div>
                 </div>
-            )}
 
-            <div className="mt-6 bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-                <h4 className="font-semibold text-yellow-800 mb-2">
-                    💡 Частые причины проблем:
-                </h4>
-                <ul className="text-sm text-yellow-700 space-y-1">
-                    <li>• Email попал в папку спам</li>
-                    <li>• Настройки безопасности почтового провайдера</li>
-                    <li>• Превышен лимит отправки Firebase</li>
-                    <li>• Неправильные настройки домена в Firebase</li>
-                    <li>• Блокировка со стороны почтового сервиса</li>
-                </ul>
+                {/* Описание */}
+                <p className="text-gray-600 mb-6 line-clamp-3">
+                    {consultation.description}
+                </p>
+
+                {/* Детали */}
+                <div className="space-y-3 mb-6">
+                    <div className="flex items-center text-gray-700">
+                        <FaVideo className="w-4 h-4 mr-3 text-blue-500" />
+                        <span className="text-sm">Online video consultation</span>
+                    </div>
+                    <div className="flex items-center text-gray-700">
+                        <div className="w-2 h-2 bg-green-500 rounded-full mr-3"></div>
+                        <span className="text-sm">Real-time availability</span>
+                    </div>
+                </div>
+
+                {/* Цена и кнопка */}
+                <div className="flex items-center justify-between pt-4 border-t border-gray-100">
+                    <div>
+                        <span className="text-3xl font-bold text-blue-600">
+                            ${consultation.price}
+                        </span>
+                        <span className="text-gray-500 ml-2 text-sm">/session</span>
+                    </div>
+                    <button
+                        onClick={() => onBook(consultation)}
+                        className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-medium py-3 px-5 rounded-lg transition-all duration-300 flex items-center group"
+                    >
+                        <span>Book Now</span>
+                        <FaArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
+                    </button>
+                </div>
+            </div>
+
+            {/* Нижний информационный бар */}
+            <div className="bg-gray-50 px-6 py-3 border-t border-gray-200">
+                <div className="flex items-center justify-between text-xs text-gray-500">
+                    <span>Flexible scheduling</span>
+                    <span>24/7 booking</span>
+                    <span>Instant confirmation</span>
+                </div>
             </div>
         </div>
     );

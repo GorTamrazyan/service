@@ -23,7 +23,7 @@ export default function RootLayout({
             <GuestBrowsingWrapper>
                 <CartProvider>
                     <Header />
-                    <main className="flex-1 pt-10 sm:p-10">{children}</main>
+                    <main className="flex-1 pt-20 sm:pt-24 px-4 sm:px-10 pb-10">{children}</main>
                     <Footer />
                 </CartProvider>
             </GuestBrowsingWrapper>

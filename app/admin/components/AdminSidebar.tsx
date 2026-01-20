@@ -6,6 +6,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
     LayoutDashboard,
+    Calendar,
     Package,
     Wrench,
     ShoppingCart,
@@ -18,6 +19,7 @@ import {
 } from "lucide-react";
 import { T } from "../../client/components/T";
 import { logoutAdmin } from "../../lib/firebase/admin";
+import { title } from "process";
 
 const menuItems = [
     {
@@ -34,6 +36,11 @@ const menuItems = [
         title: "Services",
         icon: Wrench,
         href: "/admin/service_consultation",
+    },
+    {
+        title: "Consultation",
+        icon: Calendar,
+        href: "/admin/consultation"
     },
     {
         title: "Orders",

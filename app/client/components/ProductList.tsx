@@ -103,84 +103,133 @@ export function ProductCard({ product }: { product: Product }) {
    
     return (
         <>
-            <div className="bg-[var(--color-card-bg)] rounded-3xl shadow-md overflow-hidden flex flex-col h-full transform transition-transform duration-300 hover:-translate-y-2 hover:shadow-xl border border-[var(--color-border)]">
-                <div className="flex it p-2">
-                    <div className="w-full h-100 rounded-2xl   bg-gradient-to-br from-gray-100 to-gray-300 dark:from-gray-400 dark:to-gray-900 flex items-center justify-center overflow-hidden">
-                        {product.imageUrl ? (
-                            <Image
-                                src={product.imageUrl}
-                                alt={product.name}
-                                width={400}
-                                height={500}
-                                className="w-full h-full object-cover transform transition-transform duration-300 hover:scale-105"
-                                priority
-                            />
-                        ) : (
-                            <div className="w-24 h-24  bg-gray-300 dark:bg-gray-700 rounded-lg"></div>
-                        )}
-                    </div>
+            <div className="bg-[var(--color-card-bg)] rounded-3xl shadow-lg overflow-hidden flex flex-col h-full transform transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl border border-[var(--color-border)] group">
+    {/* Изображение товара с эффектом */}
+    <div className="relative p-3">
+        <div className="relative w-full h-[200px] rounded-2xl bg-gradient-to-br from-gray-100 to-gray-300 dark:from-gray-800 dark:to-gray-700 overflow-hidden">
+            {product.imageUrl ? (
+                <Image
+                    src={product.imageUrl}
+                    alt={product.name}
+                    width={400}
+                    height={500}
+                    className="w-full h-full object-cover transform transition-transform duration-500 group-hover:scale-110"
+                    priority
+                />
+            ) : (
+                <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-gray-200 to-gray-300 dark:from-gray-700 dark:to-gray-800">
+                    <svg className="w-16 h-16 text-gray-400 dark:text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
                 </div>
-                <div className="p-3 flex flex-col flex-grow">
-                    <h3 className="text-xl font-bold text-[var(--color-primary)] mb-1 h-10 overflow-hidden line-clamp-2">
-                        <T>{product.name}</T>
-                    </h3>
-                    <div className="text-sm text-[var(--color-text)]  h-10 overflow-hidden line-clamp-3 leading-relaxed">
-                        <T>{product.description || "No description."}</T>
-                    </div>
+            )}
+            
+            
+        </div>
+        
+        {/* Эффект при наведении на изображение */}
+        <div className="absolute inset-0 p-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
+            <div className="w-full h-[200px] rounded-2xl bg-gradient-to-t from-black/20 to-transparent" />
+        </div>
+    </div>
 
-                    {/* Выбор цвета, если цвета есть */}
-                    {product.colors && product.colors.length > 0 && (
-                        <div className="mb-3">
-                            
-                            <div className="flex flex-wrap gap-2">
-                                {product.colors.map((color) => (
-                                    <button
-                                        key={color.id}
-                                        className={"w-8 h-8 rounded-full border-2 transition-all  border-gray-300 "}
-                                        style={{
-                                            backgroundColor: color.hexCode,
-                                        }}
-                                        
-                                    />
-                                ))}
-                            </div>
+    {/* Контент карточки */}
+    <div className="p-5 flex flex-col flex-grow">
+        {/* Название товара */}
+        <h3 className="text-xl font-bold text-[var(--color-primary)] mb-2 min-h-[3.5rem] line-clamp-2 leading-tight">
+            <T>{product.name}</T>
+        </h3>
+     
+        <div className="mb-4">
+            <p className="text-sm text-[var(--color-text)]/80 leading-relaxed line-clamp-2 min-h-[2.5rem]">
+                <T>{product.description || "No description available."}</T>
+            </p>
+        </div>
+
+   
+        {product.colors && product.colors.length > 0 && (
+            <div className="mb-4">
+                <div className="flex items-center gap-2 mb-2">
+                    <span className="text-xs font-medium text-[var(--color-text)]/60">
+                        <T>Colors</T>:
+                    </span>
+                    <span className="text-xs text-[var(--color-text)]/40">
+                        {product.colors.length} <T>options</T>
+                    </span>
+                </div>
+                <div className="flex flex-wrap gap-1.5">
+                    {product.colors.map((color) => (
+                        <button
+                            key={color.id}
+                            className="w-7 h-7 rounded-full border-2 border-gray-300 dark:border-gray-600 transition-all duration-200 hover:scale-110 hover:shadow-md active:scale-95"
+                            style={{ backgroundColor: color.hexCode }}
+                            aria-label={`Color: ${color.name}`}
+                            title={color.name}
+                        />
+                    ))}
+                    {product.colors.length > 6 && (
+                        <div className="w-7 h-7 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
+                            <span className="text-xs text-gray-500 dark:text-gray-400">+{product.colors.length - 6}</span>
                         </div>
                     )}
-
-                    <div className="flex items-baseline mt-auto mb-4">
-                        <span className="text-2xl font-extrabold text-[var(--color-accent)]">
-                            {`$${parseFloat(product.price).toFixed(2)}`}
-                        </span>
-                    </div>
-
-                    <div className="flex flex-col gap-2 mt-3">
-                        {/*<button
-                            onClick={handleAddToCart}
-                            disabled={isColorRequiredAndMissing}
-                            className={`py-2 px-4 rounded-full font-semibold text-sm border transition-all duration-200 ease-in-out transform hover:scale-105 flex items-center justify-center text-center ${
-                                isColorRequiredAndMissing
-                                    ? "text-gray-400 border-gray-400 cursor-not-allowed"
-                                    : "text-[var(--color-success)] border-[var(--color-success)] hover:bg-[var(--color-success)] hover:text-white"
-                            }`}
-                        >
-                            <T>Add to cart</T>
-                        </button>*/}
-                        <button
-                            onClick={() => setIsModalOpen(true)}
-                            className="py-2 px-4 rounded-full text-[var(--color-primary)] font-semibold text-sm border border-[var(--color-primary)] hover:bg-[var(--color-primary)] hover:text-white transition-all duration-200 ease-in-out transform hover:scale-105 flex items-center justify-center text-center"
-                        >
-                            <T>Details</T>
-                        </button>
-                    </div>
                 </div>
             </div>
+        )}
 
-            {/* Product Modal */}
-            <ProductModal
-                product={product}
-                isOpen={isModalOpen}
-                onClose={() => setIsModalOpen(false)}
-            />
-        </>
-    );
-}
+
+        <div className="mt-auto space-y-4">
+            {/* Цена */}
+            <div className="flex items-center justify-between">
+                <div className="flex items-baseline gap-2">
+                    <span className="text-2xl font-extrabold text-[var(--color-accent)]">
+                        ${parseFloat(product.price).toFixed(2)}
+                    </span>
+                    
+                </div>
+                
+                
+            </div>
+
+            {/* Кнопки действий */}
+            <div className="flex gap-2">
+                {/*<button
+                    onClick={handleAddToCart}
+                    disabled={isColorRequiredAndMissing}
+                    className={`flex-1 py-3 rounded-xl font-semibold text-sm border transition-all duration-200 flex items-center justify-center gap-2 group/btn ${
+                        isColorRequiredAndMissing
+                            ? "text-gray-400 border-gray-300 dark:border-gray-700 cursor-not-allowed"
+                            : "text-[var(--color-success)] border-[var(--color-success)] hover:bg-[var(--color-success)] hover:text-white"
+                    }`}
+                >
+                    <svg className="w-4 h-4 group-hover/btn:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                    </svg>
+                    <T>Add to cart</T>
+                </button>*/}
+                
+                <button
+                    onClick={() => setIsModalOpen(true)}
+                    className="flex-1 py-3 rounded-xl text-[var(--color-primary)] font-semibold text-sm border border-[var(--color-primary)] hover:bg-[var(--color-primary)] hover:text-white transition-all duration-200 flex items-center justify-center gap-2 group/btn"
+                >
+                    <svg className="w-4 h-4 group-hover/btn:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <T>Details</T>
+                </button>
+            </div>
+            
+            
+        </div>
+    </div>
+
+    
+</div>
+
+{/* Product Modal */}
+<ProductModal
+    product={product}
+    isOpen={isModalOpen}
+    onClose={() => setIsModalOpen(false)}
+/>
+</>
+);}

@@ -10,20 +10,38 @@ import React, {
     useCallback,
 } from "react";
 import { useAuthState } from "../../hooks/useAuthState";
+import { useProfile } from "../../hooks/useProfile";
+import { createOrder } from "../../lib/firebase/orders";
 import type { Color } from "../../lib/firebase/products/types";
 
 
 
 // Интерфейс для продукта в корзине
-interface CartItem {
+export interface CartItem {
     id: string;
     name: string;
     price: string;
     imageUrl: string | null;
     quantity: number;
-    color: Color | null;
-    height: number;
-    length:number;
+    type: 'product' | 'consultation' | 'service'; // Тип элемента
+    // Поля для продуктов
+    color?: Color | null;
+    height?: number;
+    length?: number;
+    // Поля для консультаций
+    duration?: number; // Продолжительность в минутах
+    features?: string[]; // Что включено в консультацию
+    // Поля для услуг
+    description?: string; // Описание услуги
+    serviceType?: 'delivery' | 'installation' | 'assembly' | 'other'; // Тип услуги
+}
+
+// Интерфейс для информации о клиенте
+export interface CustomerInfo {
+    name: string;
+    email: string;
+    phone: string;
+    address: string;
 }
 
 // Интерфейс для значений контекста корзины
@@ -36,15 +54,41 @@ interface CartContextType {
         imageUrl: string | null;
         color: Color | null;
         height: number;
-        length: number; 
+        length: number;
+    }) => void;
+    addConsultationToCart: (consultation: {
+        id: string;
+        name: string;
+        price: number;
+        duration: number;
+        features: string[];
+    }) => void;
+    addServiceToCart: (service: {
+        id: string;
+        name: string;
+        price: number;
+        description: string;
+        serviceType?: 'delivery' | 'installation' | 'assembly' | 'other';
     }) => void;
     removeFromCart: (id: string, colorId?:string) => void;
     updateQuantity: (id: string, newQuantity: number,colorId?:string) => void;
+    incrementQuantity: (id: string, currentQuantity: number, colorId?: string) => void;
+    decrementQuantity: (id: string, currentQuantity: number, colorId?: string) => void;
     clearCart: () => void;
     getTotalItems: () => number;
     getTotalPrice: () => number;
     isAuthenticated: boolean;
     requiresAuth: (action: string) => boolean;
+    // Checkout functionality
+    showCheckoutModal: boolean;
+    customerInfo: CustomerInfo;
+    isSubmitting: boolean;
+    orderSuccess: boolean;
+    openCheckoutModal: () => void;
+    closeCheckoutModal: () => void;
+    updateCustomerInfo: (info: Partial<CustomerInfo>) => void;
+    handleSubmitOrder: (e: React.FormEvent) => Promise<void>;
+    resetOrderSuccess: () => void;
 }
 
 // Создаем контекст с значениями по умолчанию
@@ -60,6 +104,18 @@ export const CartProvider = ({ children }: CartProviderProps) => {
     const [cartItems, setCartItems] = useState<CartItem[]>([]);
     const [isClient, setIsClient] = useState(false); // <--- Добавляем состояние для проверки клиента
     const [user, loading] = useAuthState();
+    const { profile } = useProfile();
+
+    // Checkout states
+    const [showCheckoutModal, setShowCheckoutModal] = useState(false);
+    const [customerInfo, setCustomerInfo] = useState<CustomerInfo>({
+        name: "",
+        email: "",
+        phone: "",
+        address: "",
+    });
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [orderSuccess, setOrderSuccess] = useState(false);
 
     // Этот useEffect выполняется только на клиенте после монтирования
     useEffect(() => {
@@ -139,6 +195,7 @@ export const CartProvider = ({ children }: CartProviderProps) => {
                     : product.id;
 
                 const existingItemIndex = prevItems.findIndex((item) => {
+                    if (item.type !== 'product') return false;
                     const existingItemKey = item.color
                         ? `${item.id}-${item.color.id}`
                         : item.id;
@@ -154,7 +211,100 @@ export const CartProvider = ({ children }: CartProviderProps) => {
                     );
                 } else {
                     // Добавляем новый товар
-                    return [...prevItems, { ...product, quantity: 1 }];
+                    return [...prevItems, { ...product, quantity: 1, type: 'product' }];
+                }
+            });
+        },
+        [isAuthenticated]
+    );
+
+    // Добавление консультации в корзину
+    const addConsultationToCart = useCallback(
+        (consultation: {
+            id: string;
+            name: string;
+            price: number;
+            duration: number;
+            features: string[];
+        }) => {
+            if (!isAuthenticated) {
+                showAuthRequired();
+                return;
+            }
+
+            setCartItems((prevItems) => {
+                // Проверяем, есть ли уже такая консультация в корзине
+                const existingItemIndex = prevItems.findIndex(
+                    (item) => item.type === 'consultation' && item.id === consultation.id
+                );
+
+                if (existingItemIndex !== -1) {
+                    // Консультации не увеличиваются в количестве, просто уведомляем
+                    alert('This consultation is already in your cart');
+                    return prevItems;
+                } else {
+                    // Добавляем новую консультацию
+                    return [
+                        ...prevItems,
+                        {
+                            id: consultation.id,
+                            name: consultation.name,
+                            price: consultation.price.toString(),
+                            imageUrl: null,
+                            quantity: 1,
+                            type: 'consultation',
+                            duration: consultation.duration,
+                            features: consultation.features,
+                        },
+                    ];
+                }
+            });
+        },
+        [isAuthenticated]
+    );
+
+    // Добавление услуги в корзину
+    const addServiceToCart = useCallback(
+        (service: {
+            id: string;
+            name: string;
+            price: number;
+            description: string;
+            serviceType?: 'delivery' | 'installation' | 'assembly' | 'other';
+        }) => {
+            if (!isAuthenticated) {
+                showAuthRequired();
+                return;
+            }
+
+            setCartItems((prevItems) => {
+                // Проверяем, есть ли уже такая услуга в корзине
+                const existingItemIndex = prevItems.findIndex(
+                    (item) => item.type === 'service' && item.id === service.id
+                );
+
+                if (existingItemIndex !== -1) {
+                    // Увеличиваем количество услуги
+                    return prevItems.map((item, index) =>
+                        index === existingItemIndex
+                            ? { ...item, quantity: item.quantity + 1 }
+                            : item
+                    );
+                } else {
+                    // Добавляем новую услугу
+                    return [
+                        ...prevItems,
+                        {
+                            id: service.id,
+                            name: service.name,
+                            price: service.price.toString(),
+                            imageUrl: null,
+                            quantity: 1,
+                            type: 'service',
+                            description: service.description,
+                            serviceType: service.serviceType || 'other',
+                        },
+                    ];
                 }
             });
         },
@@ -230,17 +380,158 @@ export const CartProvider = ({ children }: CartProviderProps) => {
             : 0;
     }, [cartItems, isClient]);
 
+    // Увеличение количества товара
+    const incrementQuantity = useCallback(
+        (id: string, currentQuantity: number, colorId?: string) => {
+            if (currentQuantity < 100) {
+                updateQuantity(id, currentQuantity + 1, colorId);
+            }
+        },
+        [updateQuantity]
+    );
+
+    // Уменьшение количества товара
+    const decrementQuantity = useCallback(
+        (id: string, currentQuantity: number, colorId?: string) => {
+            if (currentQuantity > 1) {
+                updateQuantity(id, currentQuantity - 1, colorId);
+            }
+        },
+        [updateQuantity]
+    );
+
+    // Открытие модального окна оформления заказа
+    const openCheckoutModal = useCallback(() => {
+        if (profile) {
+            const fullAddress = `${profile.address.city}, ${
+                profile.address.street
+            } ${profile.address.houseNumber}${
+                profile.address.apartmentNumber
+                    ? `, apt. ${profile.address.apartmentNumber}`
+                    : ""
+            }, ${profile.address.zipCode}`.trim();
+
+            setCustomerInfo({
+                name: `${profile.firstName} ${profile.lastName}`.trim() || "",
+                email: profile.email || user?.email || "",
+                phone: profile.phone || "",
+                address: fullAddress || "",
+            });
+        } else {
+            setCustomerInfo({
+                name: "",
+                email: user?.email || "",
+                phone: "",
+                address: "",
+            });
+        }
+        setShowCheckoutModal(true);
+    }, [profile, user]);
+
+    // Закрытие модального окна
+    const closeCheckoutModal = useCallback(() => {
+        setShowCheckoutModal(false);
+    }, []);
+
+    // Обновление информации о клиенте
+    const updateCustomerInfo = useCallback((info: Partial<CustomerInfo>) => {
+        setCustomerInfo((prev) => ({ ...prev, ...info }));
+    }, []);
+
+    // Сброс состояния успешного заказа
+    const resetOrderSuccess = useCallback(() => {
+        setOrderSuccess(false);
+    }, []);
+
+    // Обработка отправки заказа
+    const handleSubmitOrder = useCallback(
+        async (e: React.FormEvent) => {
+            e.preventDefault();
+            if (!user) return;
+
+            setIsSubmitting(true);
+            try {
+                const hasProducts = cartItems.some(
+                    (item) => item.type === "product"
+                );
+                const hasServices = cartItems.some(
+                    (item) => item.type === "service"
+                );
+
+                const productItems = cartItems.filter(
+                    (item) => item.type === "product"
+                );
+                const serviceItems = cartItems.filter(
+                    (item) => item.type === "service"
+                );
+
+                const orderData = {
+                    userId: user.uid,
+                    type:
+                        hasServices && !hasProducts
+                            ? ("service" as const)
+                            : ("product" as const),
+                    products: productItems.map((item) => ({
+                        id: item.id,
+                        name: item.name,
+                        price: item.price,
+                        quantity: item.quantity,
+                        color: item.color?.hexCode,
+                    })),
+                    services:
+                        serviceItems.length > 0
+                            ? serviceItems.map((item) => ({
+                                  serviceType:
+                                      item.serviceType || ("other" as const),
+                                  serviceName: item.name,
+                                  description: item.description || "",
+                                  price: parseFloat(item.price),
+                              }))
+                            : undefined,
+                    totalPrice: getTotalPrice().toFixed(2),
+                    status: "pending" as const,
+                    customerInfo,
+                };
+
+                await createOrder(orderData);
+                clearCart();
+                setShowCheckoutModal(false);
+                setOrderSuccess(true);
+            } catch (error) {
+                console.error("Error creating order:", error);
+                alert("There was an error placing your order. Please try again.");
+            } finally {
+                setIsSubmitting(false);
+            }
+        },
+        [user, cartItems, getTotalPrice, customerInfo, clearCart]
+    );
+
     // Значения, которые будут доступны через контекст
     const contextValue = {
         cartItems,
         addToCart,
+        addConsultationToCart,
+        addServiceToCart,
         removeFromCart,
         updateQuantity,
+        incrementQuantity,
+        decrementQuantity,
         clearCart,
         getTotalItems,
         getTotalPrice,
         isAuthenticated,
         requiresAuth,
+        // Checkout
+        showCheckoutModal,
+        customerInfo,
+        isSubmitting,
+        orderSuccess,
+        openCheckoutModal,
+        closeCheckoutModal,
+        updateCustomerInfo,
+        handleSubmitOrder,
+        resetOrderSuccess,
     };
 
     return (

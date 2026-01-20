@@ -2,6 +2,7 @@
 import React, { useState } from "react";
 import { Consultation } from "../../../lib/firebase/products/types";
 import { FaTimes } from "react-icons/fa";
+import { format } from "path";
 
 interface ConsultationModalProps {
     isOpen: boolean;
@@ -14,7 +15,8 @@ const initialFormData: Omit<Consultation, "id" | "createdAt" | "updatedAt"> & {
 } = {
     title: "",
     description: "",
-    price: "",
+    price: 0,
+    duration: 0,
     features: [],
     featuresInput: "",
 };
@@ -57,6 +59,7 @@ export default function ConsultationModal({
                 title: formData.title,
                 description: formData.description,
                 price: formData.price,
+                duration: formData.duration,
                 features: featuresArray, // Sending the array
             };
 
@@ -137,6 +140,23 @@ export default function ConsultationModal({
                             className="mt-1 block w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm p-2 dark:bg-gray-700 dark:text-white"
                         />
                     </div>
+                    <div>
+                        <label
+                            htmlFor="duration"
+                            className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+                        >
+                            Duration(minute)
+                        </label>
+                        <input
+                            type="text"
+                            name="duration"
+                            id="duration"
+                            value={formData.duration}
+                            onChange={handleChange}
+                            required
+                            className="mt-1 block w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm p-2 dark:bg-gray-700 dark:text-white"
+                        />
+                    </div>
 
                     <div>
                         <label
@@ -185,7 +205,7 @@ export default function ConsultationModal({
                         }`}
                     >
                         {status === "loading"
-                            ? "Saving..." // Сохранение...
+                            ? "Saving..." 
                             : "Add Tariff"}{" "}
                     </button>
                 </form>

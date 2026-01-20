@@ -144,6 +144,7 @@ const consultationToFirestore = (
         description: consultation.description,
         price: consultation.price,
         features: consultation.features,
+        duration: consultation.duration,
         createdAt: Timestamp.fromDate(consultation.createdAt),
         updatedAt: Timestamp.fromDate(consultation.updatedAt),
     };

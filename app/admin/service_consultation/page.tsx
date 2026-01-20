@@ -109,7 +109,8 @@ export default function AdminCombinedServicesPage() {
         title: "",
         description: "",
         features: "",
-        price: "",
+        duration: 0, 
+        price: 0,
     });
 
     // Function to load ALL data
@@ -198,7 +199,8 @@ export default function AdminCombinedServicesPage() {
              features: Array.isArray(consultation.features)
                  ? consultation.features.join(", ")
                  : consultation.features || "",
-             price: consultation.price || "",
+             price: consultation.price,
+             duration: consultation.duration,
          });
          setShowEditConsultationForm(true);
          setError("");

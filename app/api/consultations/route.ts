@@ -29,7 +29,7 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
     try {
         const body = await request.json();
-        const { title, description, features, price } = body;
+        const { title, description, features, price, duration } = body;
 
         // Validation
         if (!title || !description || !Array.isArray(features)) {
@@ -47,6 +47,7 @@ export async function POST(request: Request) {
             title,
             description,
             features,
+            duration,
             price,
         });
 
@@ -82,7 +83,7 @@ export async function PUT(request: Request) {
         }
 
         const body = await request.json();
-        const { title, description, features, price } = body;
+        const { title, description, features, price, duration } = body;
 
         // Validation
         if (!title || !description || !Array.isArray(features)) {
@@ -101,6 +102,7 @@ export async function PUT(request: Request) {
             description,
             features,
             price,
+            duration,
         });
 
         return NextResponse.json(

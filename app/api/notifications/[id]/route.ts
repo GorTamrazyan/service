@@ -5,15 +5,13 @@ import {
     deleteNotification,
 } from "../../../lib/firebase/notifications"; // Импортируем deleteNotification
 
-interface Params {
-    params: {
-        id: string;
-    };
-}
-
-export async function PUT(request: NextRequest, { params }: Params) {
+export async function PUT(
+    request: NextRequest,
+    { params }: { params: Promise<{ id: string }> }
+) {
     try {
-        await markNotificationAsRead(params.id); 
+        const { id } = await params;
+        await markNotificationAsRead(id);
         return NextResponse.json({ success: true });
     } catch (error) {
         return NextResponse.json(
@@ -24,9 +22,13 @@ export async function PUT(request: NextRequest, { params }: Params) {
 }
 
 // Новый метод: DELETE для удаления конкретного уведомления
-export async function DELETE(request: NextRequest, { params }: Params) {
+export async function DELETE(
+    request: NextRequest,
+    { params }: { params: Promise<{ id: string }> }
+) {
     try {
-        await deleteNotification(params.id); // Вызываем функцию удаления
+        const { id } = await params;
+        await deleteNotification(id); // Вызываем функцию удаления
         return NextResponse.json({ success: true });
     } catch (error) {
         console.error("Error deleting notification:", error);

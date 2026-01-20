@@ -110,38 +110,7 @@ export default function Footer() {
                         </nav>
                     </div>
 
-                    {/* Categories */}
-                    <div className="space-y-4">
-                        <h4 className="text-lg font-semibold text-[var(--color-primary)]">
-                            <T>Categories</T>
-                        </h4>
-                        <nav className="space-y-2">
-                            <Link 
-                                href="/client/dashboard/products?category=vinyl" 
-                                className="block text-[var(--color-text)]/70 hover:text-[var(--color-accent)] transition-colors duration-200"
-                            >
-                                <T>Vinyl Fences</T>
-                            </Link>
-                            <Link 
-                                href="/client/dashboard/products?category=wood" 
-                                className="block text-[var(--color-text)]/70 hover:text-[var(--color-accent)] transition-colors duration-200"
-                            >
-                                <T>Wood Fences</T>
-                            </Link>
-                            <Link 
-                                href="/client/dashboard/products?category=metal" 
-                                className="block text-[var(--color-text)]/70 hover:text-[var(--color-accent)] transition-colors duration-200"
-                            >
-                                <T>Metal Fences</T>
-                            </Link>
-                            <Link 
-                                href="/client/dashboard/products?category=plastic" 
-                                className="block text-[var(--color-text)]/70 hover:text-[var(--color-accent)] transition-colors duration-200"
-                            >
-                                <T>Plastic Fences</T>
-                            </Link>
-                        </nav>
-                    </div>
+                    
 
                     {/* Contact Info */}
                     <div className="space-y-4">

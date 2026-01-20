@@ -25,17 +25,35 @@ export interface Product {
     quantity: number;
 }
 
+export interface ConsultationInfo {
+    consultationType: string;
+    duration: number;
+    price: number;
+    scheduledDate?: Date;
+    googleCalendarUrl?: string;
+}
+
+export interface ServiceInfo {
+    serviceType: 'delivery' | 'installation' | 'assembly' | 'other';
+    serviceName: string;
+    description: string;
+    price: number;
+}
+
 export interface Order {
     id?: string;
     userId: string;
+    type: 'product' | 'consultation' | 'service'; // Новое поле для типа заказа
     products: {
         id: string;
         name: string;
         price: string;
         quantity: number;
     }[];
+    consultation?: ConsultationInfo; // Информация о консультации
+    services?: ServiceInfo[]; // Информация об услугах
     totalPrice: string;
-    status: 'pending' | 'confirmed' | 'shipped' | 'delivered' | 'cancelled';
+    status: 'pending' | 'confirmed' | 'shipped' | 'delivered' | 'cancelled' | 'scheduled' | 'completed';
     customerInfo: {
         name: string;
         email: string;
@@ -54,7 +72,21 @@ export const firestoreToOrder = (doc: DocumentSnapshot<DocumentData>): Order | n
     return {
         id: doc.id,
         userId: data.userId,
+        type: data.type || 'product', // По умолчанию 'product' для обратной совместимости
         products: data.products || [],
+        consultation: data.consultation ? {
+            consultationType: data.consultation.consultationType,
+            duration: data.consultation.duration,
+            price: data.consultation.price,
+            scheduledDate: data.consultation.scheduledDate?.toDate(),
+            googleCalendarUrl: data.consultation.googleCalendarUrl
+        } : undefined,
+        services: data.services ? data.services.map((service: any) => ({
+            serviceType: service.serviceType,
+            serviceName: service.serviceName,
+            description: service.description,
+            price: service.price
+        })) : undefined,
         totalPrice: data.totalPrice,
         status: data.status || 'pending',
         customerInfo: data.customerInfo,
@@ -65,8 +97,9 @@ export const firestoreToOrder = (doc: DocumentSnapshot<DocumentData>): Order | n
 
 // Преобразование Order объекта для Firestore
 export const orderToFirestore = (order: Omit<Order, 'id'>): DocumentData => {
-    return {
+    const data: DocumentData = {
         userId: order.userId,
+        type: order.type,
         products: order.products,
         totalPrice: order.totalPrice,
         status: order.status,
@@ -74,6 +107,32 @@ export const orderToFirestore = (order: Omit<Order, 'id'>): DocumentData => {
         createdAt: Timestamp.fromDate(order.createdAt),
         updatedAt: Timestamp.fromDate(order.updatedAt)
     };
+
+    // Добавляем consultation если это консультация
+    if (order.consultation) {
+        data.consultation = {
+            consultationType: order.consultation.consultationType,
+            duration: order.consultation.duration,
+            price: order.consultation.price,
+            googleCalendarUrl: order.consultation.googleCalendarUrl
+        };
+
+        if (order.consultation.scheduledDate) {
+            data.consultation.scheduledDate = Timestamp.fromDate(order.consultation.scheduledDate);
+        }
+    }
+
+    // Добавляем services если они есть
+    if (order.services && order.services.length > 0) {
+        data.services = order.services.map(service => ({
+            serviceType: service.serviceType,
+            serviceName: service.serviceName,
+            description: service.description,
+            price: service.price
+        }));
+    }
+
+    return data;
 };
 
 // Создать новый заказ
@@ -208,6 +267,37 @@ export const deleteOrder = async (id: string): Promise<void> => {
         await deleteDoc(orderRef);
     } catch (error) {
         console.error('Ошибка при удалении заказа:', error);
+        throw error;
+    }
+};
+
+// Создать заказ консультации
+export const createConsultationOrder = async (
+    userId: string,
+    consultation: ConsultationInfo,
+    customerInfo: {
+        name: string;
+        email: string;
+        phone?: string;
+    }
+): Promise<string> => {
+    try {
+        const order: Omit<Order, 'id' | 'createdAt' | 'updatedAt'> = {
+            userId,
+            type: 'consultation',
+            products: [],
+            consultation,
+            totalPrice: consultation.price.toString(),
+            status: 'scheduled',
+            customerInfo: {
+                ...customerInfo,
+                address: 'Online Consultation' // Для консультаций адрес не нужен
+            }
+        };
+
+        return await createOrder(order);
+    } catch (error) {
+        console.error('Error creating consultation order:', error);
         throw error;
     }
 };
