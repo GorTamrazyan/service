@@ -11,7 +11,7 @@ import { T } from "./T";
 interface ConsultationCardProps {
     title: string;
     description: string;
-    price: string;
+    price: number;
     features: string[];
     popular?: boolean;
     duration?: number;

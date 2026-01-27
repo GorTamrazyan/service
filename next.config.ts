@@ -6,7 +6,13 @@ const nextConfig = {
                 protocol: "https",
                 hostname: "via.placeholder.com",
                 port: "",
-                pathname: "/**", // Позволяет любые пути на этом домене
+                pathname: "/**",
+            },
+            {
+                protocol: "https",
+                hostname: "res.cloudinary.com",
+                port: "",
+                pathname: "/**",
             },
             // Добавьте другие удаленные домены изображений, если они у вас есть (например, из Firebase Storage)
             // {

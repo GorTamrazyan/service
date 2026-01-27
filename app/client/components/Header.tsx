@@ -25,6 +25,9 @@ export default function Header() {
     const [isSearchOpen, setIsSearchOpen] = useState(false);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [searchQuery, setSearchQuery] = useState("");
+    const [searchType, setSearchType] = useState<"products" | "services">(
+        "products"
+    );
     const { getTotalItems, isAuthenticated } = useCart();
 
     const getLinkClassName = (expectedPaths: string | string[]) => {
@@ -69,13 +72,23 @@ export default function Header() {
     const handleSearchSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         if (searchQuery.trim()) {
-            router.push(
-                `/client/dashboard/products?search=${encodeURIComponent(
-                    searchQuery.trim()
-                )}`
-            );
+            // Перенаправляем в зависимости от выбранного типа поиска
+            if (searchType === "products") {
+                router.push(
+                    `/client/dashboard/products?search=${encodeURIComponent(
+                        searchQuery.trim()
+                    )}`
+                );
+            } else {
+                router.push(
+                    `/client/dashboard/service?search=${encodeURIComponent(
+                        searchQuery.trim()
+                    )}`
+                );
+            }
             setIsSearchOpen(false);
             setSearchQuery("");
+            setIsMobileMenuOpen(false);
         }
     };
 
@@ -225,59 +238,95 @@ export default function Header() {
                         {isAuthenticated ? (
                             <Link
                                 href="/client/dashboard/profile"
-                                className="p-3 rounded-full bg-gradient-to-r from-[var(--color-accent)]/20 to-[var(--color-accent)]/10 hover:from-[var(--color-accent)]/30 hover:to-[var(--color-accent)]/20 transition-all duration-300 group"
+                                className="p-3 rounded-full bg-white/10 hover:bg-white/20 transition-all duration-300 group"
                                 aria-label="Profile"
                             >
-                                <FaUserCircle className="w-6 h-6 text-white group-hover:scale-110 transition-transform" />
+                                <FaUserCircle className="w-5 h-5 text-white group-hover:scale-110 transition-transform" />
                             </Link>
                         ) : (
-                            <div className="hidden md:flex items-center gap-4">
-                                <Link
-                                    href="/client/sign-in"
-                                    className="px-5 py-2.5 rounded-full bg-white/10 hover:bg-white/20 text-white font-medium transition-all duration-300 hover:scale-105"
-                                >
-                                    <T>Sign In</T>
-                                </Link>
-                                <Link
-                                    href="/client/register"
-                                    className="px-5 py-2.5 rounded-full bg-gradient-to-r from-[var(--color-accent)] to-[var(--color-accent)]/80 text-[var(--color-primary)] font-bold hover:scale-105 transition-all duration-300 shadow-lg"
-                                >
-                                    <T>Register</T>
-                                </Link>
-                            </div>
+                            <Link
+                                href="/client/dashboard/login"
+                                className="hidden sm:flex items-center gap-2 px-6 py-2.5 bg-gradient-to-r from-[var(--color-accent)] to-[var(--color-accent)]/80 text-[var(--color-primary)] font-bold rounded-xl hover:scale-105 transition-all duration-300 shadow-lg"
+                            >
+                                <FaUserCircle className="w-4 h-4" />
+                                <T>Login</T>
+                            </Link>
                         )}
                     </div>
                 </div>
+            </div>
 
-                {/* Search Bar */}
+            {/* Search Bar - Desktop and Mobile */}
+            <div className="max-w-7xl mx-auto">
                 <div
                     className={`
-                        mt-4 overflow-hidden transition-all duration-500 ease-in-out
+                        transition-all duration-500 ease-in-out overflow-hidden
                         ${
                             isSearchOpen
-                                ? "max-h-20 opacity-100"
+                                ? "max-h-32 opacity-100 mt-4"
                                 : "max-h-0 opacity-0"
                         }
                     `}
                 >
                     <form onSubmit={handleSearchSubmit} className="relative">
-                        <div className="absolute left-4 top-1/2 transform -translate-y-1/2">
-                            <FaSearch className="w-5 h-5 text-gray-400" />
+                        <div className="flex flex-col sm:flex-row gap-3">
+                            {/* Search Type Selector */}
+                            <div className="flex rounded-2xl bg-white/10 backdrop-blur-sm border border-white/20 overflow-hidden">
+                                <button
+                                    type="button"
+                                    onClick={() => setSearchType("products")}
+                                    className={`flex items-center gap-2 px-4 py-3 transition-all duration-300 ${
+                                        searchType === "products"
+                                            ? "bg-[var(--color-accent)] text-[var(--color-primary)] font-bold"
+                                            : "text-white/70 hover:text-white"
+                                    }`}
+                                >
+                                    <FaBox className="w-4 h-4" />
+                                    <span className="hidden sm:inline">
+                                        <T>Products</T>
+                                    </span>
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => setSearchType("services")}
+                                    className={`flex items-center gap-2 px-4 py-3 transition-all duration-300 ${
+                                        searchType === "services"
+                                            ? "bg-[var(--color-accent)] text-[var(--color-primary)] font-bold"
+                                            : "text-white/70 hover:text-white"
+                                    }`}
+                                >
+                                    <FaTools className="w-4 h-4" />
+                                    <span className="hidden sm:inline">
+                                        <T>Services</T>
+                                    </span>
+                                </button>
+                            </div>
+
+                            {/* Search Input */}
+                            <div className="relative flex-1">
+                                <div className="absolute left-4 top-1/2 transform -translate-y-1/2">
+                                    <FaSearch className="w-5 h-5 text-gray-400" />
+                                </div>
+                                <input
+                                    type="text"
+                                    placeholder={
+                                        searchType === "products"
+                                            ? "Search for products..."
+                                            : "Search for services..."
+                                    }
+                                    value={searchQuery}
+                                    onChange={handleSearchInputChange}
+                                    onKeyDown={handleSearchKeyDown}
+                                    className="w-full pl-12 pr-24 py-3 rounded-2xl bg-white/10 backdrop-blur-sm border border-white/20 text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] focus:border-transparent"
+                                />
+                                <button
+                                    type="submit"
+                                    className="absolute right-2 top-1/2 transform -translate-y-1/2 px-6 py-2 bg-gradient-to-r from-[var(--color-accent)] to-[var(--color-accent)]/80 text-[var(--color-primary)] font-bold rounded-xl hover:scale-105 transition-all duration-300"
+                                >
+                                    <T>Search</T>
+                                </button>
+                            </div>
                         </div>
-                        <input
-                            type="text"
-                            placeholder="Search for products, services..."
-                            value={searchQuery}
-                            onChange={handleSearchInputChange}
-                            onKeyDown={handleSearchKeyDown}
-                            className="w-full pl-12 pr-24 py-4 rounded-2xl bg-white/10 backdrop-blur-sm border border-white/20 text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] focus:border-transparent"
-                        />
-                        <button
-                            type="submit"
-                            className="absolute right-2 top-1/2 transform -translate-y-1/2 px-6 py-2.5 bg-gradient-to-r from-[var(--color-accent)] to-[var(--color-accent)]/80 text-[var(--color-primary)] font-bold rounded-xl hover:scale-105 transition-all duration-300"
-                        >
-                            <T>Search</T>
-                        </button>
                     </form>
                 </div>
             </div>
@@ -288,7 +337,7 @@ export default function Header() {
                     lg:hidden absolute top-full left-0 w-full bg-gradient-to-b from-[var(--color-primary)] to-[var(--color-primary)]/95 backdrop-blur-lg border-t border-white/10 transition-all duration-500 ease-in-out overflow-hidden
                     ${
                         isMobileMenuOpen
-                            ? "max-h-96 opacity-100"
+                            ? "max-h-[500px] opacity-100"
                             : "max-h-0 opacity-0"
                     }
                 `}
@@ -303,74 +352,37 @@ export default function Header() {
                                 <Link
                                     key={item.href}
                                     href={item.href}
+                                    onClick={() => setIsMobileMenuOpen(false)}
                                     className={`flex items-center gap-4 px-6 py-4 rounded-2xl transition-all duration-300 ${
                                         isActive
                                             ? "bg-white/10 text-[var(--color-accent)]"
                                             : "hover:bg-white/5"
                                     }`}
-                                    onClick={() => setIsMobileMenuOpen(false)}
                                 >
-                                    <div
-                                        className={`w-10 h-10 rounded-xl flex items-center justify-center ${
-                                            isActive
-                                                ? "bg-gradient-to-r from-[var(--color-accent)]/20 to-[var(--color-accent)]/10"
-                                                : "bg-white/5"
-                                        }`}
-                                    >
-                                        <item.icon
-                                            className={`w-5 h-5 ${
-                                                isActive
-                                                    ? "text-[var(--color-accent)]"
-                                                    : "text-white"
-                                            }`}
-                                        />
-                                    </div>
-                                    <span className="font-medium text-lg">
+                                    <item.icon className="w-5 h-5" />
+                                    <span className="font-medium">
                                         <T>{item.label}</T>
                                     </span>
                                 </Link>
                             );
                         })}
 
-                        {/* Mobile Auth Buttons */}
+                        {/* Mobile Login Button */}
                         {!isAuthenticated && (
-                            <div className="pt-6 px-6 space-y-3">
-                                <Link
-                                    href="/client/sign-in"
-                                    className="block w-full text-center px-6 py-3 rounded-xl bg-white/10 hover:bg-white/20 text-white font-medium transition-all duration-300"
-                                    onClick={() => setIsMobileMenuOpen(false)}
-                                >
-                                    <T>Sign In</T>
-                                </Link>
-                                <Link
-                                    href="/client/register"
-                                    className="block w-full text-center px-6 py-3 rounded-xl bg-gradient-to-r from-[var(--color-accent)] to-[var(--color-accent)]/80 text-[var(--color-primary)] font-bold hover:scale-105 transition-all duration-300"
-                                    onClick={() => setIsMobileMenuOpen(false)}
-                                >
-                                    <T>Register</T>
-                                </Link>
-                            </div>
+                            <Link
+                                href="/client/dashboard/login"
+                                onClick={() => setIsMobileMenuOpen(false)}
+                                className="flex items-center gap-4 px-6 py-4 rounded-2xl bg-gradient-to-r from-[var(--color-accent)] to-[var(--color-accent)]/80 text-[var(--color-primary)] font-bold transition-all duration-300 hover:scale-105"
+                            >
+                                <FaUserCircle className="w-5 h-5" />
+                                <span>
+                                    <T>Login</T>
+                                </span>
+                            </Link>
                         )}
                     </nav>
                 </div>
             </div>
-
-            {/* Active Indicator Animation */}
-            <style jsx global>{`
-                @keyframes slideIn {
-                    from {
-                        transform: translateY(-10px);
-                        opacity: 0;
-                    }
-                    to {
-                        transform: translateY(0);
-                        opacity: 1;
-                    }
-                }
-                .animate-slideIn {
-                    animation: slideIn 0.3s ease-out;
-                }
-            `}</style>
         </header>
     );
 }

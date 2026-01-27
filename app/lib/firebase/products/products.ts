@@ -19,6 +19,8 @@ import { db } from "../firebase";
 import { Product, Material, Color } from "./types";
 import { getMaterialById } from "./materials";
 import { getColorById } from "./colors";
+import { getImagesByProductId, getPrimaryImageByProductId } from "./images";
+import type { Image } from "./types";
 
 // Преобразование Firestore документа в Product объект
 export const firestoreToProduct = (doc: DocumentSnapshot<DocumentData>): Product | null => {
@@ -252,12 +254,14 @@ export interface EnrichedProduct extends Omit<Product, 'materialId' | 'colorIds'
   material?: Material;
   colorIds?: string[];
   colors?: Color[];
+  images?: Image[];
+  imageUrl?: string | null;
 }
 
-// Обогащение одного продукта данными материала и цветов
+// Обогащение одного продукта данными материала, цветов и изображений
 export const enrichProduct = async (product: Product): Promise<EnrichedProduct> => {
   try {
-    const enriched: EnrichedProduct = { ...product };
+    const enriched: EnrichedProduct = { ...product, imageUrl: null };
 
     // Загружаем материал, если есть materialId
     if (product.materialId) {
@@ -274,10 +278,20 @@ export const enrichProduct = async (product: Product): Promise<EnrichedProduct> 
       enriched.colors = colorsResults.filter((color): color is Color => color !== null);
     }
 
+    // Загружаем изображения продукта
+    if (product.id) {
+      const images = await getImagesByProductId(product.id);
+      enriched.images = images;
+
+      // Устанавливаем основное изображение
+      const primaryImage = images.find(img => img.isPrimary);
+      enriched.imageUrl = primaryImage?.url || images[0]?.url || null;
+    }
+
     return enriched;
   } catch (error) {
     console.error('Ошибка при обогащении продукта:', error);
-    return product;
+    return { ...product, imageUrl: null };
   }
 };
 

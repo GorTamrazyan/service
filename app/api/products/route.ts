@@ -54,7 +54,13 @@ export async function GET(request: Request) {
             );
         }
 
-        return NextResponse.json(products, { status: 200 });
+        // Форматируем продукты для клиента с массивом URL изображений
+        const formattedProducts = products.map((product) => ({
+            ...product,
+            images: product.images?.map((img) => img.url) || [],
+        }));
+
+        return NextResponse.json(formattedProducts, { status: 200 });
     } catch (error) {
         console.error("Ошибка при получении продуктов:", error);
         return NextResponse.json(

@@ -2,6 +2,7 @@
 "use client";
 
 import React, { useEffect, useState, useCallback } from "react";
+import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Filter, Zap, Shield, Palette, Ruler, Truck } from "lucide-react";
 import ProductList from "../../components/ProductList";
@@ -31,11 +32,14 @@ interface Product {
 }
 
 export default function ProductPage() {
+    const searchParams = useSearchParams();
     const [products, setProducts] = useState<Product[]>([]);
+    const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [isFilterOpen, setIsFilterOpen] = useState(false);
     const [typeOfProducts, setTypeOfProducts] = useState<TypeOfProduct[]>([]);
+    const [searchQuery, setSearchQuery] = useState("");
 
     const [filters, setFilters] = useState<FilterState>({
         categoryId: undefined,
@@ -45,6 +49,14 @@ export default function ProductPage() {
         minPrice: "",
         maxPrice: "",
     });
+
+    // Получаем параметр поиска из URL при загрузке страницы
+    useEffect(() => {
+        const search = searchParams?.get("search");
+        if (search) {
+            setSearchQuery(search);
+        }
+    }, [searchParams]);
 
     useEffect(() => {
         async function loadTypeOfProducts() {
@@ -105,6 +117,62 @@ export default function ProductPage() {
         }
     }, []);
 
+    // Функция поиска товаров по запросу
+    const filterProductsBySearch = useCallback(
+        (productsToFilter: Product[], query: string) => {
+            if (!query.trim()) {
+                return productsToFilter;
+            }
+
+            const searchLower = query.toLowerCase().trim();
+
+            return productsToFilter.filter((product) => {
+                // Поиск по названию
+                const nameMatch = product.name
+                    .toLowerCase()
+                    .includes(searchLower);
+
+                // Поиск по описанию
+                const descriptionMatch =
+                    product.description?.toLowerCase().includes(searchLower) ||
+                    false;
+
+                // Поиск по материалу
+                const materialMatch =
+                    product.material?.name
+                        .toLowerCase()
+                        .includes(searchLower) || false;
+
+                // Поиск по цветам
+                const colorMatch =
+                    product.colors?.some((color) =>
+                        color.name.toLowerCase().includes(searchLower)
+                    ) || false;
+
+                // Поиск по тегам
+                const tagMatch =
+                    product.tags?.some((tag) =>
+                        tag.toLowerCase().includes(searchLower)
+                    ) || false;
+
+                return (
+                    nameMatch ||
+                    descriptionMatch ||
+                    materialMatch ||
+                    colorMatch ||
+                    tagMatch
+                );
+            });
+        },
+        []
+    );
+
+    // Применение поиска при изменении товаров или запроса
+    useEffect(() => {
+        const filtered = filterProductsBySearch(products, searchQuery);
+        setFilteredProducts(filtered);
+    }, [products, searchQuery, filterProductsBySearch]);
+
     useEffect(() => {
         fetchProducts(filters);
     }, []);
@@ -122,7 +190,16 @@ export default function ProductPage() {
         filters.minPrice ||
         filters.maxPrice;
 
-    const [shouldGroup, setShouldGroup] = useState(!hasActiveFilters);
+    const hasActiveSearch = searchQuery.trim().length > 0;
+
+    const [shouldGroup, setShouldGroup] = useState(
+        !hasActiveFilters && !hasActiveSearch
+    );
+
+    // Обновляем shouldGroup при изменении фильтров или поиска
+    useEffect(() => {
+        setShouldGroup(!hasActiveFilters && !hasActiveSearch);
+    }, [hasActiveFilters, hasActiveSearch]);
 
     const fenceTypeId = typeOfProducts.find(
         (t) =>
@@ -138,8 +215,9 @@ export default function ProductPage() {
     let fenceProducts: Product[] = [];
     let gateProducts: Product[] = [];
 
+    // Используем filteredProducts вместо products
     if (shouldGroup) {
-        products.forEach((p) => {
+        filteredProducts.forEach((p) => {
             if (gateTypeId && p.typeOfProductId === gateTypeId) {
                 gateProducts.push(p);
             } else {
@@ -147,7 +225,7 @@ export default function ProductPage() {
             }
         });
     } else {
-        fenceProducts = products;
+        fenceProducts = filteredProducts;
     }
 
     if (loading) {
@@ -175,11 +253,11 @@ export default function ProductPage() {
                             </div>
                         </div>
                     </div>
-                    <h2 className="text-2xl font-bold text-[var(--color-primary)] mb-2">
+                    <h2 className="text-3xl font-bold text-[var(--color-primary)] mb-4">
                         <T>Loading Products</T>
                     </h2>
-                    <p className="text-[var(--color-text)]/60">
-                        <T>Discovering premium fencing solutions</T>
+                    <p className="text-[var(--color-text)]/60 text-lg">
+                        <T>Please wait while we fetch your products...</T>
                     </p>
                 </div>
             </div>
@@ -188,22 +266,30 @@ export default function ProductPage() {
 
     if (error) {
         return (
-            <div className="min-h-screen bg-gradient-to-b from-[var(--color-background)] to-white flex items-center justify-center p-4">
-                <div className="max-w-md w-full text-center">
-                    <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-[var(--color-error)]/10 flex items-center justify-center">
-                        <div className="w-10 h-10 rounded-full bg-[var(--color-error)] flex items-center justify-center">
-                            <span className="text-white font-bold text-xl">
-                                !
-                            </span>
-                        </div>
+            <div className="min-h-screen bg-[var(--color-background)] flex flex-col items-center justify-center p-4">
+                <div className="text-center max-w-md">
+                    <div className="w-20 h-20 mx-auto mb-6 bg-red-100 rounded-xl flex items-center justify-center">
+                        <svg
+                            className="w-10 h-10 text-red-600"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                        >
+                            <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+                            />
+                        </svg>
                     </div>
-                    <h2 className="text-2xl font-bold text-[var(--color-error)] mb-4">
-                        <T>Oops! Something went wrong</T>
+                    <h2 className="text-2xl font-bold text-red-600 mb-3">
+                        <T>Error Loading Products</T>
                     </h2>
-                    <p className="text-[var(--color-text)]/80 mb-8">{error}</p>
+                    <p className="text-[var(--color-text)]/70 mb-6">{error}</p>
                     <button
-                        onClick={() => window.location.reload()}
-                        className="inline-flex items-center gap-2 bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-primary)]/90 text-white font-bold py-3 px-6 rounded-full hover:scale-105 transition-all duration-200"
+                        onClick={() => fetchProducts(filters)}
+                        className="px-6 py-3 bg-[var(--color-primary)] text-white rounded-lg hover:bg-[var(--color-primary)]/90 transition-colors font-medium"
                     >
                         <T>Try Again</T>
                     </button>
@@ -213,215 +299,173 @@ export default function ProductPage() {
     }
 
     return (
-        <div className="min-h-screen bg-[var(--color-background)]">
-            {/* Hero Banner */}
-            <div className="relative overflow-hidden bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-primary)]/90 py-16 md:py-24">
-                <div className="absolute inset-0 bg-[url('/pattern.svg')] opacity-5"></div>
-                <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-white/10 to-transparent rounded-full -translate-y-32 translate-x-32"></div>
-
-                <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="text-center max-w-4xl mx-auto">
-                        <div className="inline-flex items-center gap-3 px-6 py-3 bg-white/20 backdrop-blur-sm rounded-full mb-8 border border-white/30">
-                            <Zap className="w-5 h-5 text-white" />
-                            <span className="text-white font-bold text-sm">
-                                <T>Premium Collection</T>
-                            </span>
-                        </div>
-
-                        <h1 className="text-4xl md:text-6xl font-black text-white leading-tight mb-6">
-                            <span className="block">
-                                <T>Premium Quality</T>
-                            </span>
-                            <span className="block text-[var(--color-accent)]">
-                                <T>Fencing Solutions</T>
-                            </span>
+        <div className="min-h-screen bg-gradient-to-br from-[var(--color-background)] via-[var(--color-secondary)]/20 to-[var(--color-background)]">
+            {/* Hero Section */}
+            <div className="relative bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-primary)]/80 text-white overflow-hidden">
+                <div className="absolute inset-0 bg-[url('/grid-pattern.svg')] opacity-10"></div>
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 relative z-10">
+                    <div className="text-center">
+                        <h1 className="text-5xl md:text-6xl font-extrabold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-white to-white/90">
+                            <T>Our Products</T>
                         </h1>
-
-                        <p className="text-lg md:text-xl text-white/90 mb-12 max-w-3xl mx-auto leading-relaxed">
+                        <p className="text-xl md:text-2xl text-white/90 max-w-3xl mx-auto">
                             <T>
-                                Discover our collection of durable, secure, and
-                                beautifully designed fences and gates for your
-                                property.
+                                Discover our premium selection of fences and
+                                gates
                             </T>
                         </p>
-
-                        <div className="flex flex-wrap justify-center gap-4 mb-8">
-                            <div className="flex items-center gap-3 px-4 py-2 bg-white/10 rounded-full border border-white/20">
-                                <Shield className="w-4 h-4 text-white" />
-                                <span className="text-white text-sm">
-                                    <T>15-Year Warranty</T>
-                                </span>
-                            </div>
-                            <div className="flex items-center gap-3 px-4 py-2 bg-white/10 rounded-full border border-white/20">
-                                <Palette className="w-4 h-4 text-white" />
-                                <span className="text-white text-sm">
-                                    <T>Multiple Colors</T>
-                                </span>
-                            </div>
-                            <div className="flex items-center gap-3 px-4 py-2 bg-white/10 rounded-full border border-white/20">
-                                <Ruler className="w-4 h-4 text-white" />
-                                <span className="text-white text-sm">
-                                    <T>Custom Sizes</T>
-                                </span>
-                            </div>
-                            <div className="flex items-center gap-3 px-4 py-2 bg-white/10 rounded-full border border-white/20">
-                                <Truck className="w-4 h-4 text-white" />
-                                <span className="text-white text-sm">
-                                    <T>Fast Delivery</T>
-                                </span>
-                            </div>
-                        </div>
                     </div>
                 </div>
+                <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-[var(--color-background)] to-transparent"></div>
             </div>
 
             {/* Main Content */}
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-16">
-                {/* Control Bar */}
-                <div className="bg-[var(--color-card-bg)] rounded-xl shadow-lg p-6 mb-10 border border-[var(--color-border)]">
-                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-                        <div className="flex items-center gap-4">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+                {/* Search and Filter Bar */}
+                <div className="mb-8 flex flex-col sm:flex-row gap-4 items-center justify-between">
+                    {/* Search Input */}
+                    <div className="relative w-full sm:w-96">
+                        <input
+                            type="text"
+                            placeholder="Search products..."
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            className="w-full px-4 py-3 pl-10 rounded-xl border-2 border-[var(--color-primary)]/20 focus:border-[var(--color-primary)] focus:ring-2 focus:ring-[var(--color-primary)]/20 outline-none transition-all"
+                        />
+                        <svg
+                            className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-[var(--color-primary)]/50"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                        >
+                            <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                            />
+                        </svg>
+                        {searchQuery && (
                             <button
-                                onClick={() => setIsFilterOpen(true)}
-                                className="group relative flex items-center gap-3 bg-[var(--color-primary)] text-white font-bold py-3 px-8 rounded-lg hover:bg-[var(--color-primary)]/90 transition-all duration-200 shadow-md"
+                                onClick={() => setSearchQuery("")}
+                                className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--color-primary)]/50 hover:text-[var(--color-primary)] transition-colors"
                             >
-                                <Filter className="w-5 h-5" />
-                                <span>
-                                    <T>Filters</T>
-                                </span>
-                                {hasActiveFilters && (
-                                    <span className="ml-2 bg-white text-[var(--color-primary)] text-xs px-2 py-1 rounded-full font-bold">
-                                        {
-                                            Object.values(filters).filter((v) =>
-                                                Array.isArray(v)
-                                                    ? v.length > 0
-                                                    : Boolean(v)
-                                            ).length
-                                        }
-                                    </span>
-                                )}
-                            </button>
-
-                            <div className="flex items-center gap-3">
-                                <div className="w-10 h-10 rounded-lg bg-[var(--color-primary)]/10 flex items-center justify-center">
-                                    <div className="text-2xl font-bold text-[var(--color-primary)]">
-                                        {products.length}
-                                    </div>
-                                </div>
-                                <div>
-                                    <div className="text-sm text-[var(--color-text)]/70">
-                                        <T>Products Available</T>
-                                    </div>
-                                    <div className="text-sm text-[var(--color-text)] font-medium">
-                                        <T>Premium Selection</T>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="flex items-center gap-4">
-                            <div className="flex items-center gap-3 px-4 py-2 bg-[var(--color-gray-100)] rounded-lg border border-[var(--color-border)]">
-                                <span className="text-sm text-[var(--color-text)] font-medium">
-                                    <T>Group by Type</T>
-                                </span>
-                                <label className="relative inline-flex items-center cursor-pointer">
-                                    <input
-                                        type="checkbox"
-                                        checked={shouldGroup}
-                                        onChange={() =>
-                                            setShouldGroup(!shouldGroup)
-                                        }
-                                        className="sr-only peer"
+                                <svg
+                                    className="w-5 h-5"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                >
+                                    <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        strokeWidth={2}
+                                        d="M6 18L18 6M6 6l12 12"
                                     />
-                                    <div className="w-12 h-6 bg-[var(--color-gray-300)] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-6 peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[var(--color-accent)]"></div>
-                                </label>
-                            </div>
+                                </svg>
+                            </button>
+                        )}
+                    </div>
+
+                    {/* Filter Button */}
+                    <button
+                        onClick={() => setIsFilterOpen(true)}
+                        className="group flex items-center gap-3 bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-primary)]/90 text-white px-8 py-3 rounded-xl font-bold hover:shadow-2xl hover:scale-105 transition-all duration-300"
+                    >
+                        <Filter className="w-5 h-5" />
+                        <T>Filters</T>
+                        {hasActiveFilters && (
+                            <span className="bg-white text-[var(--color-primary)] px-2 py-0.5 rounded-full text-xs font-bold">
+                                Active
+                            </span>
+                        )}
+                    </button>
+                </div>
+
+                {/* Search Results Info */}
+                {searchQuery && (
+                    <div className="mb-6 p-4 bg-[var(--color-primary)]/10 rounded-xl">
+                        <p className="text-[var(--color-primary)] font-semibold">
+                            <T>Search results for</T>: "{searchQuery}"
+                            <span className="ml-2 text-[var(--color-text)]/70">
+                                ({filteredProducts.length} <T>products found</T>
+                                )
+                            </span>
+                        </p>
+                    </div>
+                )}
+
+                {/* Features Grid */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+                    <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-[var(--color-primary)]/10 hover:shadow-xl transition-shadow">
+                        <div className="w-14 h-14 bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-primary)]/80 rounded-xl flex items-center justify-center mb-4">
+                            <Shield className="w-7 h-7 text-white" />
                         </div>
+                        <h3 className="text-xl font-bold text-[var(--color-primary)] mb-2">
+                            <T>Quality Guaranteed</T>
+                        </h3>
+                        <p className="text-[var(--color-text)]/70">
+                            <T>All products come with our quality assurance</T>
+                        </p>
+                    </div>
+
+                    <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-[var(--color-primary)]/10 hover:shadow-xl transition-shadow">
+                        <div className="w-14 h-14 bg-gradient-to-br from-[var(--color-accent)] to-[var(--color-accent)]/80 rounded-xl flex items-center justify-center mb-4">
+                            <Palette className="w-7 h-7 text-white" />
+                        </div>
+                        <h3 className="text-xl font-bold text-[var(--color-primary)] mb-2">
+                            <T>Custom Options</T>
+                        </h3>
+                        <p className="text-[var(--color-text)]/70">
+                            <T>Choose from various materials and colors</T>
+                        </p>
+                    </div>
+
+                    <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-[var(--color-primary)]/10 hover:shadow-xl transition-shadow">
+                        <div className="w-14 h-14 bg-gradient-to-br from-green-500 to-green-600 rounded-xl flex items-center justify-center mb-4">
+                            <Truck className="w-7 h-7 text-white" />
+                        </div>
+                        <h3 className="text-xl font-bold text-[var(--color-primary)] mb-2">
+                            <T>Fast Delivery</T>
+                        </h3>
+                        <p className="text-[var(--color-text)]/70">
+                            <T>Quick and reliable delivery service</T>
+                        </p>
                     </div>
                 </div>
 
-                {/* Products Section */}
-                <div className="space-y-16">
+                {/* Products Display */}
+                <div className="space-y-12">
                     {shouldGroup ? (
                         <>
                             {/* Fences Section */}
                             {fenceProducts.length > 0 && (
-                                <div className="relative">
-                                    <div className="flex items-center justify-between mb-10">
-                                        <div className="flex items-center gap-4">
-                                            <div className="w-2 h-10 bg-gradient-to-b from-[var(--color-primary)] to-[var(--color-accent)] rounded-full"></div>
-                                            <div>
-                                                <h2 className="text-2xl md:text-3xl font-bold text-[var(--color-primary)]">
-                                                    <T>
-                                                        {typeOfProducts.find(
-                                                            (t) =>
-                                                                t.id ===
-                                                                fenceTypeId
-                                                        )?.name ||
-                                                            "Premium Fences"}
-                                                    </T>
-                                                </h2>
-                                                <p className="text-[var(--color-text)]/70 mt-1 text-sm">
-                                                    <T>
-                                                        Durable and secure
-                                                        fencing solutions
-                                                    </T>
-                                                </p>
-                                            </div>
-                                        </div>
-                                        <div className="px-4 py-2 bg-[var(--color-primary)]/10 rounded-lg">
-                                            <span className="text-lg font-bold text-[var(--color-primary)]">
-                                                {fenceProducts.length}
-                                            </span>
-                                            <span className="text-[var(--color-text)]/70 ml-2 text-sm">
-                                                <T>items</T>
-                                            </span>
-                                        </div>
+                                <div className="space-y-6">
+                                    <div className="flex items-center gap-4">
+                                        <h2 className="text-4xl font-extrabold text-[var(--color-primary)]">
+                                            <T>Fences</T>
+                                        </h2>
+                                        <div className="flex-1 h-1 bg-gradient-to-r from-[var(--color-primary)] to-transparent rounded-full"></div>
                                     </div>
                                     <ProductList
                                         products={fenceProducts}
-                                        showGroupedView={false}
+                                        showGroupedView={true}
                                     />
                                 </div>
                             )}
 
                             {/* Gates Section */}
                             {gateProducts.length > 0 && (
-                                <div className="relative">
-                                    <div className="flex items-center justify-between mb-10">
-                                        <div className="flex items-center gap-4">
-                                            <div className="w-2 h-10 bg-gradient-to-b from-[var(--color-accent)] to-[var(--color-primary)] rounded-full"></div>
-                                            <div>
-                                                <h2 className="text-2xl md:text-3xl font-bold text-[var(--color-primary)]">
-                                                    <T>
-                                                        {typeOfProducts.find(
-                                                            (t) =>
-                                                                t.id ===
-                                                                gateTypeId
-                                                        )?.name ||
-                                                            "Security Gates"}
-                                                    </T>
-                                                </h2>
-                                                <p className="text-[var(--color-text)]/70 mt-1 text-sm">
-                                                    <T>
-                                                        Secure and elegant gate
-                                                        solutions
-                                                    </T>
-                                                </p>
-                                            </div>
-                                        </div>
-                                        <div className="px-4 py-2 bg-[var(--color-primary)]/10 rounded-lg">
-                                            <span className="text-lg font-bold text-[var(--color-primary)]">
-                                                {gateProducts.length}
-                                            </span>
-                                            <span className="text-[var(--color-text)]/70 ml-2 text-sm">
-                                                <T>items</T>
-                                            </span>
-                                        </div>
+                                <div className="space-y-6">
+                                    <div className="flex items-center gap-4">
+                                        <h2 className="text-4xl font-extrabold text-[var(--color-primary)]">
+                                            <T>Gates</T>
+                                        </h2>
+                                        <div className="flex-1 h-1 bg-gradient-to-r from-[var(--color-primary)] to-transparent rounded-full"></div>
                                     </div>
                                     <ProductList
                                         products={gateProducts}
-                                        showGroupedView={false}
+                                        showGroupedView={true}
                                     />
                                 </div>
                             )}
@@ -448,20 +492,40 @@ export default function ProductPage() {
                                         <h3 className="text-2xl font-bold text-[var(--color-primary)] mb-3">
                                             <T>No products found</T>
                                         </h3>
-                                        <p className="text-[var(--color-text)]/70 max-w-md mx-auto">
+                                        <p className="text-[var(--color-text)]/70 max-w-md mx-auto mb-6">
                                             <T>
-                                                Try adjusting your filters or
-                                                browse our entire collection.
+                                                Try adjusting your search or
+                                                filters.
                                             </T>
                                         </p>
-                                        <button
-                                            onClick={() =>
-                                                setIsFilterOpen(true)
-                                            }
-                                            className="mt-6 px-6 py-3 bg-[var(--color-primary)] text-white rounded-lg hover:bg-[var(--color-primary)]/90 transition-colors font-medium"
-                                        >
-                                            <T>Adjust Filters</T>
-                                        </button>
+                                        {(searchQuery || hasActiveFilters) && (
+                                            <button
+                                                onClick={() => {
+                                                    setSearchQuery("");
+                                                    setFilters({
+                                                        categoryId: undefined,
+                                                        typeOfProductId:
+                                                            undefined,
+                                                        materialId: undefined,
+                                                        colorIds: [],
+                                                        minPrice: "",
+                                                        maxPrice: "",
+                                                    });
+                                                    fetchProducts({
+                                                        categoryId: undefined,
+                                                        typeOfProductId:
+                                                            undefined,
+                                                        materialId: undefined,
+                                                        colorIds: [],
+                                                        minPrice: "",
+                                                        maxPrice: "",
+                                                    });
+                                                }}
+                                                className="mt-6 px-6 py-3 bg-[var(--color-primary)] text-white rounded-lg hover:bg-[var(--color-primary)]/90 transition-colors font-medium"
+                                            >
+                                                <T>Clear All Filters</T>
+                                            </button>
+                                        )}
                                     </div>
                                 )}
                         </>
@@ -493,88 +557,44 @@ export default function ProductPage() {
                                     <h3 className="text-2xl font-bold text-[var(--color-primary)] mb-3">
                                         <T>No matching products</T>
                                     </h3>
-                                    <p className="text-[var(--color-text)]/70 max-w-md mx-auto">
+                                    <p className="text-[var(--color-text)]/70 max-w-md mx-auto mb-6">
                                         <T>
-                                            Your filters didn't match any
-                                            products. Try different criteria.
+                                            Your search or filters didn't match
+                                            any products.
                                         </T>
                                     </p>
                                     <button
-                                        onClick={() => setIsFilterOpen(true)}
-                                        className="mt-6 px-6 py-3 bg-[var(--color-primary)] text-white rounded-lg hover:bg-[var(--color-primary)]/90 transition-colors font-medium"
+                                        onClick={() => {
+                                            setSearchQuery("");
+                                            setFilters({
+                                                categoryId: undefined,
+                                                typeOfProductId: undefined,
+                                                materialId: undefined,
+                                                colorIds: [],
+                                                minPrice: "",
+                                                maxPrice: "",
+                                            });
+                                            fetchProducts({
+                                                categoryId: undefined,
+                                                typeOfProductId: undefined,
+                                                materialId: undefined,
+                                                colorIds: [],
+                                                minPrice: "",
+                                                maxPrice: "",
+                                            });
+                                        }}
+                                        className="px-6 py-3 bg-[var(--color-primary)] text-white rounded-lg hover:bg-[var(--color-primary)]/90 transition-colors font-medium"
                                     >
-                                        <T>Adjust Filters</T>
+                                        <T>Clear All Filters</T>
                                     </button>
                                 </div>
                             )}
                         </>
                     )}
                 </div>
-
-                {/* Contact Section */}
-                <section className="mt-20">
-                    <div className="bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-primary)]/90 rounded-2xl overflow-hidden">
-                        <div className="p-10 md:p-14 text-center">
-                            <div className="max-w-3xl mx-auto">
-                                <div className="inline-flex items-center gap-3 px-6 py-3 bg-white/20 rounded-full mb-8 border border-white/30">
-                                    <svg
-                                        className="w-6 h-6 text-white"
-                                        fill="none"
-                                        stroke="currentColor"
-                                        viewBox="0 0 24 24"
-                                    >
-                                        <path
-                                            strokeLinecap="round"
-                                            strokeLinejoin="round"
-                                            strokeWidth={2}
-                                            d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
-                                        />
-                                    </svg>
-                                    <span className="text-white font-bold">
-                                        <T>Custom Solutions</T>
-                                    </span>
-                                </div>
-
-                                <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">
-                                    <T>Need a Custom Solution?</T>
-                                </h2>
-
-                                <p className="text-lg text-white/90 mb-10 max-w-2xl mx-auto">
-                                    <T>
-                                        Contact our experts for personalized
-                                        fence designs tailored to your specific
-                                        requirements.
-                                    </T>
-                                </p>
-
-                                <Link
-                                    href="/contact"
-                                    className="group inline-flex items-center gap-3 bg-white text-[var(--color-primary)] font-bold py-4 px-10 rounded-xl hover:bg-gray-50 transition-all duration-300 shadow-lg"
-                                >
-                                    <span>
-                                        <T>Get Free Consultation</T>
-                                    </span>
-                                    <svg
-                                        className="w-5 h-5 transform group-hover:translate-x-2 transition-transform"
-                                        fill="none"
-                                        stroke="currentColor"
-                                        viewBox="0 0 24 24"
-                                    >
-                                        <path
-                                            strokeLinecap="round"
-                                            strokeLinejoin="round"
-                                            strokeWidth={2}
-                                            d="M14 5l7 7m0 0l-7 7m7-7H3"
-                                        />
-                                    </svg>
-                                </Link>
-                            </div>
-                        </div>
-                    </div>
-                </section>
             </div>
 
-            {/* Filter Sidebar */}
+            {/* Filter Modal */}
             <ProductFilters
                 isOpen={isFilterOpen}
                 onClose={() => setIsFilterOpen(false)}

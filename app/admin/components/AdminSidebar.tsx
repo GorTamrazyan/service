@@ -53,11 +53,6 @@ const menuItems = [
         href: "/admin/users",
     },
     {
-        title: "Analytics",
-        icon: BarChart3,
-        href: "/admin/analytics",
-    },
-    {
         title: "Settings",
         icon: Settings,
         href: "/admin/settings",

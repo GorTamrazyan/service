@@ -9,17 +9,17 @@ import { T } from "../../components/T";
 import {
     FaShoppingCart,
     FaTrashAlt,
+    FaCreditCard,
     FaChevronRight,
     FaPlus,
     FaMinus,
     FaShippingFast,
     FaShieldAlt,
-    FaCreditCard,
-    FaTimes,
     FaCheckCircle,
     FaArrowLeft,
     FaTag,
 } from "react-icons/fa";
+import CheckoutModal from "../../components/CheckoutModal";
 
 export default function CartPage() {
     const {
@@ -535,242 +535,16 @@ export default function CartPage() {
             </div>
 
             {/* Checkout Modal */}
-            {showCheckoutModal && (
-                <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fadeIn">
-                    <div className="bg-[var(--color-card)] rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto animate-slideUp">
-                        <div className="p-6 md:p-8">
-                            {/* Header */}
-                            <div className="flex items-center justify-between mb-6">
-                                <div>
-                                    <h2 className="text-3xl font-black text-[var(--color-primary)]">
-                                        <T>Checkout</T>
-                                    </h2>
-                                    <p className="text-gray-600 mt-1">
-                                        <T>
-                                            Complete your order with secure
-                                            payment
-                                        </T>
-                                    </p>
-                                </div>
-                                <button
-                                    onClick={closeCheckoutModal}
-                                    className="text-gray-400 hover:text-gray-600 transition-colors p-2"
-                                >
-                                    <FaTimes className="w-6 h-6" />
-                                </button>
-                            </div>
-
-                            {/* Progress Steps */}
-                            <div className="flex items-center justify-between mb-8">
-                                <div className="flex items-center gap-2">
-                                    <div className="w-8 h-8 rounded-full bg-[var(--color-accent)] text-[var(--color-primary)] font-bold flex items-center justify-center">
-                                        1
-                                    </div>
-                                    <span className="font-semibold">
-                                        <T>Cart</T>
-                                    </span>
-                                </div>
-                                <div className="h-1 flex-grow mx-4 bg-gray-200">
-                                    <div className="h-full bg-[var(--color-accent)] w-1/2"></div>
-                                </div>
-                                <div className="flex items-center gap-2">
-                                    <div className="w-8 h-8 rounded-full bg-[var(--color-accent)] text-[var(--color-primary)] font-bold flex items-center justify-center">
-                                        2
-                                    </div>
-                                    <span className="font-semibold">
-                                        <T>Details</T>
-                                    </span>
-                                </div>
-                                <div className="h-1 flex-grow mx-4 bg-gray-200">
-                                    <div className="h-full bg-gray-200 w-0"></div>
-                                </div>
-                                <div className="flex items-center gap-2">
-                                    <div className="w-8 h-8 rounded-full bg-gray-200 text-gray-400 font-bold flex items-center justify-center">
-                                        3
-                                    </div>
-                                    <span className="text-gray-400">
-                                        <T>Payment</T>
-                                    </span>
-                                </div>
-                            </div>
-
-                            <form onSubmit={handleSubmitOrder}>
-                                <div className="space-y-6">
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                        <div>
-                                            <label className="block text-sm font-semibold text-gray-700 mb-2">
-                                                <T>Full Name</T> *
-                                            </label>
-                                            <input
-                                                type="text"
-                                                required
-                                                value={customerInfo.name}
-                                                onChange={(e) =>
-                                                    updateCustomerInfo({
-                                                        name: e.target.value,
-                                                    })
-                                                }
-                                                className="w-full px-4 py-3 border border-[var(--color-border)] bg-[var(--color-background)] text-[var(--color-text)] rounded-xl focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] focus:border-transparent transition-all"
-                                                placeholder="John Doe"
-                                            />
-                                        </div>
-                                        <div>
-                                            <label className="block text-sm font-semibold text-gray-700 mb-2">
-                                                <T>Email</T> *
-                                            </label>
-                                            <input
-                                                type="email"
-                                                required
-                                                value={customerInfo.email}
-                                                onChange={(e) =>
-                                                    updateCustomerInfo({
-                                                        email: e.target.value,
-                                                    })
-                                                }
-                                                className="w-full px-4 py-3 border border-[var(--color-border)] bg-[var(--color-background)] text-[var(--color-text)] rounded-xl focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] focus:border-transparent transition-all"
-                                                placeholder="john@example.com"
-                                            />
-                                        </div>
-                                        <div>
-                                            <label className="block text-sm font-semibold text-gray-700 mb-2">
-                                                <T>Phone Number</T>
-                                            </label>
-                                            <input
-                                                type="tel"
-                                                value={customerInfo.phone}
-                                                onChange={(e) =>
-                                                    updateCustomerInfo({
-                                                        phone: e.target.value,
-                                                    })
-                                                }
-                                                className="w-full px-4 py-3 border border-[var(--color-border)] bg-[var(--color-background)] text-[var(--color-text)] rounded-xl focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] focus:border-transparent transition-all"
-                                                placeholder="+1 (555) 123-4567"
-                                            />
-                                        </div>
-                                        <div className="md:col-span-2">
-                                            <label className="block text-sm font-semibold text-gray-700 mb-2">
-                                                <T>Delivery Address</T> *
-                                            </label>
-                                            <textarea
-                                                required
-                                                value={customerInfo.address}
-                                                onChange={(e) =>
-                                                    updateCustomerInfo({
-                                                        address: e.target.value,
-                                                    })
-                                                }
-                                                rows={3}
-                                                className="w-full px-4 py-3 border border-[var(--color-border)] bg-[var(--color-background)] text-[var(--color-text)] rounded-xl focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] focus:border-transparent transition-all resize-none"
-                                                placeholder="Street, City, State, ZIP Code"
-                                            />
-                                        </div>
-                                    </div>
-
-                                    {/* Order Summary in Modal */}
-                                    <div className="bg-[var(--color-background)] rounded-xl p-6">
-                                        <h3 className="text-lg font-bold text-[var(--color-text)] mb-4">
-                                            <T>Order Summary</T>
-                                        </h3>
-                                        <div className="space-y-3">
-                                            {cartItems.map((item) => (
-                                                <div
-                                                    key={`${item.id}-${item.color?.id}`}
-                                                    className="flex justify-between items-center py-2"
-                                                >
-                                                    <div className="flex items-center gap-3">
-                                                        <span className="font-medium">
-                                                            {item.name}
-                                                        </span>
-                                                        <span className="text-sm text-gray-500">
-                                                            ×{item.quantity}
-                                                        </span>
-                                                    </div>
-                                                    <span className="font-semibold">
-                                                        $
-                                                        {(
-                                                            parseFloat(
-                                                                item.price
-                                                            ) * item.quantity
-                                                        ).toFixed(2)}
-                                                    </span>
-                                                </div>
-                                            ))}
-                                            <div className="border-t pt-3">
-                                                <div className="flex justify-between items-center">
-                                                    <span className="text-lg font-bold">
-                                                        <T>Total</T>
-                                                    </span>
-                                                    <div className="text-right">
-                                                        <div className="text-2xl font-black text-[var(--color-accent)]">
-                                                            $
-                                                            {(
-                                                                getTotalPrice() *
-                                                                1.08
-                                                            ).toFixed(2)}
-                                                        </div>
-                                                        <div className="text-sm text-gray-500">
-                                                            <T>
-                                                                Including tax
-                                                                and shipping
-                                                            </T>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    {/* Submit Buttons */}
-                                    <div className="flex flex-col sm:flex-row gap-4 pt-6 border-t">
-                                        <button
-                                            type="button"
-                                            onClick={closeCheckoutModal}
-                                            className="flex-1 px-6 py-4 border-2 border-[var(--color-border)] text-[var(--color-text)] font-bold rounded-xl hover:bg-[var(--color-background)] transition-colors"
-                                        >
-                                            <T>Cancel</T>
-                                        </button>
-                                        <button
-                                            type="submit"
-                                            disabled={isSubmitting}
-                                            className="flex-1 px-6 py-4 bg-gradient-to-r from-[var(--color-accent)] to-[var(--color-accent)]/90 text-[var(--color-primary)] font-bold rounded-xl hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-                                        >
-                                            {isSubmitting ? (
-                                                <>
-                                                    <svg
-                                                        className="animate-spin h-5 w-5 text-white"
-                                                        fill="none"
-                                                        viewBox="0 0 24 24"
-                                                    >
-                                                        <circle
-                                                            className="opacity-25"
-                                                            cx="12"
-                                                            cy="12"
-                                                            r="10"
-                                                            stroke="currentColor"
-                                                            strokeWidth="4"
-                                                        />
-                                                        <path
-                                                            className="opacity-75"
-                                                            fill="currentColor"
-                                                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                                                        />
-                                                    </svg>
-                                                    <T>Processing...</T>
-                                                </>
-                                            ) : (
-                                                <>
-                                                    <FaCreditCard className="w-5 h-5" />
-                                                    <T>Place Secure Order</T>
-                                                </>
-                                            )}
-                                        </button>
-                                    </div>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-            )}
+            <CheckoutModal
+                isOpen={showCheckoutModal}
+                onClose={closeCheckoutModal}
+                customerInfo={customerInfo}
+                updateCustomerInfo={updateCustomerInfo}
+                cartItems={cartItems}
+                getTotalPrice={getTotalPrice}
+                isSubmitting={isSubmitting}
+                onSubmit={handleSubmitOrder}
+            />
         </div>
     );
 }

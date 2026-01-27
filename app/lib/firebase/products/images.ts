@@ -8,7 +8,6 @@ import {
   deleteDoc,
   query,
   where,
-  orderBy,
   DocumentData,
   QuerySnapshot,
   DocumentSnapshot,
@@ -51,14 +50,16 @@ export const getImagesByProductId = async (productId: string): Promise<Image[]> 
     const imagesRef = collection(db, 'images');
     const q = query(
       imagesRef,
-      where('productId', '==', productId),
-      orderBy('order', 'asc')
+      where('productId', '==', productId)
     );
     const querySnapshot: QuerySnapshot<DocumentData> = await getDocs(q);
 
-    return querySnapshot.docs
+    const images = querySnapshot.docs
       .map(doc => firestoreToImage(doc))
       .filter((image): image is Image => image !== null);
+
+    // Сортируем на клиенте вместо Firestore (не требует индекса)
+    return images.sort((a, b) => (a.order || 0) - (b.order || 0));
   } catch (error) {
     console.error('Ошибка при получении изображений продукта:', error);
     throw error;
@@ -68,17 +69,9 @@ export const getImagesByProductId = async (productId: string): Promise<Image[]> 
 // Получить основное изображение продукта
 export const getPrimaryImageByProductId = async (productId: string): Promise<Image | null> => {
   try {
-    const imagesRef = collection(db, 'images');
-    const q = query(
-      imagesRef,
-      where('productId', '==', productId),
-      where('isPrimary', '==', true)
-    );
-    const querySnapshot: QuerySnapshot<DocumentData> = await getDocs(q);
-
-    if (querySnapshot.empty) return null;
-
-    return firestoreToImage(querySnapshot.docs[0]);
+    // Получаем все изображения продукта и фильтруем на клиенте
+    const images = await getImagesByProductId(productId);
+    return images.find(img => img.isPrimary) || images[0] || null;
   } catch (error) {
     console.error('Ошибка при получении основного изображения:', error);
     throw error;

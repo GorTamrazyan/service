@@ -37,6 +37,10 @@ import {
     TypeOfProduct,
     uploadProductImages,
     createImage,
+    getImagesByProductId,
+    deleteImage,
+    deleteProductImage,
+    Image as ProductImage,
 } from "../../lib/firebase/products/";
 
 export default function AdminProductsPage() {
@@ -71,6 +75,7 @@ export default function AdminProductsPage() {
     });
     const [newProductImages, setNewProductImages] = useState<File[]>([]);
     const [editProductImages, setEditProductImages] = useState<File[]>([]);
+    const [existingImages, setExistingImages] = useState<ProductImage[]>([]);
     const [editProduct, setEditProduct] = useState({
         name: "",
         description: "",
@@ -221,7 +226,7 @@ export default function AdminProductsPage() {
         }
     };
 
-    const handleEditProduct = (product: Product) => {
+    const handleEditProduct = async (product: Product) => {
         setEditingProduct(product);
         setEditProduct({
             name: product.name,
@@ -234,8 +239,38 @@ export default function AdminProductsPage() {
             featured: product.featured || false,
             discount: product.discount || 0,
         });
+
+        // Загружаем существующие изображения продукта
+        if (product.id) {
+            try {
+                const images = await getImagesByProductId(product.id);
+                setExistingImages(images);
+            } catch (error) {
+                console.error("Error loading product images:", error);
+                setExistingImages([]);
+            }
+        }
+
         setShowEditForm(true);
         setError("");
+    };
+
+    const handleDeleteImage = async (image: ProductImage) => {
+        if (!confirm("Are you sure you want to delete this image?")) return;
+
+        try {
+            // Удаляем из Cloudinary
+            await deleteProductImage(image.url);
+            // Удаляем из Firestore
+            if (image.id) {
+                await deleteImage(image.id);
+            }
+            // Обновляем локальное состояние
+            setExistingImages(prev => prev.filter(img => img.id !== image.id));
+        } catch (error) {
+            console.error("Error deleting image:", error);
+            setError("Failed to delete image");
+        }
     };
 
     const handleUpdateProduct = async (e: React.FormEvent) => {
@@ -863,6 +898,8 @@ export default function AdminProductsPage() {
                                 onClick={() => {
                                     setShowEditForm(false);
                                     setEditingProduct(null);
+                                    setEditProductImages([]);
+                                    setExistingImages([]);
                                     setError("");
                                 }}
                                 className="p-2 hover:bg-[var(--color-secondary)]/20 rounded-lg"
@@ -1064,39 +1101,80 @@ export default function AdminProductsPage() {
                                 <label className="block text-sm font-medium text-[var(--color-text)] mb-2">
                                     <T>Images</T>
                                 </label>
-                                <div className="space-y-2">
-                                    <div className="flex items-center justify-center w-full">
-                                        <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-[var(--color-text)]/30 border-dashed rounded-xl cursor-pointer bg-[var(--color-secondary)]/20 hover:bg-[var(--color-secondary)]/30 transition-colors">
-                                            <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                                                <Upload className="w-8 h-8 mb-2 text-[var(--color-text)]/50" />
-                                                <p className="mb-2 text-sm text-[var(--color-text)]/70">
-                                                    <span className="font-semibold">
-                                                        <T>Click to upload</T>
-                                                    </span>{" "}
-                                                    <T>or drag and drop</T>
-                                                </p>
-                                                <p className="text-xs text-[var(--color-text)]/50">
-                                                    PNG, JPG, WEBP (MAX. 5MB)
-                                                </p>
+                                <div className="space-y-4">
+                                    {/* Существующие изображения */}
+                                    {existingImages.length > 0 && (
+                                        <div>
+                                            <p className="text-xs text-[var(--color-text)]/60 mb-2">
+                                                <T>Current images</T> ({existingImages.length})
+                                            </p>
+                                            <div className="grid grid-cols-3 gap-2">
+                                                {existingImages.map((image) => (
+                                                    <div
+                                                        key={image.id}
+                                                        className="relative group aspect-square rounded-lg overflow-hidden border border-[var(--color-text)]/20"
+                                                    >
+                                                        <img
+                                                            src={image.url}
+                                                            alt={image.alt || "Product image"}
+                                                            className="w-full h-full object-cover"
+                                                        />
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => handleDeleteImage(image)}
+                                                            className="absolute top-1 right-1 p-1 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                                                        >
+                                                            <Trash2 className="w-3 h-3" />
+                                                        </button>
+                                                        {image.isPrimary && (
+                                                            <div className="absolute bottom-1 left-1 px-2 py-0.5 bg-[var(--color-accent)] text-white text-xs rounded">
+                                                                <T>Primary</T>
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                ))}
                                             </div>
-                                            <input
-                                                type="file"
-                                                className="hidden"
-                                                accept="image/*"
-                                                multiple
-                                                onChange={(e) => {
-                                                    const files = Array.from(
-                                                        e.target.files || []
-                                                    );
-                                                    setEditProductImages(
-                                                        (prev) => [
-                                                            ...prev,
-                                                            ...files,
-                                                        ]
-                                                    );
-                                                }}
-                                            />
-                                        </label>
+                                        </div>
+                                    )}
+
+                                    {/* Загрузка новых изображений */}
+                                    <div>
+                                        <p className="text-xs text-[var(--color-text)]/60 mb-2">
+                                            <T>Add new images</T>
+                                        </p>
+                                        <div className="flex items-center justify-center w-full">
+                                            <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-[var(--color-text)]/30 border-dashed rounded-xl cursor-pointer bg-[var(--color-secondary)]/20 hover:bg-[var(--color-secondary)]/30 transition-colors">
+                                                <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                                                    <Upload className="w-8 h-8 mb-2 text-[var(--color-text)]/50" />
+                                                    <p className="mb-2 text-sm text-[var(--color-text)]/70">
+                                                        <span className="font-semibold">
+                                                            <T>Click to upload</T>
+                                                        </span>{" "}
+                                                        <T>or drag and drop</T>
+                                                    </p>
+                                                    <p className="text-xs text-[var(--color-text)]/50">
+                                                        PNG, JPG, WEBP (MAX. 5MB)
+                                                    </p>
+                                                </div>
+                                                <input
+                                                    type="file"
+                                                    className="hidden"
+                                                    accept="image/*"
+                                                    multiple
+                                                    onChange={(e) => {
+                                                        const files = Array.from(
+                                                            e.target.files || []
+                                                        );
+                                                        setEditProductImages(
+                                                            (prev) => [
+                                                                ...prev,
+                                                                ...files,
+                                                            ]
+                                                        );
+                                                    }}
+                                                />
+                                            </label>
+                                        </div>
                                     </div>
                                     {editProductImages.length > 0 && (
                                         <div className="grid grid-cols-3 gap-2 mt-2">
@@ -1171,6 +1249,7 @@ export default function AdminProductsPage() {
                                         setShowEditForm(false);
                                         setEditingProduct(null);
                                         setEditProductImages([]);
+                                        setExistingImages([]);
                                         setError("");
                                     }}
                                     disabled={isLoading}
