@@ -13,6 +13,7 @@ import { useAuthState } from "../../hooks/useAuthState";
 import { useProfile } from "../../hooks/useProfile";
 import { createOrder } from "../../lib/firebase/orders";
 import type { Color } from "../../lib/firebase/products/types";
+import { sendOrderEmail } from "../../lib/email/helpers";
 
 
 
@@ -493,7 +494,28 @@ export const CartProvider = ({ children }: CartProviderProps) => {
                     customerInfo,
                 };
 
-                await createOrder(orderData);
+                const orderId = await createOrder(orderData);
+
+                // Отправляем email подтверждение заказа
+                try {
+                    await sendOrderEmail({
+                        orderId: orderId || 'unknown',
+                        customerEmail: customerInfo.email,
+                        customerName: customerInfo.name,
+                        items: productItems.map(item => ({
+                            name: item.name,
+                            quantity: item.quantity,
+                            price: item.price
+                        })),
+                        totalPrice: getTotalPrice().toFixed(2),
+                        shippingAddress: customerInfo.address
+                    });
+                    console.log("✅ Order confirmation email sent");
+                } catch (emailError) {
+                    console.error("⚠️ Error sending order confirmation email:", emailError);
+                    // Не прерываем процесс - заказ уже создан
+                }
+
                 clearCart();
                 setShowCheckoutModal(false);
                 setOrderSuccess(true);

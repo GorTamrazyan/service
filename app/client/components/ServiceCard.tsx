@@ -1,4 +1,4 @@
-import { IconType } from "../../api/types/icon";
+import { IconType } from "@/types/icon";
 import { T } from "./T";
 
 interface ServiceCardProps {

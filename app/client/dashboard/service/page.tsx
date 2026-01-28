@@ -3,7 +3,7 @@
 
 import React, { useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
-import { IconType } from "../../../api/types/icon";
+import { IconType } from "@/types/icon";
 import {
     FaHammer,
     FaWrench,

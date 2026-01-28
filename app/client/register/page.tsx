@@ -24,8 +24,10 @@ import {
 import { db } from "../../lib/firebase/firebase";
 import { FcGoogle } from "react-icons/fc";
 import { FaApple } from "react-icons/fa";
+import { MdEmail, MdLock, MdCheckCircle, MdInfo } from "react-icons/md";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { sendWelcomeEmailHelper } from "../../lib/email/helpers";
 
 export default function RegisterPage() {
     const [email, setEmail] = useState("");
@@ -33,10 +35,11 @@ export default function RegisterPage() {
     const [confirmPassword, setConfirmPassword] = useState("");
     const [error, setError] = useState("");
     const [verificationSent, setVerificationSent] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
 
     const router = useRouter();
 
-    // Функция для проверки существования email в базе данных
+    // Check if email exists in database
     const checkEmailExists = async (email: string) => {
         try {
             const usersRef = collection(db, "users");
@@ -44,12 +47,12 @@ export default function RegisterPage() {
             const querySnapshot = await getDocs(q);
             return !querySnapshot.empty;
         } catch (error) {
-            console.error("Ошибка при проверке email:", error);
+            console.error("Error checking email:", error);
             return false;
         }
     };
 
-    // Функция для создания профиля пользователя в Firestore (если не существует)
+    // Create user profile in Firestore (if it doesn't exist)
     const createUserProfile = async (userId: string, email: string) => {
         try {
             const userDocRef = doc(db, "users", userId);
@@ -74,14 +77,14 @@ export default function RegisterPage() {
 
                 await setDoc(userDocRef, newProfile);
                 console.log(
-                    "✅ Профиль пользователя создан в Firestore:",
-                    newProfile
+                    "✅ User profile created in Firestore:",
+                    newProfile,
                 );
             } else {
-                console.log("ℹ️ Профиль пользователя уже существует");
+                console.log("ℹ️ User profile already exists");
             }
         } catch (error) {
-            console.error("❌ Ошибка при создании профиля:", error);
+            console.error("❌ Error creating profile:", error);
         }
     };
 
@@ -89,63 +92,84 @@ export default function RegisterPage() {
         event.preventDefault();
 
         if (password !== confirmPassword) {
-            setError("Пароли не совпадают.");
+            setError("Passwords do not match.");
+            return;
+        }
+
+        if (password.length < 6) {
+            setError("Password must be at least 6 characters long.");
             return;
         }
 
         setError("");
+        setIsLoading(true);
 
         try {
-            // Проверяем, существует ли уже email в базе данных
+            // Check if email already exists in database
             const emailExists = await checkEmailExists(email);
             if (emailExists) {
-                setError("Пользователь с таким email уже существует.");
+                setError("An account with this email already exists.");
+                setIsLoading(false);
                 return;
             }
 
             const userCredential = await createUserWithEmailAndPassword(
                 auth,
                 email,
-                password
+                password,
             );
             const user = userCredential.user;
-            console.log("Успешная регистрация через Email/Пароль:", user);
+            console.log("Successful registration via Email/Password:", user);
 
-            // Создаем профиль пользователя в Firestore
+            // Create user profile in Firestore
             await createUserProfile(user.uid, email);
 
-            // Отправляем email для верификации
+            // Send email verification
             try {
                 await sendEmailVerification(user, {
                     url: `${window.location.origin}/client/dashboard/home`,
-                    handleCodeInApp: false, // Изменено на false
+                    handleCodeInApp: false,
                 });
 
                 setVerificationSent(true);
                 console.log(
-                    "✅ Email для верификации успешно отправлен на:",
-                    email
+                    "✅ Verification email successfully sent to:",
+                    email,
                 );
-                console.log("📧 Проверьте папку 'Входящие' и 'Спам'");
-            } catch (emailError: any) {
-                console.error("❌ Ошибка отправки email:", emailError);
-                setError(
-                    `Регистрация успешна, но не удалось отправить email для подтверждения: ${emailError.message}`
-                );
-                // Не устанавливаем verificationSent как true при ошибке
-            }
+                console.log("📧 Check your inbox and spam folder");
 
-            // Не перенаправляем сразу на dashboard, пока email не подтвержден
+                // Send welcome email
+                try {
+                    await sendWelcomeEmailHelper(email, email.split("@")[0]);
+                    console.log("✅ Welcome email sent");
+                } catch (welcomeEmailError) {
+                    console.error(
+                        "⚠️ Error sending welcome email:",
+                        welcomeEmailError,
+                    );
+                }
+            } catch (emailError: any) {
+                console.error("❌ Error sending email:", emailError);
+                setError(
+                    `Registration successful, but failed to send verification email: ${emailError.message}`,
+                );
+            }
         } catch (firebaseError: any) {
             if (firebaseError.code === "auth/email-already-in-use") {
-                setError("Пользователь с таким email уже существует.");
+                setError("An account with this email already exists.");
+            } else if (firebaseError.code === "auth/weak-password") {
+                setError("Password is too weak. Use at least 6 characters.");
+            } else if (firebaseError.code === "auth/invalid-email") {
+                setError("Invalid email address format.");
             } else {
-                setError(firebaseError.message);
+                setError("Registration failed. Please try again.");
             }
             console.error(
-                "Ошибка регистрации через Email/Пароль:",
-                firebaseError
+                "Registration error via Email/Password:",
+                firebaseError,
             );
+        } finally {
+            setIsLoading(false);
         }
 
         setEmail("");
@@ -155,245 +179,467 @@ export default function RegisterPage() {
 
     const handleGoogleSignIn = async () => {
         const provider = new GoogleAuthProvider();
+        setIsLoading(true);
         try {
             const result = await signInWithPopup(auth, provider);
             const user = result.user;
-            console.log("Успешная регистрация через Google:", user);
+            console.log("Successful registration via Google:", user);
 
-            // Создаем профиль пользователя в Firestore, если его еще нет
+            // Create user profile in Firestore if it doesn't exist
             if (user.email) {
                 await createUserProfile(user.uid, user.email);
+
+                // Send welcome email
+                try {
+                    await sendWelcomeEmailHelper(
+                        user.email,
+                        user.displayName || user.email.split("@")[0],
+                    );
+                } catch (welcomeEmailError) {
+                    console.error(
+                        "⚠️ Error sending welcome email:",
+                        welcomeEmailError,
+                    );
+                }
             }
 
             router.push("/client/dashboard/home");
         } catch (firebaseError: any) {
-            setError(firebaseError.message);
-            console.error("Ошибка регистрации через Google:", firebaseError);
+            if (firebaseError.code !== "auth/popup-closed-by-user") {
+                setError("Failed to sign in with Google. Please try again.");
+            }
+            console.error("Google registration error:", firebaseError);
+        } finally {
+            setIsLoading(false);
         }
     };
 
     const handleAppleSignIn = async () => {
         const provider = new OAuthProvider("apple.com");
+        setIsLoading(true);
         try {
             const result = await signInWithPopup(auth, provider);
             const user = result.user;
-            console.log("Успешная регистрация через Apple/iCloud:", user);
+            console.log("Successful registration via Apple/iCloud:", user);
 
-            // Создаем профиль пользователя в Firestore, если его еще нет
+            // Create user profile in Firestore if it doesn't exist
             if (user.email) {
                 await createUserProfile(user.uid, user.email);
+
+                // Send welcome email
+                try {
+                    await sendWelcomeEmailHelper(
+                        user.email,
+                        user.displayName || user.email.split("@")[0],
+                    );
+                } catch (welcomeEmailError) {
+                    console.error(
+                        "⚠️ Error sending welcome email:",
+                        welcomeEmailError,
+                    );
+                }
             }
 
             router.push("/client/dashboard/home");
         } catch (firebaseError: any) {
-            setError(firebaseError.message);
-            console.error(
-                "Ошибка регистрации через Apple/iCloud:",
-                firebaseError
-            );
+            if (firebaseError.code !== "auth/popup-closed-by-user") {
+                setError("Failed to sign in with Apple. Please try again.");
+            }
+            console.error("Apple/iCloud registration error:", firebaseError);
+        } finally {
+            setIsLoading(false);
         }
     };
 
     return (
-        <div className="min-h-screen bg-[var(--color-background)] flex flex-col">
-            {/* Header with logo */}
-            <div className="bg-[var(--color-secondary)] w-full py-6">
-                <div className="flex items-center justify-center">
-                    <div className="flex items-center space-x-4">
-                        {/* Fence icon */}
-                        <div className="text-[var(--color-accent)]">
-                            <svg
-                                width="60"
-                                height="40"
-                                viewBox="0 0 60 40"
-                                fill="currentColor"
-                            >
-                                <rect x="8" y="8" width="6" height="24" />
-                                <rect x="18" y="8" width="6" height="24" />
-                                <rect x="28" y="8" width="6" height="24" />
-                                <rect x="38" y="8" width="6" height="24" />
-                                <rect x="4" y="12" width="44" height="4" />
-                                <rect x="4" y="20" width="44" height="4" />
-                                <polygon points="8,8 11,4 14,8" />
-                                <polygon points="18,8 21,4 24,8" />
-                                <polygon points="28,8 31,4 34,8" />
-                                <polygon points="38,8 41,4 44,8" />
-                            </svg>
+        <div className="min-h-screen bg-[var(--color-background)] flex flex-col relative overflow-hidden">
+            {/* Background decorative elements */}
+            <div className="absolute inset-0 overflow-hidden pointer-events-none">
+                <div className="absolute top-0 right-0 w-96 h-96 bg-[var(--color-primary)]/5 rounded-full blur-3xl"></div>
+                <div className="absolute bottom-0 left-0 w-96 h-96 bg-[var(--color-accent)]/5 rounded-full blur-3xl"></div>
+            </div>
+
+            {/* Modern Header */}
+            <div className="relative w-full py-6 bg-[var(--color-secondary)] shadow-sm border-b border-[var(--color-border)]">
+                <div className="max-w-7xl mx-auto px-4">
+                    <Link
+                        href="/"
+                        className="flex items-center justify-center group"
+                    >
+                        <div className="flex items-center space-x-4 transition-transform duration-300 group-hover:scale-105">
+                            {/* Enhanced Fence icon */}
+                            <div className="text-[var(--color-accent)] transform transition-all duration-300 group-hover:rotate-6">
+                                <svg
+                                    width="60"
+                                    height="40"
+                                    viewBox="0 0 60 40"
+                                    className="drop-shadow-lg"
+                                    fill="currentColor"
+                                >
+                                    <rect x="8" y="8" width="6" height="24" />
+                                    <rect x="18" y="8" width="6" height="24" />
+                                    <rect x="28" y="8" width="6" height="24" />
+                                    <rect x="38" y="8" width="6" height="24" />
+                                    <rect x="4" y="12" width="44" height="4" />
+                                    <rect x="4" y="20" width="44" height="4" />
+                                    <polygon points="8,8 11,4 14,8" />
+                                    <polygon points="18,8 21,4 24,8" />
+                                    <polygon points="28,8 31,4 34,8" />
+                                    <polygon points="38,8 41,4 44,8" />
+                                </svg>
+                            </div>
+                            <h1 className="text-4xl font-bold text-[var(--color-primary)]">
+                                ONIK'S VINYL
+                            </h1>
                         </div>
-                        <h1 className="text-4xl font-bold text-[var(--color-text)]">
-                            ONIK'S VINYL
-                        </h1>
-                    </div>
+                    </Link>
                 </div>
             </div>
 
             {/* Main content */}
-            <div className="flex-1 flex items-center justify-center px-4 py-12">
+            <div className="relative flex-1 flex items-center justify-center px-4 py-12">
                 <div className="w-full max-w-md">
-                    {/* REGISTER title */}
-                    <div className="text-center mb-8">
-                        <h2 className="text-5xl font-bold text-[var(--color-primary)] mb-8">
-                            REGISTER
-                        </h2>
-                    </div>
-
-                    {/* Form */}
-                    <form
-                        onSubmit={handleEmailPasswordSubmit}
-                        className="space-y-6"
-                    >
-                        {/* Email field */}
-                        <div>
-                            <label
-                                htmlFor="email"
-                                className="block text-lg font-medium text-[var(--color-text)] mb-2"
-                            >
-                                Email
-                            </label>
-                            <input
-                                id="email"
-                                name="email"
-                                type="email"
-                                autoComplete="email"
-                                required
-                                className="w-full px-4 py-3 border-2 border-[var(--color-text)]/30 rounded-lg bg-[var(--color-background)] text-[var(--color-text)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] focus:border-[var(--color-accent)] text-lg"
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
-                            />
-                        </div>
-
-                        {/* Password field */}
-                        <div>
-                            <label
-                                htmlFor="password"
-                                className="block text-lg font-medium text-[var(--color-text)] mb-2"
-                            >
-                                Password
-                            </label>
-                            <input
-                                id="password"
-                                name="password"
-                                type="password"
-                                autoComplete="new-password"
-                                required
-                                className="w-full px-4 py-3 border-2 border-[var(--color-text)]/30 rounded-lg bg-[var(--color-background)] text-[var(--color-text)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] focus:border-[var(--color-accent)] text-lg"
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
-                            />
-                        </div>
-
-                        {/* Confirm Password field */}
-                        <div>
-                            <label
-                                htmlFor="confirmPassword"
-                                className="block text-lg font-medium text-[var(--color-text)] mb-2"
-                            >
-                                Confirm Password
-                            </label>
-                            <input
-                                id="confirmPassword"
-                                name="confirmPassword"
-                                type="password"
-                                autoComplete="new-password"
-                                required
-                                className="w-full px-4 py-3 border-2 border-[var(--color-text)]/30 rounded-lg bg-[var(--color-background)] text-[var(--color-text)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] focus:border-[var(--color-accent)] text-lg"
-                                value={confirmPassword}
-                                onChange={(e) =>
-                                    setConfirmPassword(e.target.value)
-                                }
-                            />
-                        </div>
-
-                        {/* Error message */}
-                        {error && (
-                            <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-lg text-sm">
-                                {error}
+                    {/* Modern card container */}
+                    <div className="bg-[var(--color-card-bg)] rounded-2xl shadow-2xl border border-[var(--color-border)] p-8 md:p-10 transition-all duration-300 hover:shadow-3xl">
+                        {/* Header section */}
+                        <div className="text-center mb-8">
+                            <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-accent)] rounded-2xl mb-4 shadow-lg">
+                                <svg
+                                    className="w-8 h-8 text-white"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                >
+                                    <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        strokeWidth={2}
+                                        d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"
+                                    />
+                                </svg>
                             </div>
-                        )}
+                            <h2 className="text-4xl md:text-5xl font-bold text-[var(--color-primary)] mb-2">
+                                Create Account
+                            </h2>
+                            <p className="text-[var(--color-text)]/60 text-sm">
+                                Join us to get started with premium fencing
+                                solutions
+                            </p>
+                        </div>
 
-                        {/* Verification sent message */}
-                        {verificationSent && (
-                            <div className="space-y-4">
-                                <div className="bg-green-50 border border-green-200 text-green-600 px-4 py-3 rounded-lg text-sm">
-                                    <p className="mb-3">
-                                        Регистрация успешна! Проверьте вашу
-                                        почту и перейдите по ссылке для
-                                        подтверждения email.
-                                    </p>
-                                    <div className="flex gap-2">
-                                        <Link
-                                            href="/client/sign-in"
-                                            className="inline-block bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded transition duration-150 ease-in-out"
-                                        >
-                                            Перейти к входу
-                                        </Link>
+                        {/* Form */}
+                        <form
+                            onSubmit={handleEmailPasswordSubmit}
+                            className="space-y-5"
+                        >
+                            {/* Email field with icon */}
+                            <div className="space-y-2">
+                                <label
+                                    htmlFor="email"
+                                    className="block text-sm font-medium text-[var(--color-text)]"
+                                >
+                                    Email Address
+                                </label>
+                                <div className="relative group">
+                                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <MdEmail className="h-5 w-5 text-[var(--color-text)]/40 group-focus-within:text-[var(--color-primary)]" />
                                     </div>
+                                    <input
+                                        id="email"
+                                        name="email"
+                                        type="email"
+                                        autoComplete="email"
+                                        required
+                                        className="w-full pl-10 pr-4 py-3 bg-[var(--color-input-bg)] border-2 border-[var(--color-input-border)] rounded-xl text-[var(--color-text)] placeholder-[var(--color-text)]/40 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:border-[var(--color-primary)] transition-all duration-200"
+                                        placeholder="you@example.com"
+                                        value={email}
+                                        onChange={(e) =>
+                                            setEmail(e.target.value)
+                                        }
+                                        disabled={isLoading}
+                                    />
                                 </div>
-
-                                {/* Email Diagnostics */}
-                                <details className="mt-4">
-                                    <summary className="cursor-pointer text-blue-600 hover:text-blue-800 font-medium">
-                                        🔧 Не получили email? Проверьте папку спам
-                                    </summary>
-                                    <div className="mt-3 text-sm text-gray-600">
-                                        <p>Если письмо не пришло:</p>
-                                        <ul className="list-disc list-inside mt-2">
-                                            <li>Проверьте папку "Спам" или "Нежелательная почта"</li>
-                                            <li>Убедитесь, что email адрес введен правильно</li>
-                                            <li>Попробуйте зарегистрироваться снова</li>
-                                        </ul>
-                                    </div>
-                                </details>
                             </div>
-                        )}
 
-                        {/* Register button */}
-                        <div className="pt-4">
-                            <button
-                                type="submit"
-                                className="w-full bg-[var(--color-accent)] hover:opacity-90 text-[var(--color-primary)] font-bold py-4 px-6 rounded-lg text-xl transition duration-150 ease-in-out"
-                            >
-                                REGISTER
-                            </button>
-                        </div>
+                            {/* Password field with icon */}
+                            <div className="space-y-2">
+                                <label
+                                    htmlFor="password"
+                                    className="block text-sm font-medium text-[var(--color-text)]"
+                                >
+                                    Password
+                                </label>
+                                <div className="relative group">
+                                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <MdLock className="h-5 w-5 text-[var(--color-text)]/40 group-focus-within:text-[var(--color-primary)]" />
+                                    </div>
+                                    <input
+                                        id="password"
+                                        name="password"
+                                        type="password"
+                                        autoComplete="new-password"
+                                        required
+                                        className="w-full pl-10 pr-4 py-3 bg-[var(--color-input-bg)] border-2 border-[var(--color-input-border)] rounded-xl text-[var(--color-text)] placeholder-[var(--color-text)]/40 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:border-[var(--color-primary)] transition-all duration-200"
+                                        placeholder="••••••••"
+                                        value={password}
+                                        onChange={(e) =>
+                                            setPassword(e.target.value)
+                                        }
+                                        disabled={isLoading}
+                                    />
+                                </div>
+                                <p className="text-xs text-[var(--color-text)]/60">
+                                    Must be at least 6 characters
+                                </p>
+                            </div>
 
-                        {/* Social login buttons */}
-                        <div className="space-y-3 pt-4 h-20 flex">
-                            <button
-                                type="button"
-                                onClick={handleGoogleSignIn}
-                                className="w-full flex items-center justify-center py-3 px-4 m-1 border-2 border-[var(--color-text)]/30 rounded-lg bg-[var(--color-background)] hover:bg-[var(--color-secondary)]/20 transition duration-150 ease-in-out"
-                            >
-                                <FcGoogle className="h-6 w-6 mr-3" />
-                                <span className="text-[var(--color-text)] font-medium">
-                                    Continue with Google
-                                </span>
-                            </button>
+                            {/* Confirm Password field with icon */}
+                            <div className="space-y-2">
+                                <label
+                                    htmlFor="confirmPassword"
+                                    className="block text-sm font-medium text-[var(--color-text)]"
+                                >
+                                    Confirm Password
+                                </label>
+                                <div className="relative group">
+                                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <MdLock className="h-5 w-5 text-[var(--color-text)]/40 group-focus-within:text-[var(--color-primary)]" />
+                                    </div>
+                                    <input
+                                        id="confirmPassword"
+                                        name="confirmPassword"
+                                        type="password"
+                                        autoComplete="new-password"
+                                        required
+                                        className="w-full pl-10 pr-4 py-3 bg-[var(--color-input-bg)] border-2 border-[var(--color-input-border)] rounded-xl text-[var(--color-text)] placeholder-[var(--color-text)]/40 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:border-[var(--color-primary)] transition-all duration-200"
+                                        placeholder="••••••••"
+                                        value={confirmPassword}
+                                        onChange={(e) =>
+                                            setConfirmPassword(e.target.value)
+                                        }
+                                        disabled={isLoading}
+                                    />
+                                </div>
+                            </div>
 
-                            <button
-                                type="button"
-                                onClick={handleAppleSignIn}
-                                className="w-full flex items-center justify-center py-3 px-4 m-1 border-2 border-[var(--color-text)]/30 rounded-lg bg-[var(--color-background)] hover:bg-[var(--color-secondary)]/20 transition duration-150 ease-in-out"
-                            >
-                                <FaApple className="h-6 w-6 mr-3 text-[var(--color-text)]" />
-                                <span className="text-[var(--color-text)] font-medium">
-                                    Continue with Apple
-                                </span>
-                            </button>
-                        </div>
+                            {/* Error message with modern styling */}
+                            {error && (
+                                <div className="bg-[var(--color-error)]/10 border-2 border-[var(--color-error)]/30 text-[var(--color-error)] px-4 py-3 rounded-xl text-sm flex items-start space-x-2 animate-shake">
+                                    <MdInfo className="h-5 w-5 flex-shrink-0 mt-0.5" />
+                                    <span>{error}</span>
+                                </div>
+                            )}
+
+                            {/* Verification sent message with modern styling */}
+                            {verificationSent && (
+                                <div className="space-y-4 animate-fadeIn">
+                                    <div className="bg-[var(--color-success)]/10 border-2 border-[var(--color-success)]/30 text-[var(--color-success)] px-4 py-4 rounded-xl">
+                                        <div className="flex items-start space-x-3">
+                                            <MdCheckCircle className="h-6 w-6 flex-shrink-0 mt-0.5" />
+                                            <div className="flex-1">
+                                                <p className="font-bold text-[var(--color-text)] mb-2">
+                                                    Registration Successful!
+                                                </p>
+                                                <p className="text-sm text-[var(--color-text)]/70 mb-4">
+                                                    Please check your email and
+                                                    click the verification link
+                                                    to activate your account.
+                                                </p>
+                                                <Link
+                                                    href="/client/sign-in"
+                                                    className="inline-flex items-center justify-center bg-[var(--color-success)] hover:bg-[var(--color-success)]/90 text-white font-medium py-2 px-6 rounded-lg transition-all duration-200 transform hover:scale-105 shadow-md"
+                                                >
+                                                    Go to Sign In
+                                                </Link>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* Email help section */}
+                                    <details className="group">
+                                        <summary className="cursor-pointer text-[var(--color-info)] hover:text-[var(--color-info)]/80 font-medium text-sm flex items-center space-x-2 transition-colors">
+                                            <span>
+                                                🔧 Didn't receive the email?
+                                            </span>
+                                            <svg
+                                                className="w-4 h-4 transform transition-transform group-open:rotate-180"
+                                                fill="none"
+                                                stroke="currentColor"
+                                                viewBox="0 0 24 24"
+                                            >
+                                                <path
+                                                    strokeLinecap="round"
+                                                    strokeLinejoin="round"
+                                                    strokeWidth={2}
+                                                    d="M19 9l-7 7-7-7"
+                                                />
+                                            </svg>
+                                        </summary>
+                                        <div className="mt-3 pl-6 text-sm text-[var(--color-text)]/70 space-y-2">
+                                            <p className="font-medium">
+                                                Try the following:
+                                            </p>
+                                            <ul className="space-y-1.5 list-disc list-inside">
+                                                <li>
+                                                    Check your spam or junk
+                                                    folder
+                                                </li>
+                                                <li>
+                                                    Verify your email address is
+                                                    correct
+                                                </li>
+                                                <li>
+                                                    Wait a few minutes for the
+                                                    email to arrive
+                                                </li>
+                                                <li>
+                                                    Try registering again if
+                                                    needed
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </details>
+                                </div>
+                            )}
+
+                            {/* Register button with loading state */}
+                            <div className="pt-2">
+                                <button
+                                    type="submit"
+                                    disabled={isLoading || verificationSent}
+                                    className="w-full bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-accent)] hover:from-[var(--color-primary)]/90 hover:to-[var(--color-accent)]/90 text-white font-bold py-4 px-6 rounded-xl text-lg transition-all duration-300 transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none shadow-lg hover:shadow-xl"
+                                >
+                                    {isLoading ? (
+                                        <span className="flex items-center justify-center space-x-2">
+                                            <svg
+                                                className="animate-spin h-5 w-5"
+                                                viewBox="0 0 24 24"
+                                            >
+                                                <circle
+                                                    className="opacity-25"
+                                                    cx="12"
+                                                    cy="12"
+                                                    r="10"
+                                                    stroke="currentColor"
+                                                    strokeWidth="4"
+                                                    fill="none"
+                                                />
+                                                <path
+                                                    className="opacity-75"
+                                                    fill="currentColor"
+                                                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                                                />
+                                            </svg>
+                                            <span>Creating Account...</span>
+                                        </span>
+                                    ) : (
+                                        "Create Account"
+                                    )}
+                                </button>
+                            </div>
+
+                            {/* Divider */}
+                            <div className="relative py-4">
+                                <div className="absolute inset-0 flex items-center">
+                                    <div className="w-full border-t border-[var(--color-border)]"></div>
+                                </div>
+                                <div className="relative flex justify-center text-sm">
+                                    <span className="px-4 bg-[var(--color-card-bg)] text-[var(--color-text)]/60">
+                                        Or continue with
+                                    </span>
+                                </div>
+                            </div>
+
+                            {/* Social login buttons with modern design */}
+                            <div className="grid grid-cols-2 gap-3">
+                                <button
+                                    type="button"
+                                    onClick={handleGoogleSignIn}
+                                    disabled={isLoading}
+                                    className="flex items-center justify-center py-3 px-4 bg-[var(--color-input-bg)] border-2 border-[var(--color-input-border)] rounded-xl hover:border-[var(--color-primary)] hover:bg-[var(--color-primary)]/5 transition-all duration-200 transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none group"
+                                >
+                                    <FcGoogle className="h-5 w-5 mr-2 group-hover:scale-110 transition-transform" />
+                                    <span className="text-[var(--color-text)] font-medium text-sm">
+                                        Google
+                                    </span>
+                                </button>
+
+                                <button
+                                    type="button"
+                                    onClick={handleAppleSignIn}
+                                    disabled={isLoading}
+                                    className="flex items-center justify-center py-3 px-4 bg-[var(--color-input-bg)] border-2 border-[var(--color-input-border)] rounded-xl hover:border-[var(--color-primary)] hover:bg-[var(--color-primary)]/5 transition-all duration-200 transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none group"
+                                >
+                                    <FaApple className="h-5 w-5 mr-2 text-[var(--color-text)] group-hover:scale-110 transition-transform" />
+                                    <span className="text-[var(--color-text)] font-medium text-sm">
+                                        Apple
+                                    </span>
+                                </button>
+                            </div>
+                        </form>
 
                         {/* Sign in link */}
-                        <div className="text-center pt-6">
-                            <Link
-                                href="/client/sign-in"
-                                className="text-[var(--color-text)] hover:text-[var(--color-accent)] transition duration-150 ease-in-out font-medium"
-                            >
-                                Already have an account? Sign in
-                            </Link>
+                        <div className="text-center mt-8 pt-6 border-t border-[var(--color-border)]">
+                            <p className="text-[var(--color-text)]/70 text-sm">
+                                Already have an account?{" "}
+                                <Link
+                                    href="/client/sign-in"
+                                    className="text-[var(--color-primary)] hover:text-[var(--color-accent)] font-semibold transition-colors duration-200"
+                                >
+                                    Sign In
+                                </Link>
+                            </p>
                         </div>
-                    </form>
+                    </div>
+
+                    {/* Footer note */}
+                    <p className="text-center text-[var(--color-text)]/50 text-xs mt-6">
+                        By creating an account, you agree to our Terms of
+                        Service and Privacy Policy
+                    </p>
                 </div>
             </div>
+
+            <style jsx>{`
+                @keyframes shake {
+                    0%,
+                    100% {
+                        transform: translateX(0);
+                    }
+                    10%,
+                    30%,
+                    50%,
+                    70%,
+                    90% {
+                        transform: translateX(-5px);
+                    }
+                    20%,
+                    40%,
+                    60%,
+                    80% {
+                        transform: translateX(5px);
+                    }
+                }
+
+                @keyframes fadeIn {
+                    from {
+                        opacity: 0;
+                        transform: translateY(-10px);
+                    }
+                    to {
+                        opacity: 1;
+                        transform: translateY(0);
+                    }
+                }
+
+                .animate-shake {
+                    animation: shake 0.5s ease-in-out;
+                }
+
+                .animate-fadeIn {
+                    animation: fadeIn 0.3s ease-out;
+                }
+            `}</style>
         </div>
     );
 }

@@ -174,7 +174,7 @@ export default function Header() {
                     <nav className="hidden lg:flex items-center gap-1">
                         {navItems.map((item) => {
                             const isActive = getLinkClassName(
-                                item.href
+                                item.href,
                             ).includes("font-bold");
                             return (
                                 <Link
@@ -224,7 +224,7 @@ export default function Header() {
                             <button
                                 onClick={() =>
                                     alert(
-                                        "Log in to your account to access your shopping cart."
+                                        "Log in to your account to access your shopping cart.",
                                     )
                                 }
                                 className="p-3 rounded-full bg-white/10 hover:bg-white/20 transition-all duration-300 relative group"
@@ -244,13 +244,22 @@ export default function Header() {
                                 <FaUserCircle className="w-5 h-5 text-white group-hover:scale-110 transition-transform" />
                             </Link>
                         ) : (
-                            <Link
-                                href="/client/dashboard/login"
-                                className="hidden sm:flex items-center gap-2 px-6 py-2.5 bg-gradient-to-r from-[var(--color-accent)] to-[var(--color-accent)]/80 text-[var(--color-primary)] font-bold rounded-xl hover:scale-105 transition-all duration-300 shadow-lg"
-                            >
-                                <FaUserCircle className="w-4 h-4" />
-                                <T>Login</T>
-                            </Link>
+                            <div className="flex gap-1">
+                                <Link
+                                    href="/client/sign-in"
+                                    className="hidden sm:flex items-center gap-2 px-6 py-2.5 bg-gradient-to-r from-[var(--color-accent)] to-[var(--color-accent)]/80 text-[var(--color-primary)] font-bold rounded-xl hover:scale-105 transition-all duration-300 shadow-lg"
+                                >
+                                    <FaUserCircle className="w-4 h-4" />
+                                    <T>Login</T>
+                                </Link>
+                                <Link
+                                    href="/client/register"
+                                    className="hidden sm:flex items-center gap-2 px-6 py-2.5 bg-gradient-to-r from-[var(--color-accent)] to-[var(--color-accent)]/80 text-[var(--color-primary)] font-bold rounded-xl hover:scale-105 transition-all duration-300 shadow-lg"
+                                >
+                                    <FaUserCircle className="w-4 h-4" />
+                                    <T>Register</T>
+                                </Link>
+                            </div>
                         )}
                     </div>
                 </div>
@@ -346,7 +355,7 @@ export default function Header() {
                     <nav className="py-6 space-y-2">
                         {navItems.map((item) => {
                             const isActive = getLinkClassName(
-                                item.href
+                                item.href,
                             ).includes("font-bold");
                             return (
                                 <Link
@@ -369,16 +378,28 @@ export default function Header() {
 
                         {/* Mobile Login Button */}
                         {!isAuthenticated && (
-                            <Link
-                                href="/client/dashboard/login"
-                                onClick={() => setIsMobileMenuOpen(false)}
-                                className="flex items-center gap-4 px-6 py-4 rounded-2xl bg-gradient-to-r from-[var(--color-accent)] to-[var(--color-accent)]/80 text-[var(--color-primary)] font-bold transition-all duration-300 hover:scale-105"
-                            >
-                                <FaUserCircle className="w-5 h-5" />
-                                <span>
-                                    <T>Login</T>
-                                </span>
-                            </Link>
+                            <div>
+                                <Link
+                                    href="/client/sign-in"
+                                    onClick={() => setIsMobileMenuOpen(false)}
+                                    className="flex items-center gap-4 px-6 py-4 rounded-2xl bg-gradient-to-r from-[var(--color-accent)] to-[var(--color-accent)]/80 text-[var(--color-primary)] font-bold transition-all duration-300 hover:scale-105"
+                                >
+                                    <FaUserCircle className="w-5 h-5" />
+                                    <span>
+                                        <T>Login</T>
+                                    </span>
+                                </Link>
+                                <Link
+                                    href="/client/register"
+                                    onClick={() => setIsMobileMenuOpen(false)}
+                                    className="flex items-center gap-4 px-6 py-4 rounded-2xl bg-gradient-to-r from-[var(--color-accent)] to-[var(--color-accent)]/80 text-[var(--color-primary)] font-bold transition-all duration-300 hover:scale-105"
+                                >
+                                    <FaUserCircle className="w-5 h-5" />
+                                    <span>
+                                        <T>Register</T>
+                                    </span>
+                                </Link>
+                            </div>
                         )}
                     </nav>
                 </div>

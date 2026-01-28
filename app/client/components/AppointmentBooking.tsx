@@ -15,6 +15,7 @@ import { T } from "./T";
 import { createConsultationOrder } from "../../lib/firebase/orders";
 import { useAuthState } from "../../hooks/useAuthState";
 import { useProfile } from "../../hooks/useProfile";
+import { sendConsultationEmail } from "../../lib/email/helpers";
 
 interface AppointmentBookingModalProps {
     isOpen: boolean;
@@ -333,6 +334,24 @@ export default function AppointmentBookingModal({
                 alert(`Консультация сохранена, но не удалось создать событие в календаре: ${data.error}`);
             } else {
                 console.log("✅ Step 2 complete: Calendar event created:", data);
+
+                // Отправляем email подтверждение консультации
+                try {
+                    await sendConsultationEmail({
+                        customerEmail: customerInfo.email,
+                        customerName: customerInfo.name,
+                        consultationType: consultationType,
+                        date: appointmentDate.toLocaleDateString(),
+                        time: appointmentDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                        duration: duration,
+                        meetingLink: data.eventLink
+                    });
+                    console.log("✅ Consultation confirmation email sent");
+                } catch (emailError) {
+                    console.error("⚠️ Error sending consultation email:", emailError);
+                    // Не прерываем процесс - консультация уже забронирована
+                }
+
                 setIsBooked(true);
                 setShowSuccess(true);
 

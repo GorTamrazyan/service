@@ -1,4 +1,4 @@
-// client/signIn/page.tsx
+// client/sign-in/page.tsx
 "use client";
 import { useState } from "react";
 import React from "react";
@@ -14,6 +14,7 @@ import { doc, getDoc, setDoc } from "firebase/firestore";
 import { db } from "../../lib/firebase/firebase";
 import { FcGoogle } from "react-icons/fc";
 import { FaApple } from "react-icons/fa";
+import { MdEmail, MdLock, MdInfo, MdWarning } from "react-icons/md";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
@@ -23,11 +24,15 @@ export default function SignInPage() {
     const [error, setError] = useState("");
     const [emailNotVerified, setEmailNotVerified] = useState(false);
     const [verificationSent, setVerificationSent] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
 
     const router = useRouter();
 
-    // Функция для создания профиля пользователя в Firestore (если не существует)
-    const createUserProfileIfNotExists = async (userId: string, email: string) => {
+    // Create user profile in Firestore (if it doesn't exist)
+    const createUserProfileIfNotExists = async (
+        userId: string,
+        email: string,
+    ) => {
         try {
             const userDocRef = doc(db, "users", userId);
             const docSnap = await getDoc(userDocRef);
@@ -46,16 +51,19 @@ export default function SignInPage() {
                     },
                     email: email,
                     createdAt: new Date(),
-                    updatedAt: new Date()
+                    updatedAt: new Date(),
                 };
 
                 await setDoc(userDocRef, newProfile);
-                console.log("✅ Профиль пользователя создан в Firestore:", newProfile);
+                console.log(
+                    "✅ User profile created in Firestore:",
+                    newProfile,
+                );
             } else {
-                console.log("ℹ️ Профиль пользователя уже существует");
+                console.log("ℹ️ User profile already exists");
             }
         } catch (error) {
-            console.error("❌ Ошибка при создании профиля:", error);
+            console.error("❌ Error creating profile:", error);
         }
     };
 
@@ -63,30 +71,43 @@ export default function SignInPage() {
         event.preventDefault();
         setError("");
         setEmailNotVerified(false);
+        setIsLoading(true);
 
         try {
             const userCredential = await signInWithEmailAndPassword(
                 auth,
                 email,
-                password
+                password,
             );
             const user = userCredential.user;
 
-            // Проверяем, верифицирован ли email
+            // Check if email is verified
             if (!user.emailVerified) {
                 setEmailNotVerified(true);
-                setError("Пожалуйста, подтвердите ваш email перед входом в систему.");
+                setError("Please verify your email before signing in.");
+                setIsLoading(false);
                 return;
             }
 
-            console.log("Успешный вход через Email/Пароль:", user);
+            console.log("Successful sign in via Email/Password:", user);
             router.push("/client/dashboard/home");
         } catch (firebaseError: any) {
-            setError(firebaseError.message);
-            console.error("Ошибка входа через Email/Пароль:", firebaseError);
+            if (
+                firebaseError.code === "auth/invalid-credential" ||
+                firebaseError.code === "auth/user-not-found" ||
+                firebaseError.code === "auth/wrong-password"
+            ) {
+                setError("Invalid email or password. Please try again.");
+            } else if (firebaseError.code === "auth/too-many-requests") {
+                setError("Too many failed attempts. Please try again later.");
+            } else {
+                setError("Failed to sign in. Please try again.");
+            }
+            console.error("Sign in error via Email/Password:", firebaseError);
+        } finally {
+            setIsLoading(false);
         }
 
-        setEmail("");
         setPassword("");
     };
 
@@ -99,224 +120,387 @@ export default function SignInPage() {
                     handleCodeInApp: false,
                 });
                 setVerificationSent(true);
-                console.log("✅ Email для верификации повторно отправлен на:", user.email);
-                console.log("📧 Проверьте папку 'Входящие' и 'Спам'");
+                console.log("✅ Verification email resent to:", user.email);
+                console.log("📧 Check your inbox and spam folder");
             }
         } catch (error: any) {
-            console.error("❌ Ошибка при повторной отправке email:", error);
-            setError(`Ошибка при отправке email для верификации: ${error.message}`);
+            console.error("❌ Error resending verification email:", error);
+            setError(`Failed to send verification email: ${error.message}`);
         }
     };
 
     const handleGoogleSignIn = async () => {
         const provider = new GoogleAuthProvider();
+        setIsLoading(true);
         try {
             const result = await signInWithPopup(auth, provider);
             const user = result.user;
-            console.log("Успешный вход через Google:", user);
-            
-            // Создаем профиль пользователя в Firestore, если его еще нет
+            console.log("Successful sign in via Google:", user);
+
+            // Create user profile in Firestore if it doesn't exist
             if (user.email) {
                 await createUserProfileIfNotExists(user.uid, user.email);
             }
-            
+
             router.push("/client/dashboard/home");
         } catch (firebaseError: any) {
-            setError(firebaseError.message);
-            console.error("Ошибка входа через Google:", firebaseError);
+            if (firebaseError.code !== "auth/popup-closed-by-user") {
+                setError("Failed to sign in with Google. Please try again.");
+            }
+            console.error("Google sign in error:", firebaseError);
+        } finally {
+            setIsLoading(false);
         }
     };
 
     const handleAppleSignIn = async () => {
         const provider = new OAuthProvider("apple.com");
+        setIsLoading(true);
         try {
             const result = await signInWithPopup(auth, provider);
             const user = result.user;
-            console.log("Успешный вход через Apple/iCloud:", user);
-            
-            // Создаем профиль пользователя в Firestore, если его еще нет
+            console.log("Successful sign in via Apple/iCloud:", user);
+
+            // Create user profile in Firestore if it doesn't exist
             if (user.email) {
                 await createUserProfileIfNotExists(user.uid, user.email);
             }
-            
+
             router.push("/client/dashboard/home");
         } catch (firebaseError: any) {
-            setError(firebaseError.message);
-            console.error("Ошибка входа через Apple/iCloud:", firebaseError);
+            if (firebaseError.code !== "auth/popup-closed-by-user") {
+                setError("Failed to sign in with Apple. Please try again.");
+            }
+            console.error("Apple/iCloud sign in error:", firebaseError);
+        } finally {
+            setIsLoading(false);
         }
     };
 
     return (
-        <div className="min-h-screen bg-[var(--color-background)] flex flex-col">
-            {/* Header with logo */}
-            <div className="bg-[var(--color-secondary)] w-full py-6">
-                <div className="flex items-center justify-center">
-                    <div className="flex items-center space-x-4">
-                        {/* Fence icon */}
-                        <div className="text-[var(--color-accent)]">
-                            <svg
-                                width="60"
-                                height="40"
-                                viewBox="0 0 60 40"
-                                fill="currentColor"
-                            >
-                                <rect x="8" y="8" width="6" height="24" />
-                                <rect x="18" y="8" width="6" height="24" />
-                                <rect x="28" y="8" width="6" height="24" />
-                                <rect x="38" y="8" width="6" height="24" />
-                                <rect x="4" y="12" width="44" height="4" />
-                                <rect x="4" y="20" width="44" height="4" />
-                                <polygon points="8,8 11,4 14,8" />
-                                <polygon points="18,8 21,4 24,8" />
-                                <polygon points="28,8 31,4 34,8" />
-                                <polygon points="38,8 41,4 44,8" />
-                            </svg>
+        <div className="min-h-screen bg-[var(--color-background)] flex flex-col relative overflow-hidden">
+            {/* Background decorative elements */}
+            <div className="absolute inset-0 overflow-hidden pointer-events-none">
+                <div className="absolute top-0 right-0 w-96 h-96 bg-[var(--color-primary)]/5 rounded-full blur-3xl"></div>
+                <div className="absolute bottom-0 left-0 w-96 h-96 bg-[var(--color-accent)]/5 rounded-full blur-3xl"></div>
+            </div>
+
+            {/* Modern Header */}
+            <div className="relative w-full py-6 bg-[var(--color-secondary)] shadow-sm border-b border-[var(--color-border)]">
+                <div className="max-w-7xl mx-auto px-4">
+                    <Link
+                        href="/"
+                        className="flex items-center justify-center group"
+                    >
+                        <div className="flex items-center space-x-4 transition-transform duration-300 group-hover:scale-105">
+                            {/* Enhanced Fence icon */}
+                            <div className="text-[var(--color-accent)] transform transition-all duration-300 group-hover:rotate-6">
+                                <svg
+                                    width="60"
+                                    height="40"
+                                    viewBox="0 0 60 40"
+                                    className="drop-shadow-lg"
+                                    fill="currentColor"
+                                >
+                                    <rect x="8" y="8" width="6" height="24" />
+                                    <rect x="18" y="8" width="6" height="24" />
+                                    <rect x="28" y="8" width="6" height="24" />
+                                    <rect x="38" y="8" width="6" height="24" />
+                                    <rect x="4" y="12" width="44" height="4" />
+                                    <rect x="4" y="20" width="44" height="4" />
+                                    <polygon points="8,8 11,4 14,8" />
+                                    <polygon points="18,8 21,4 24,8" />
+                                    <polygon points="28,8 31,4 34,8" />
+                                    <polygon points="38,8 41,4 44,8" />
+                                </svg>
+                            </div>
+                            <h1 className="text-4xl font-bold text-[var(--color-primary)]">
+                                ONIK'S VINYL
+                            </h1>
                         </div>
-                        <h1 className="text-4xl font-bold text-[var(--color-text)]">
-                            ONIK'S VINYL
-                        </h1>
-                    </div>
+                    </Link>
                 </div>
             </div>
 
             {/* Main content */}
-            <div className="flex-1 flex items-center justify-center px-4 py-12">
+            <div className="relative flex-1 flex items-center justify-center px-4 py-12">
                 <div className="w-full max-w-md">
-                    {/* LOGIN title */}
-                    <div className="text-center mb-8">
-                        <h2 className="text-5xl font-bold text-[var(--color-primary)] mb-8">
-                            LOGIN
-                        </h2>
-                    </div>
-
-                    {/* Form */}
-                    <form
-                        onSubmit={handleEmailPasswordSignIn}
-                        className="space-y-6"
-                    >
-                        {/* Email field */}
-                        <div>
-                            <label
-                                htmlFor="email"
-                                className="block text-lg font-medium text-[var(--color-text)] mb-2"
-                            >
-                                Email
-                            </label>
-                            <input
-                                id="email"
-                                name="email"
-                                type="email"
-                                autoComplete="email"
-                                required
-                                className="w-full px-4 py-3 border-2 border-[var(--color-text)]/30 rounded-lg bg-[var(--color-background)] text-[var(--color-text)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] focus:border-[var(--color-accent)] text-lg"
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
-                            />
+                    {/* Modern card container */}
+                    <div className="bg-[var(--color-card-bg)] rounded-2xl shadow-2xl border border-[var(--color-border)] p-8 md:p-10 transition-all duration-300 hover:shadow-3xl">
+                        {/* Header section */}
+                        <div className="text-center mb-8">
+                            <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-accent)] rounded-2xl mb-4 shadow-lg">
+                                <svg
+                                    className="w-8 h-8 text-white"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                >
+                                    <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        strokeWidth={2}
+                                        d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"
+                                    />
+                                </svg>
+                            </div>
+                            <h2 className="text-4xl md:text-5xl font-bold text-[var(--color-primary)] mb-2">
+                                Welcome Back
+                            </h2>
+                            <p className="text-[var(--color-text)]/60 text-sm">
+                                Sign in to access your account
+                            </p>
                         </div>
 
-                        {/* Password field */}
-                        <div>
-                            <label
-                                htmlFor="password"
-                                className="block text-lg font-medium text-[var(--color-text)] mb-2"
-                            >
-                                Password
-                            </label>
-                            <input
-                                id="password"
-                                name="password"
-                                type="password"
-                                autoComplete="current-password"
-                                required
-                                className="w-full px-4 py-3 border-2 border-[var(--color-text)]/30 rounded-lg bg-[var(--color-background)] text-[var(--color-text)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] focus:border-[var(--color-accent)] text-lg"
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
-                            />
-                        </div>
-
-                        {/* Forgot password link */}
-                        <div className="text-left">
-                            <Link
-                                href="/forgot-password"
-                                className="text-[var(--color-text)] hover:text-[var(--color-accent)] transition duration-150 ease-in-out"
-                            >
-                                Forgot password?
-                            </Link>
-                        </div>
-
-                        {/* Error message */}
-                        {error && (
-                            <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-lg text-sm">
-                                {error && "Invalid email or password"}
-                                {emailNotVerified && (
-                                    <div className="mt-2">
-                                        <button
-                                            onClick={resendVerificationEmail}
-                                            className="text-blue-600 underline hover:text-blue-800"
-                                        >
-                                            Отправить письмо для подтверждения
-                                            повторно
-                                        </button>
+                        {/* Form */}
+                        <form
+                            onSubmit={handleEmailPasswordSignIn}
+                            className="space-y-5"
+                        >
+                            {/* Email field with icon */}
+                            <div className="space-y-2">
+                                <label
+                                    htmlFor="email"
+                                    className="block text-sm font-medium text-[var(--color-text)]"
+                                >
+                                    Email Address
+                                </label>
+                                <div className="relative group">
+                                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <MdEmail className="h-5 w-5 text-[var(--color-text)]/40 group-focus-within:text-[var(--color-primary)]" />
                                     </div>
-                                )}
+                                    <input
+                                        id="email"
+                                        name="email"
+                                        type="email"
+                                        autoComplete="email"
+                                        required
+                                        className="w-full pl-10 pr-4 py-3 bg-[var(--color-input-bg)] border-2 border-[var(--color-input-border)] rounded-xl text-[var(--color-text)] placeholder-[var(--color-text)]/40 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:border-[var(--color-primary)] transition-all duration-200"
+                                        placeholder="you@example.com"
+                                        value={email}
+                                        onChange={(e) =>
+                                            setEmail(e.target.value)
+                                        }
+                                        disabled={isLoading}
+                                    />
+                                </div>
                             </div>
-                        )}
 
-                        {/* Verification sent message */}
-                        {verificationSent && (
-                            <div className="bg-green-50 border border-green-200 text-green-600 px-4 py-3 rounded-lg text-sm">
-                                Email для подтверждения отправлен повторно.
-                                Проверьте вашу почту.
+                            {/* Password field with icon */}
+                            <div className="space-y-2">
+                                <label
+                                    htmlFor="password"
+                                    className="block text-sm font-medium text-[var(--color-text)]"
+                                >
+                                    Password
+                                </label>
+                                <div className="relative group">
+                                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <MdLock className="h-5 w-5 text-[var(--color-text)]/40 group-focus-within:text-[var(--color-primary)]" />
+                                    </div>
+                                    <input
+                                        id="password"
+                                        name="password"
+                                        type="password"
+                                        autoComplete="current-password"
+                                        required
+                                        className="w-full pl-10 pr-4 py-3 bg-[var(--color-input-bg)] border-2 border-[var(--color-input-border)] rounded-xl text-[var(--color-text)] placeholder-[var(--color-text)]/40 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:border-[var(--color-primary)] transition-all duration-200"
+                                        placeholder="••••••••"
+                                        value={password}
+                                        onChange={(e) =>
+                                            setPassword(e.target.value)
+                                        }
+                                        disabled={isLoading}
+                                    />
+                                </div>
                             </div>
-                        )}
 
-                        {/* Login button */}
-                        <div className="pt-4">
-                            <button
-                                type="submit"
-                                className="w-full bg-[var(--color-accent)] hover:opacity-90 text-[var(--color-primary)] font-bold py-4 px-6 rounded-lg text-xl transition duration-150 ease-in-out"
-                            >
-                                LOGIN
-                            </button>
-                        </div>
+                            {/* Forgot password link */}
+                            <div className="text-right">
+                                <Link
+                                    href="/forgot-password"
+                                    className="text-sm text-[var(--color-primary)] hover:text-[var(--color-accent)] transition-colors duration-200 font-medium"
+                                >
+                                    Forgot password?
+                                </Link>
+                            </div>
 
-                        {/* Social login buttons */}
-                        <div className="space-y-3 pt-4 h-20 flex">
-                            <button
-                                type="button"
-                                onClick={handleGoogleSignIn}
-                                className="w-full flex items-center justify-center py-3 px-4 m-1 border-2 border-[var(--color-text)]/30 rounded-lg bg-[var(--color-background)] hover:bg-[var(--color-secondary)]/20 transition duration-150 ease-in-out"
-                            >
-                                <FcGoogle className="h-6 w-6 mr-3" />
-                                <span className="text-[var(--color-text)] font-medium">
-                                    Continue with Google
-                                </span>
-                            </button>
+                            {/* Error message with modern styling */}
+                            {error && (
+                                <div className="bg-[var(--color-error)]/10 border-2 border-[var(--color-error)]/30 text-[var(--color-error)] px-4 py-3 rounded-xl text-sm animate-shake">
+                                    <div className="flex items-start space-x-2">
+                                        <MdInfo className="h-5 w-5 flex-shrink-0 mt-0.5" />
+                                        <div className="flex-1">
+                                            <span>{error}</span>
+                                            {emailNotVerified && (
+                                                <div className="mt-3">
+                                                    <button
+                                                        type="button"
+                                                        onClick={
+                                                            resendVerificationEmail
+                                                        }
+                                                        className="text-[var(--color-info)] hover:text-[var(--color-info)]/80 underline font-medium transition-colors"
+                                                    >
+                                                        Resend verification
+                                                        email
+                                                    </button>
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
 
-                            <button
-                                type="button"
-                                onClick={handleAppleSignIn}
-                                className="w-full flex items-center justify-center py-3 px-4 m-1 border-2 border-[var(--color-text)]/30 rounded-lg bg-[var(--color-background)] hover:bg-[var(--color-secondary)]/20 transition duration-150 ease-in-out"
-                            >
-                                <FaApple className="h-6 w-6 mr-3 text-[var(--color-text)]" />
-                                <span className="text-[var(--color-text)] font-medium">
-                                    Continue with Apple
-                                </span>
-                            </button>
-                        </div>
+                            {/* Verification sent message */}
+                            {verificationSent && (
+                                <div className="bg-[var(--color-success)]/10 border-2 border-[var(--color-success)]/30 text-[var(--color-success)] px-4 py-3 rounded-xl text-sm animate-fadeIn">
+                                    <div className="flex items-start space-x-2">
+                                        <MdWarning className="h-5 w-5 flex-shrink-0 mt-0.5" />
+                                        <span>
+                                            Verification email sent. Please
+                                            check your inbox and spam folder.
+                                        </span>
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* Login button with loading state */}
+                            <div className="pt-2">
+                                <button
+                                    type="submit"
+                                    disabled={isLoading}
+                                    className="w-full bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-accent)] hover:from-[var(--color-primary)]/90 hover:to-[var(--color-accent)]/90 text-white font-bold py-4 px-6 rounded-xl text-lg transition-all duration-300 transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none shadow-lg hover:shadow-xl"
+                                >
+                                    {isLoading ? (
+                                        <span className="flex items-center justify-center space-x-2">
+                                            <svg
+                                                className="animate-spin h-5 w-5"
+                                                viewBox="0 0 24 24"
+                                            >
+                                                <circle
+                                                    className="opacity-25"
+                                                    cx="12"
+                                                    cy="12"
+                                                    r="10"
+                                                    stroke="currentColor"
+                                                    strokeWidth="4"
+                                                    fill="none"
+                                                />
+                                                <path
+                                                    className="opacity-75"
+                                                    fill="currentColor"
+                                                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                                                />
+                                            </svg>
+                                            <span>Signing In...</span>
+                                        </span>
+                                    ) : (
+                                        "Sign In"
+                                    )}
+                                </button>
+                            </div>
+
+                            {/* Divider */}
+                            <div className="relative py-4">
+                                <div className="absolute inset-0 flex items-center">
+                                    <div className="w-full border-t border-[var(--color-border)]"></div>
+                                </div>
+                                <div className="relative flex justify-center text-sm">
+                                    <span className="px-4 bg-[var(--color-card-bg)] text-[var(--color-text)]/60">
+                                        Or continue with
+                                    </span>
+                                </div>
+                            </div>
+
+                            {/* Social login buttons with modern design */}
+                            <div className="grid grid-cols-2 gap-3">
+                                <button
+                                    type="button"
+                                    onClick={handleGoogleSignIn}
+                                    disabled={isLoading}
+                                    className="flex items-center justify-center py-3 px-4 bg-[var(--color-input-bg)] border-2 border-[var(--color-input-border)] rounded-xl hover:border-[var(--color-primary)] hover:bg-[var(--color-primary)]/5 transition-all duration-200 transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none group"
+                                >
+                                    <FcGoogle className="h-5 w-5 mr-2 group-hover:scale-110 transition-transform" />
+                                    <span className="text-[var(--color-text)] font-medium text-sm">
+                                        Google
+                                    </span>
+                                </button>
+
+                                <button
+                                    type="button"
+                                    onClick={handleAppleSignIn}
+                                    disabled={isLoading}
+                                    className="flex items-center justify-center py-3 px-4 bg-[var(--color-input-bg)] border-2 border-[var(--color-input-border)] rounded-xl hover:border-[var(--color-primary)] hover:bg-[var(--color-primary)]/5 transition-all duration-200 transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none group"
+                                >
+                                    <FaApple className="h-5 w-5 mr-2 text-[var(--color-text)] group-hover:scale-110 transition-transform" />
+                                    <span className="text-[var(--color-text)] font-medium text-sm">
+                                        Apple
+                                    </span>
+                                </button>
+                            </div>
+                        </form>
 
                         {/* Create account link */}
-                        <div className="text-center pt-6">
-                            <Link
-                                href="/client/register"
-                                className="text-[var(--color-text)] hover:text-[var(--color-accent)] transition duration-150 ease-in-out font-medium"
-                            >
-                                Create an account
-                            </Link>
+                        <div className="text-center mt-8 pt-6 border-t border-[var(--color-border)]">
+                            <p className="text-[var(--color-text)]/70 text-sm">
+                                Don't have an account?{" "}
+                                <Link
+                                    href="/client/register"
+                                    className="text-[var(--color-primary)] hover:text-[var(--color-accent)] font-semibold transition-colors duration-200"
+                                >
+                                    Create Account
+                                </Link>
+                            </p>
                         </div>
-                    </form>
+                    </div>
+
+                    {/* Footer note */}
+                    <p className="text-center text-[var(--color-text)]/50 text-xs mt-6">
+                        Protected by industry-standard security measures
+                    </p>
                 </div>
             </div>
+
+            <style jsx>{`
+                @keyframes shake {
+                    0%,
+                    100% {
+                        transform: translateX(0);
+                    }
+                    10%,
+                    30%,
+                    50%,
+                    70%,
+                    90% {
+                        transform: translateX(-5px);
+                    }
+                    20%,
+                    40%,
+                    60%,
+                    80% {
+                        transform: translateX(5px);
+                    }
+                }
+
+                @keyframes fadeIn {
+                    from {
+                        opacity: 0;
+                        transform: translateY(-10px);
+                    }
+                    to {
+                        opacity: 1;
+                        transform: translateY(0);
+                    }
+                }
+
+                .animate-shake {
+                    animation: shake 0.5s ease-in-out;
+                }
+
+                .animate-fadeIn {
+                    animation: fadeIn 0.3s ease-out;
+                }
+            `}</style>
         </div>
     );
 }
