@@ -1,6 +1,6 @@
 // components/Header.tsx
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
@@ -15,8 +15,10 @@ import {
     FaBox,
     FaTools,
     FaInfoCircle,
+    FaGlobe,
 } from "react-icons/fa";
 import { useCart } from "../context/CartContext";
+import { useLanguage } from "../../contexts/LanguageContext";
 import { T } from "./T";
 
 export default function Header() {
@@ -28,7 +30,35 @@ export default function Header() {
     const [searchType, setSearchType] = useState<"products" | "services">(
         "products"
     );
+    const [isLanguageOpen, setIsLanguageOpen] = useState(false);
     const { getTotalItems, isAuthenticated } = useCart();
+    const { language, setLanguage } = useLanguage();
+
+    const languages = [
+        { code: "en", label: "English", flag: "🇺🇸" },
+        { code: "es", label: "Español", flag: "🇪🇸" },
+        { code: "ru", label: "Русский", flag: "🇷🇺" },
+        { code: "hy", label: "Հայերեն", flag: "🇦🇲" },
+    ];
+
+    const languageRef = useRef<HTMLDivElement>(null);
+
+    // Close language dropdown when clicking outside
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (languageRef.current && !languageRef.current.contains(event.target as Node)) {
+                setIsLanguageOpen(false);
+            }
+        };
+
+        if (isLanguageOpen) {
+            document.addEventListener("mousedown", handleClickOutside);
+        }
+
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutside);
+        };
+    }, [isLanguageOpen]);
 
     const getLinkClassName = (expectedPaths: string | string[]) => {
         const baseClasses =
@@ -206,7 +236,7 @@ export default function Header() {
                             <FaSearch className="w-5 h-5 text-white group-hover:scale-110 transition-transform" />
                         </button>
 
-                        {/* Cart */}
+                        {/* Cart or Language Selector */}
                         {isAuthenticated ? (
                             <Link
                                 href="/client/dashboard/cart"
@@ -221,17 +251,39 @@ export default function Header() {
                                 )}
                             </Link>
                         ) : (
-                            <button
-                                onClick={() =>
-                                    alert(
-                                        "Log in to your account to access your shopping cart.",
-                                    )
-                                }
-                                className="p-3 rounded-full bg-white/10 hover:bg-white/20 transition-all duration-300 relative group"
-                                aria-label="Cart"
-                            >
-                                <FaShoppingCart className="w-5 h-5 text-white/60 group-hover:text-white" />
-                            </button>
+                            <div className="relative" ref={languageRef}>
+                                <button
+                                    onClick={() => setIsLanguageOpen(!isLanguageOpen)}
+                                    className="p-3 rounded-full bg-white/10 hover:bg-white/20 transition-all duration-300 group flex items-center gap-2"
+                                    aria-label="Language"
+                                >
+                                    <FaGlobe className="w-5 h-5 text-white group-hover:scale-110 transition-transform" />
+                                    <span className="text-white text-sm font-medium hidden sm:inline">
+                                        {languages.find(l => l.code === language)?.flag}
+                                    </span>
+                                </button>
+                                {isLanguageOpen && (
+                                    <div className="absolute top-full right-0 mt-2 bg-white rounded-xl shadow-2xl border border-gray-100 overflow-hidden z-50 min-w-[160px]">
+                                        {languages.map((lang) => (
+                                            <button
+                                                key={lang.code}
+                                                onClick={() => {
+                                                    setLanguage(lang.code);
+                                                    setIsLanguageOpen(false);
+                                                }}
+                                                className={`w-full px-4 py-3 flex items-center gap-3 hover:bg-gray-50 transition-colors ${
+                                                    language === lang.code
+                                                        ? "bg-[var(--color-primary)]/10 text-[var(--color-primary)] font-semibold"
+                                                        : "text-gray-700"
+                                                }`}
+                                            >
+                                                <span className="text-lg">{lang.flag}</span>
+                                                <span>{lang.label}</span>
+                                            </button>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
                         )}
 
                         {/* User/Auth */}
@@ -250,15 +302,9 @@ export default function Header() {
                                     className="hidden sm:flex items-center gap-2 px-6 py-2.5 bg-gradient-to-r from-[var(--color-accent)] to-[var(--color-accent)]/80 text-[var(--color-primary)] font-bold rounded-xl hover:scale-105 transition-all duration-300 shadow-lg"
                                 >
                                     <FaUserCircle className="w-4 h-4" />
-                                    <T>Login</T>
+                                    <T>Sign In</T>
                                 </Link>
-                                <Link
-                                    href="/client/register"
-                                    className="hidden sm:flex items-center gap-2 px-6 py-2.5 bg-gradient-to-r from-[var(--color-accent)] to-[var(--color-accent)]/80 text-[var(--color-primary)] font-bold rounded-xl hover:scale-105 transition-all duration-300 shadow-lg"
-                                >
-                                    <FaUserCircle className="w-4 h-4" />
-                                    <T>Register</T>
-                                </Link>
+                                
                             </div>
                         )}
                     </div>
@@ -376,9 +422,36 @@ export default function Header() {
                             );
                         })}
 
+                        {/* Mobile Language Selector for non-authenticated users */}
+                        {!isAuthenticated && (
+                            <div className="border-t border-white/10 pt-4 mt-2">
+                                <p className="text-white/60 text-sm px-6 mb-2">
+                                    <T>Language</T>
+                                </p>
+                                <div className="grid grid-cols-2 gap-2 px-4">
+                                    {languages.map((lang) => (
+                                        <button
+                                            key={lang.code}
+                                            onClick={() => {
+                                                setLanguage(lang.code);
+                                            }}
+                                            className={`flex items-center gap-2 px-4 py-3 rounded-xl transition-all duration-300 ${
+                                                language === lang.code
+                                                    ? "bg-[var(--color-accent)] text-[var(--color-primary)] font-bold"
+                                                    : "bg-white/10 text-white hover:bg-white/20"
+                                            }`}
+                                        >
+                                            <span className="text-lg">{lang.flag}</span>
+                                            <span className="text-sm">{lang.label}</span>
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+
                         {/* Mobile Login Button */}
                         {!isAuthenticated && (
-                            <div>
+                            <div className="space-y-2 mt-4">
                                 <Link
                                     href="/client/sign-in"
                                     onClick={() => setIsMobileMenuOpen(false)}
@@ -386,17 +459,7 @@ export default function Header() {
                                 >
                                     <FaUserCircle className="w-5 h-5" />
                                     <span>
-                                        <T>Login</T>
-                                    </span>
-                                </Link>
-                                <Link
-                                    href="/client/register"
-                                    onClick={() => setIsMobileMenuOpen(false)}
-                                    className="flex items-center gap-4 px-6 py-4 rounded-2xl bg-gradient-to-r from-[var(--color-accent)] to-[var(--color-accent)]/80 text-[var(--color-primary)] font-bold transition-all duration-300 hover:scale-105"
-                                >
-                                    <FaUserCircle className="w-5 h-5" />
-                                    <span>
-                                        <T>Register</T>
+                                        <T>Sign In</T>
                                     </span>
                                 </Link>
                             </div>

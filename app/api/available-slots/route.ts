@@ -74,11 +74,7 @@ export async function GET(request: NextRequest) {
              * Мы используем Intl для парсинга, чтобы гарантировать, что "09:00"
              * — это именно 09:00 в часовом поясе календаря.
              */
-            const slotDate = new Date(
-                new Date(`${date}T${timeString}:00`).toLocaleString("en-US", {
-                    timeZone: calendarTimezone,
-                })
-            );
+            const slotDate = new Date(`${date}T${timeString}:00`);
 
             // Если выбран "сегодняшний" день — не показываем часы, которые уже прошли
             if (slotDate < now) continue;

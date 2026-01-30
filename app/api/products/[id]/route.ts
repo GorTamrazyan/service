@@ -44,7 +44,7 @@ export async function PUT(
     try {
         const { id } = await params;
         const body = await request.json();
-        const { name, description, price, categoryId, typeOfProductId, materialId, colorIds, featured, discount } = body;
+        const { name, description, colorPrices, categoryId, typeOfProductId, materialId, colorIds, featured, discount } = body;
 
         // Базовая валидация
         if (name !== undefined && !name) {
@@ -55,12 +55,13 @@ export async function PUT(
         }
 
         if (
-            price !== undefined &&
-            (typeof price !== "number" || price <= 0)
+            colorPrices !== undefined &&
+            (typeof colorPrices !== "object" || Array.isArray(colorPrices) ||
+            !Object.values(colorPrices).every((v) => typeof v === "number" && (v as number) > 0))
         ) {
             return NextResponse.json(
                 {
-                    message: "Цена должна быть положительным числом",
+                    message: "colorPrices должен быть объектом с положительными числами",
                 },
                 { status: 400 }
             );
@@ -79,7 +80,7 @@ export async function PUT(
         await updateProduct(id, {
             ...(name !== undefined && { name }),
             ...(description !== undefined && { description }),
-            ...(price !== undefined && { price }),
+            ...(colorPrices !== undefined && { colorPrices }),
             ...(categoryId !== undefined && { categoryId }),
             ...(typeOfProductId !== undefined && { typeOfProductId }),
             ...(materialId !== undefined && { materialId }),

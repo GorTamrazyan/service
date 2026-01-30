@@ -18,7 +18,7 @@ interface Product {
     id: string;
     name: string;
     description: string | null;
-    price: string;
+    colorPrices?: Record<string, number>;
     imageUrl: string | null;
     categorId: string | null;
     materialId?: string;
@@ -45,14 +45,20 @@ export default function ProductModal({
     const [length, setLength] = useState<number>(1);
     const { addToCart } = useCart();
     const [selectedColor, setSelectedColor] = useState<Color | null>(null);
-    const [totalPrice, setTotalPrice] = useState(Number(product.price));
     const [showNotification, setShowNotification] = useState(false);
     const [addedProductName, setAddedProductName] = useState<string>("");
 
-    useEffect(() => {
-        const newTotalPrice = height * length * Number(product.price);
-        setTotalPrice(newTotalPrice);
-    }, [height, length, product.price]);
+    const getBasePrice = (): number => {
+        const cp = product.colorPrices || {};
+        if (selectedColor?.id && cp[selectedColor.id] !== undefined) {
+            return cp[selectedColor.id];
+        }
+        const prices = Object.values(cp).filter((v) => !isNaN(v));
+        return prices.length > 0 ? prices[0] : 0;
+    };
+
+    const basePrice = getBasePrice();
+    const totalPrice = height * length * basePrice;
 
     useEffect(() => {
         if (isOpen) {
@@ -268,10 +274,7 @@ export default function ProductModal({
                                     </h1>
                                     <div className="flex items-baseline gap-4">
                                         <div className="text-4xl font-bold text-[var(--color-primary)]">
-                                            $
-                                            {parseFloat(product.price).toFixed(
-                                                2
-                                            )}
+                                            ${basePrice.toFixed(2)}
                                         </div>
                                         <span className="text-sm text-[var(--color-text)]/60">
                                             <T>per meter</T>
@@ -378,9 +381,7 @@ export default function ProductModal({
                                             </span>
                                         </div>
                                         <p className="text-sm text-[var(--color-text)]/60 mt-1">
-                                            {`${height}m × ${length}m × $${parseFloat(
-                                                product.price
-                                            ).toFixed(2)}/m`}
+                                            {`${height}m × ${length}m × $${basePrice.toFixed(2)}/m`}
                                         </p>
                                     </div>
                                 </div>

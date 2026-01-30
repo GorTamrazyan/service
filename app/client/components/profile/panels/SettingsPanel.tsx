@@ -11,7 +11,7 @@ import {
     FaEyeSlash,
     FaCog,
 } from "react-icons/fa";
-import { useTheme } from "../../../../hooks/useTheme";
+import { useTheme } from "../../../../contexts/ThemeContext";
 import { useLanguage } from "../../../../contexts/LanguageContext";
 import { T } from "../../T";
 import { auth } from "../../../../lib/firebase/firebase";
@@ -71,14 +71,12 @@ export default function SettingsPanel() {
         setPasswordSuccess("");
 
         if (passwordData.newPassword !== passwordData.confirmNewPassword) {
-            setPasswordError("Новые пароли не совпадают");
+            setPasswordError("New passwords do not match");
             return;
         }
 
         if (passwordData.newPassword.length < 6) {
-            setPasswordError(
-                "Новый пароль должен содержать минимум 6 символов"
-            );
+            setPasswordError("New password must be at least 6 characters");
             return;
         }
 
@@ -87,18 +85,18 @@ export default function SettingsPanel() {
         try {
             const user = auth.currentUser;
             if (!user || !user.email) {
-                setPasswordError("Пользователь не найден");
+                setPasswordError("User not found");
                 return;
             }
 
             const credential = EmailAuthProvider.credential(
                 user.email,
-                passwordData.currentPassword
+                passwordData.currentPassword,
             );
             await reauthenticateWithCredential(user, credential);
             await updatePassword(user, passwordData.newPassword);
 
-            setPasswordSuccess("Пароль успешно изменен!");
+            setPasswordSuccess("Password successfully changed!");
             setPasswordData({
                 currentPassword: "",
                 newPassword: "",
@@ -110,13 +108,13 @@ export default function SettingsPanel() {
                 setPasswordSuccess("");
             }, 2000);
         } catch (error: any) {
-            console.error("Ошибка при изменении пароля:", error);
+            console.error("Error changing password:", error);
             if (error.code === "auth/wrong-password") {
-                setPasswordError("Неверный текущий пароль");
+                setPasswordError("Incorrect current password");
             } else if (error.code === "auth/weak-password") {
-                setPasswordError("Слишком слабый пароль");
+                setPasswordError("Password is too weak");
             } else {
-                setPasswordError("Произошла ошибка при изменении пароля");
+                setPasswordError("An error occurred while changing password");
             }
         } finally {
             setIsChangingPassword(false);
@@ -135,7 +133,7 @@ export default function SettingsPanel() {
         setDeleteError("");
 
         if (!deleteConfirmPassword) {
-            setDeleteError("Введите ваш пароль для подтверждения");
+            setDeleteError("Please enter your password to confirm");
             return;
         }
 
@@ -144,35 +142,35 @@ export default function SettingsPanel() {
         try {
             const user = auth.currentUser;
             if (!user || !user.email) {
-                setDeleteError("Пользователь не найден");
+                setDeleteError("User not found");
                 return;
             }
 
             const credential = EmailAuthProvider.credential(
                 user.email,
-                deleteConfirmPassword
+                deleteConfirmPassword,
             );
             await reauthenticateWithCredential(user, credential);
 
             try {
                 await deleteDoc(doc(db, "users", user.uid));
-                console.log("Профиль пользователя удален из Firestore");
+                console.log("User profile deleted from Firestore");
             } catch (firestoreError) {
                 console.warn(
-                    "Ошибка при удалении профиля из Firestore:",
-                    firestoreError
+                    "Error deleting profile from Firestore:",
+                    firestoreError,
                 );
             }
 
             await deleteUser(user);
-            console.log("Аккаунт успешно удален");
+            console.log("Account successfully deleted");
             router.push("/");
         } catch (error: any) {
-            console.error("Ошибка при удалении аккаунта:", error);
+            console.error("Error deleting account:", error);
             if (error.code === "auth/wrong-password") {
-                setDeleteError("Неверный пароль");
+                setDeleteError("Incorrect password");
             } else {
-                setDeleteError("Произошла ошибка при удалении аккаунта");
+                setDeleteError("An error occurred while deleting account");
             }
         } finally {
             setIsDeletingAccount(false);
@@ -258,8 +256,8 @@ export default function SettingsPanel() {
                                     {lang === "en"
                                         ? "English"
                                         : lang === "ru"
-                                        ? "Русский"
-                                        : "Հայերեն"}
+                                          ? "Русский"
+                                          : "Հայերեն"}
                                 </button>
                             ))}
                         </div>
@@ -467,14 +465,14 @@ export default function SettingsPanel() {
                                                         e.target.value,
                                                 }))
                                             }
-                                            className="w-full px-4 py-3 border border-[var(--color-text)]/30 rounded-xl focus:ring-2 focus:ring-[var(--color-accent)] focus:border-[var(--color-accent)]"
+                                            className="w-full px-4 py-3 border border-[var(--color-text)]/30 rounded-xl focus:ring-2 focus:ring-[var(--color-accent)] focus:border-[var(--color-accent)] bg-[var(--color-input-bg)] text-[var(--color-text)]"
                                             required
                                         />
                                         <button
                                             type="button"
                                             onClick={() =>
                                                 togglePasswordVisibility(
-                                                    "current"
+                                                    "current",
                                                 )
                                             }
                                             className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--color-text)]/40 hover:text-[var(--color-text)]/70"
@@ -507,7 +505,7 @@ export default function SettingsPanel() {
                                                     newPassword: e.target.value,
                                                 }))
                                             }
-                                            className="w-full px-4 py-3 border border-[var(--color-text)]/30 rounded-xl focus:ring-2 focus:ring-[var(--color-accent)] focus:border-[var(--color-accent)]"
+                                            className="w-full px-4 py-3 border border-[var(--color-text)]/30 rounded-xl focus:ring-2 focus:ring-[var(--color-accent)] focus:border-[var(--color-accent)] bg-[var(--color-input-bg)] text-[var(--color-text)]"
                                             required
                                         />
                                         <button
@@ -548,14 +546,14 @@ export default function SettingsPanel() {
                                                         e.target.value,
                                                 }))
                                             }
-                                            className="w-full px-4 py-3 border border-[var(--color-text)]/30 rounded-xl focus:ring-2 focus:ring-[var(--color-accent)] focus:border-[var(--color-accent)]"
+                                            className="w-full px-4 py-3 border border-[var(--color-text)]/30 rounded-xl focus:ring-2 focus:ring-[var(--color-accent)] focus:border-[var(--color-accent)] bg-[var(--color-input-bg)] text-[var(--color-text)]"
                                             required
                                         />
                                         <button
                                             type="button"
                                             onClick={() =>
                                                 togglePasswordVisibility(
-                                                    "confirm"
+                                                    "confirm",
                                                 )
                                             }
                                             className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--color-text)]/40 hover:text-[var(--color-text)]/70"
@@ -572,12 +570,12 @@ export default function SettingsPanel() {
                                 {/* Error/Success Messages */}
                                 {passwordError && (
                                     <div className="bg-red-500/10 border border-red-500/30 text-red-600 px-4 py-3 rounded-xl text-sm">
-                                        {passwordError}
+                                        <T>{passwordError}</T>
                                     </div>
                                 )}
                                 {passwordSuccess && (
                                     <div className="bg-green-500/10 border border-green-500/30 text-green-600 px-4 py-3 rounded-xl text-sm">
-                                        {passwordSuccess}
+                                        <T>{passwordSuccess}</T>
                                     </div>
                                 )}
 
@@ -605,7 +603,7 @@ export default function SettingsPanel() {
                                         className="flex-1 px-4 py-3 bg-gradient-to-r from-[var(--color-accent)] to-[var(--color-primary)] text-white rounded-xl hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed font-bold shadow-lg"
                                     >
                                         {isChangingPassword ? (
-                                            "Изменяется..."
+                                            <T>Changing...</T>
                                         ) : (
                                             <T>Change Password</T>
                                         )}
@@ -697,18 +695,18 @@ export default function SettingsPanel() {
                                             value={deleteConfirmPassword}
                                             onChange={(e) =>
                                                 setDeleteConfirmPassword(
-                                                    e.target.value
+                                                    e.target.value,
                                                 )
                                             }
-                                            className="w-full px-4 py-3 border border-red-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-red-500"
-                                            placeholder="Введите ваш пароль"
+                                            className="w-full px-4 py-3 border border-red-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-red-500 bg-[var(--color-input-bg)] text-[var(--color-text)]"
+                                            placeholder="Enter your password"
                                             required
                                         />
                                         <button
                                             type="button"
                                             onClick={() =>
                                                 setShowDeletePassword(
-                                                    !showDeletePassword
+                                                    !showDeletePassword,
                                                 )
                                             }
                                             className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--color-text)]/40 hover:text-[var(--color-text)]/70"
@@ -725,7 +723,7 @@ export default function SettingsPanel() {
                                 {/* Error Message */}
                                 {deleteError && (
                                     <div className="bg-red-500/10 border border-red-500/30 text-red-600 px-4 py-3 rounded-xl text-sm">
-                                        {deleteError}
+                                        <T>{deleteError}</T>
                                     </div>
                                 )}
 
@@ -748,7 +746,7 @@ export default function SettingsPanel() {
                                         className="flex-1 px-4 py-3 bg-gradient-to-r from-red-600 to-red-700 text-white rounded-xl hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed font-bold shadow-lg"
                                     >
                                         {isDeletingAccount ? (
-                                            "Удаляется..."
+                                            <T>Deleting...</T>
                                         ) : (
                                             <T>Delete Account</T>
                                         )}

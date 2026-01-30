@@ -117,10 +117,18 @@ export const deleteProjectImage = async (imageUrl: string): Promise<void> => {
     try {
         // Извлекаем public_id из URL Cloudinary
         const urlParts = imageUrl.split("/");
-        const folderAndFile = urlParts.slice(-2).join("/"); // before-after/filename
-        const publicId = folderAndFile.replace(/\.[^/.]+$/, ""); // убираем расширение
+        const uploadIndex = urlParts.indexOf("upload");
+        if (uploadIndex === -1) return;
 
-        await cloudinary.uploader.destroy(publicId);
+        let parts = urlParts.slice(uploadIndex + 1);
+        // Пропускаем версию (v1234567890)
+        if (parts[0] && /^v\d+$/.test(parts[0])) {
+            parts = parts.slice(1);
+        }
+        const publicId = parts.join("/").replace(/\.[^/.]+$/, "");
+
+        const result = await cloudinary.uploader.destroy(publicId);
+        console.log("Cloudinary delete result:", publicId, result);
     } catch (error) {
         console.error("Error deleting image:", error);
         // Не бросаем ошибку, так как файл может уже не существовать

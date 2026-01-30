@@ -67,9 +67,12 @@ export const deleteProductImage = async (imageUrl: string): Promise<void> => {
       throw new Error("Invalid Cloudinary URL");
     }
 
-    // Get everything after 'upload/' and remove the file extension
-    const publicIdWithExt = urlParts.slice(uploadIndex + 1).join("/");
-    const publicId = publicIdWithExt.replace(/\.[^/.]+$/, "");
+    // Skip version (e.g. "v1234567890") and get public_id without extension
+    let parts = urlParts.slice(uploadIndex + 1);
+    if (parts[0] && /^v\d+$/.test(parts[0])) {
+      parts = parts.slice(1);
+    }
+    const publicId = parts.join("/").replace(/\.[^/.]+$/, "");
 
     const response = await fetch("/api/upload", {
       method: "DELETE",

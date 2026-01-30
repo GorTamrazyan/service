@@ -75,22 +75,24 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
     try {
         const body = await request.json();
-        const { name, description, price, categoryId, typeOfProductId, materialId, colorIds, featured, discount } = body;
+        const { name, description, colorPrices, categoryId, typeOfProductId, materialId, colorIds, featured, discount } = body;
 
         // Базовая валидация входных данных
-        if (!name || !price) {
+        if (!name || !colorPrices) {
             return NextResponse.json(
-                { message: "Имя и цена продукта обязательны" },
+                { message: "Имя и цены продукта обязательны" },
                 { status: 400 }
             );
         }
 
         if (
-            typeof price !== "number" || price <= 0
+            typeof colorPrices !== "object" || Array.isArray(colorPrices) ||
+            Object.keys(colorPrices).length === 0 ||
+            !Object.values(colorPrices).every((v) => typeof v === "number" && (v as number) > 0)
         ) {
             return NextResponse.json(
                 {
-                    message: "Цена должна быть положительным числом",
+                    message: "colorPrices должен быть объектом с положительными числами",
                 },
                 { status: 400 }
             );
@@ -100,7 +102,7 @@ export async function POST(request: Request) {
         const newProductId = await createProduct({
             name,
             description: description || undefined,
-            price,
+            colorPrices,
             categoryId: categoryId || undefined,
             typeOfProductId: typeOfProductId || undefined,
             materialId: materialId || undefined,

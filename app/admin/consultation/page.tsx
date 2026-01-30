@@ -192,14 +192,14 @@ export default function AdminCalendarView() {
     return (
         <div className="w-full space-y-6">
             {/* Панель управления админа */}
-            <div className="bg-white rounded-xl shadow-lg p-6">
+            <div className="bg-[var(--color-card-bg)] rounded-xl shadow-lg p-6">
                 <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-6">
                     <div>
-                        <h1 className="text-2xl font-bold text-gray-800 flex items-center">
-                            <FaCalendarAlt className="text-blue-600 mr-3" />
+                        <h1 className="text-2xl font-bold text-[var(--color-text)] flex items-center">
+                            <FaCalendarAlt className="text-[var(--color-accent)] mr-3" />
                             Consultation Calendar - Admin View
                         </h1>
-                        <p className="text-gray-600 mt-1">
+                        <p className="text-[var(--color-text)]/60 mt-1">
                             View and manage all scheduled consultations
                         </p>
                     </div>
@@ -207,21 +207,21 @@ export default function AdminCalendarView() {
                     <div className="flex flex-wrap gap-3">
                         <button
                             onClick={refreshCalendar}
-                            className="flex items-center px-4 py-2 bg-blue-50 text-blue-700 rounded-lg hover:bg-blue-100 transition-colors"
+                            className="flex items-center px-4 py-2 bg-[var(--color-accent)]/10 text-[var(--color-accent)] rounded-lg hover:bg-[var(--color-accent)]/20 transition-colors"
                         >
                             <FaSync className="mr-2" />
                             Refresh
                         </button>
                         <button
                             onClick={exportAppointments}
-                            className="flex items-center px-4 py-2 bg-green-50 text-green-700 rounded-lg hover:bg-green-100 transition-colors"
+                            className="flex items-center px-4 py-2 bg-green-500/10 text-green-500 rounded-lg hover:bg-green-500/20 transition-colors"
                         >
                             <FaDownload className="mr-2" />
                             Export CSV
                         </button>
                         <button
                             onClick={() => window.print()}
-                            className="flex items-center px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+                            className="flex items-center px-4 py-2 bg-[var(--color-secondary)]/50 text-[var(--color-text)]/70 rounded-lg hover:bg-[var(--color-secondary)] transition-colors"
                         >
                             <FaPrint className="mr-2" />
                             Print
@@ -232,15 +232,15 @@ export default function AdminCalendarView() {
                 {/* Переключатель вида календаря */}
                 <div className="flex flex-wrap gap-4 mb-6">
                     <div className="flex items-center space-x-2">
-                        <span className="text-gray-700 font-medium">View:</span>
+                        <span className="text-[var(--color-text)]/70 font-medium">View:</span>
                         {(["week", "month", "day"] as const).map((mode) => (
                             <button
                                 key={mode}
                                 onClick={() => setViewMode(mode)}
                                 className={`px-4 py-2 rounded-lg transition-colors ${
                                     viewMode === mode
-                                        ? "bg-blue-600 text-white"
-                                        : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                                        ? "bg-[var(--color-accent)] text-white"
+                                        : "bg-[var(--color-secondary)]/50 text-[var(--color-text)]/70 hover:bg-[var(--color-secondary)]"
                                 }`}
                             >
                                 {mode.charAt(0).toUpperCase() + mode.slice(1)}
@@ -249,13 +249,13 @@ export default function AdminCalendarView() {
                     </div>
 
                     <div className="flex items-center space-x-2">
-                        <span className="text-gray-700 font-medium">Show:</span>
+                        <span className="text-[var(--color-text)]/70 font-medium">Show:</span>
                         <button
                             onClick={() => setShowDetails(!showDetails)}
                             className={`px-4 py-2 rounded-lg transition-colors flex items-center ${
                                 showDetails
                                     ? "bg-purple-600 text-white"
-                                    : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                                    : "bg-[var(--color-secondary)]/50 text-[var(--color-text)]/70 hover:bg-[var(--color-secondary)]"
                             }`}
                         >
                             {showDetails ? (
@@ -276,7 +276,7 @@ export default function AdminCalendarView() {
                 {/* Основной календарь */}
                 <div className="mb-8">
                     <div className="flex items-center justify-between mb-4">
-                        <h2 className="text-lg font-semibold text-gray-800">
+                        <h2 className="text-lg font-semibold text-[var(--color-text)]">
                             Google Calendar
                         </h2>
                         <div className="flex gap-2">
@@ -284,14 +284,14 @@ export default function AdminCalendarView() {
                                 href="https://calendar.google.com"
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="text-sm text-blue-600 hover:text-blue-800 flex items-center"
+                                className="text-sm text-[var(--color-accent)] hover:text-[var(--color-accent)]/80 flex items-center"
                             >
                                 Open in Google Calendar
                             </a>
-                            <span className="text-gray-400">|</span>
+                            <span className="text-[var(--color-text)]/30">|</span>
                             <button
                                 onClick={refreshCalendar}
-                                className="text-sm text-gray-600 hover:text-gray-800 flex items-center"
+                                className="text-sm text-[var(--color-text)]/60 hover:text-[var(--color-text)] flex items-center"
                             >
                                 <FaSync className="mr-1" size={12} />
                                 Refresh
@@ -299,31 +299,30 @@ export default function AdminCalendarView() {
                         </div>
                     </div>
 
-                    <div className="border-2 border-gray-300 rounded-xl overflow-hidden shadow-sm">
-                        <div className="bg-gray-50 px-4 py-3 border-b border-gray-300 flex items-center justify-between">
+                    <div className="border-2 border-[var(--color-text)]/20 rounded-xl overflow-hidden shadow-sm">
+                        <div className="bg-[var(--color-secondary)]/30 px-4 py-3 border-b border-[var(--color-text)]/20 flex items-center justify-between">
                             <div className="flex items-center">
-                                <FaCalendarAlt className="text-blue-600 mr-2" />
-                                <span className="font-medium text-gray-700">
+                                <FaCalendarAlt className="text-[var(--color-accent)] mr-2" />
+                                <span className="font-medium text-[var(--color-text)]/70">
                                     Calendar View ({viewMode})
                                 </span>
                             </div>
-                            <span className="text-sm text-gray-500">
+                            <span className="text-sm text-[var(--color-text)]/50">
                                 {new Date().toLocaleDateString()}
                             </span>
                         </div>
 
                         {isLoading ? (
-                            <div className="flex items-center justify-center h-[600px] bg-gray-50">
+                            <div className="flex items-center justify-center h-[600px] bg-[var(--color-secondary)]/20">
                                 <div className="text-center">
-                                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-                                    <p className="text-gray-600">
+                                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[var(--color-accent)] mx-auto mb-4"></div>
+                                    <p className="text-[var(--color-text)]/60">
                                         Loading calendar...
                                     </p>
                                 </div>
                             </div>
                         ) : (
                             <div className="relative h-[600px]">
-                                {/* Альтернатива 1: Используйте embed URL */}
                                 <iframe
                                     src={getCalendarEmbedUrl()}
                                     className="w-full h-full border-0"
@@ -333,18 +332,17 @@ export default function AdminCalendarView() {
                                     scrolling="no"
                                 />
 
-                                {/* Альтернатива 2: Если iframe не работает, покажите инструкцию */}
-                                <div className="absolute inset-0 flex items-center justify-center bg-white bg-opacity-90 hidden">
+                                <div className="absolute inset-0 flex items-center justify-center bg-[var(--color-background)] bg-opacity-90 hidden">
                                     <div className="text-center p-8 max-w-md">
-                                        <FaCalendarAlt className="text-4xl text-blue-500 mx-auto mb-4" />
-                                        <h3 className="text-xl font-bold mb-2">
+                                        <FaCalendarAlt className="text-4xl text-[var(--color-accent)] mx-auto mb-4" />
+                                        <h3 className="text-xl font-bold text-[var(--color-text)] mb-2">
                                             Calendar Setup Required
                                         </h3>
-                                        <p className="text-gray-600 mb-4">
+                                        <p className="text-[var(--color-text)]/60 mb-4">
                                             To display the calendar, you need
                                             to:
                                         </p>
-                                        <ol className="text-left text-sm text-gray-600 mb-6 space-y-2">
+                                        <ol className="text-left text-sm text-[var(--color-text)]/60 mb-6 space-y-2">
                                             <li>
                                                 1. Open Google Calendar settings
                                             </li>
@@ -361,7 +359,7 @@ export default function AdminCalendarView() {
                                             href="https://support.google.com/calendar/answer/37648"
                                             target="_blank"
                                             rel="noopener noreferrer"
-                                            className="text-blue-600 hover:text-blue-800 underline"
+                                            className="text-[var(--color-accent)] hover:text-[var(--color-accent)]/80 underline"
                                         >
                                             View setup instructions
                                         </a>
@@ -375,8 +373,8 @@ export default function AdminCalendarView() {
                 {/* Список предстоящих консультаций */}
                 {showDetails && (
                     <div>
-                        <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center">
-                            <FaClock className="text-blue-600 mr-2" />
+                        <h3 className="text-lg font-semibold text-[var(--color-text)] mb-4 flex items-center">
+                            <FaClock className="text-[var(--color-accent)] mr-2" />
                             Upcoming Appointments ({appointments.length})
                         </h3>
 
@@ -384,11 +382,11 @@ export default function AdminCalendarView() {
                             {appointments.map((appointment) => (
                                 <div
                                     key={appointment.id}
-                                    className="bg-white border border-gray-200 rounded-xl p-4 hover:shadow-md transition-shadow"
+                                    className="bg-[var(--color-card-bg)] border border-[var(--color-text)]/10 rounded-xl p-4 hover:shadow-md transition-shadow"
                                 >
                                     <div className="flex items-start justify-between mb-3">
                                         <div>
-                                            <h4 className="font-bold text-gray-800">
+                                            <h4 className="font-bold text-[var(--color-text)]">
                                                 {appointment.clientName}
                                             </h4>
                                             <div className="flex items-center mt-1">
@@ -396,24 +394,24 @@ export default function AdminCalendarView() {
                                                     className={`px-2 py-1 rounded-full text-xs ${
                                                         appointment.status ===
                                                         "confirmed"
-                                                            ? "bg-green-100 text-green-800"
-                                                            : "bg-yellow-100 text-yellow-800"
+                                                            ? "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400"
+                                                            : "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400"
                                                     }`}
                                                 >
                                                     {appointment.status}
                                                 </span>
-                                                <span className="ml-2 text-sm text-gray-600">
+                                                <span className="ml-2 text-sm text-[var(--color-text)]/60">
                                                     {appointment.type}
                                                 </span>
                                             </div>
                                         </div>
                                         <div className="text-right">
-                                            <span className="text-sm text-gray-500 block">
+                                            <span className="text-sm text-[var(--color-text)]/50 block">
                                                 {new Date(
                                                     appointment.date
                                                 ).toLocaleDateString()}
                                             </span>
-                                            <span className="text-sm text-gray-500">
+                                            <span className="text-sm text-[var(--color-text)]/50">
                                                 {new Date(
                                                     appointment.date
                                                 ).toLocaleTimeString([], {
@@ -424,7 +422,7 @@ export default function AdminCalendarView() {
                                         </div>
                                     </div>
 
-                                    <div className="space-y-2 text-sm text-gray-600">
+                                    <div className="space-y-2 text-sm text-[var(--color-text)]/60">
                                         <div className="flex items-center">
                                             <FaEnvelope className="w-3 h-3 mr-2 text-blue-500" />
                                             <span>{appointment.email}</span>
@@ -442,27 +440,27 @@ export default function AdminCalendarView() {
                                     </div>
 
                                     {appointment.notes && (
-                                        <div className="mt-3 pt-3 border-t border-gray-100">
-                                            <p className="text-sm text-gray-700">
+                                        <div className="mt-3 pt-3 border-t border-[var(--color-text)]/10">
+                                            <p className="text-sm text-[var(--color-text)]/70">
                                                 {appointment.notes}
                                             </p>
                                         </div>
                                     )}
 
-                                    <div className="mt-4 pt-3 border-t border-gray-100 flex justify-between">
+                                    <div className="mt-4 pt-3 border-t border-[var(--color-text)]/10 flex justify-between">
                                         {appointment.htmlLink && (
                                             <a
                                                 href={appointment.htmlLink}
                                                 target="_blank"
                                                 rel="noopener noreferrer"
-                                                className="text-sm text-blue-600 hover:text-blue-800 px-3 py-1 rounded hover:bg-blue-50"
+                                                className="text-sm text-[var(--color-accent)] hover:text-[var(--color-accent)]/80 px-3 py-1 rounded hover:bg-[var(--color-accent)]/10"
                                             >
                                                 View Details
                                             </a>
                                         )}
                                         <button
                                             onClick={() => handleCancelAppointment(appointment.id, appointment.clientName)}
-                                            className="text-sm text-red-600 hover:text-red-800 px-3 py-1 rounded hover:bg-red-50 transition-colors"
+                                            className="text-sm text-red-500 hover:text-red-400 px-3 py-1 rounded hover:bg-red-500/10 transition-colors"
                                         >
                                             Cancel
                                         </button>
@@ -476,12 +474,12 @@ export default function AdminCalendarView() {
 
             {/* Ошибка загрузки */}
             {error && (
-                <div className="bg-red-50 border border-red-200 rounded-xl p-4 mb-6">
+                <div className="bg-red-500/10 border border-red-500/30 rounded-xl p-4 mb-6">
                     <div className="flex items-center">
-                        <div className="text-red-600 mr-3">⚠️</div>
+                        <div className="text-red-500 mr-3">⚠️</div>
                         <div>
-                            <h3 className="font-semibold text-red-800">Error Loading Calendar</h3>
-                            <p className="text-sm text-red-700">{error}</p>
+                            <h3 className="font-semibold text-red-500">Error Loading Calendar</h3>
+                            <p className="text-sm text-red-400">{error}</p>
                         </div>
                     </div>
                 </div>
@@ -489,31 +487,31 @@ export default function AdminCalendarView() {
 
             {/* Статистика */}
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <div className="bg-white rounded-xl p-4 shadow">
-                    <div className="text-2xl font-bold text-blue-600">
+                <div className="bg-[var(--color-card-bg)] rounded-xl p-4 shadow">
+                    <div className="text-2xl font-bold text-[var(--color-accent)]">
                         {appointments.length}
                     </div>
-                    <div className="text-sm text-gray-600">
+                    <div className="text-sm text-[var(--color-text)]/60">
                         Total Appointments
                     </div>
                 </div>
-                <div className="bg-white rounded-xl p-4 shadow">
-                    <div className="text-2xl font-bold text-green-600">
+                <div className="bg-[var(--color-card-bg)] rounded-xl p-4 shadow">
+                    <div className="text-2xl font-bold text-green-500">
                         {appointments.filter(a => a.status === "confirmed").length}
                     </div>
-                    <div className="text-sm text-gray-600">Confirmed</div>
+                    <div className="text-sm text-[var(--color-text)]/60">Confirmed</div>
                 </div>
-                <div className="bg-white rounded-xl p-4 shadow">
-                    <div className="text-2xl font-bold text-yellow-600">
+                <div className="bg-[var(--color-card-bg)] rounded-xl p-4 shadow">
+                    <div className="text-2xl font-bold text-yellow-500">
                         {appointments.filter(a => a.status === "pending").length}
                     </div>
-                    <div className="text-sm text-gray-600">Pending</div>
+                    <div className="text-sm text-[var(--color-text)]/60">Pending</div>
                 </div>
-                <div className="bg-white rounded-xl p-4 shadow">
-                    <div className="text-2xl font-bold text-red-600">
+                <div className="bg-[var(--color-card-bg)] rounded-xl p-4 shadow">
+                    <div className="text-2xl font-bold text-red-500">
                         {appointments.filter(a => a.status === "cancelled").length}
                     </div>
-                    <div className="text-sm text-gray-600">Cancelled</div>
+                    <div className="text-sm text-[var(--color-text)]/60">Cancelled</div>
                 </div>
             </div>
         </div>

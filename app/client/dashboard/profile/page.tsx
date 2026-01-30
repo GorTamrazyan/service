@@ -145,7 +145,7 @@ function ProfilePageContent() {
     const handleLogout = async () => {
         try {
             await auth.signOut();
-            router.push("/");
+            router.push("/client/dashboard/home");
         } catch (err: any) {
             setError("Error logging out: " + err.message);
             console.error(err);
@@ -233,7 +233,7 @@ function ProfilePageContent() {
     return (
         <div className="min-h-screen bg-[var(--color-background)] text-[var(--color-text)]">
             {/* Header */}
-            <header className="bg-gradient-to-r from-[var(--color-primary)] via-[var(--color-primary)]/90 to-[var(--color-accent)]/30 py-6 px-4 sm:px-6 lg:px-8">
+            <header className="bg-gradient-to-r from-[var(--color-primary)] via-[var(--color-primary)]/90 to-[var(--color-accent)]/90 py-6 px-4 sm:px-6 lg:px-8">
                 <div className="max-w-7xl mx-auto">
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                         <div>
@@ -246,13 +246,6 @@ function ProfilePageContent() {
                                 </T>
                             </p>
                         </div>
-                        <button
-                            onClick={handleLogout}
-                            className="group inline-flex items-center gap-2 border-2 border-white/30 hover:border-white text-white hover:bg-[var(--color-secondary)]/10 font-bold py-3 px-6 rounded-full transition-all duration-200 backdrop-blur-sm"
-                        >
-                            <FaSignOutAlt className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
-                            <T>Sign Out</T>
-                        </button>
                     </div>
                 </div>
             </header>

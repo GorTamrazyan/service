@@ -65,7 +65,7 @@ export default function AdminProductsPage() {
     const [newProduct, setNewProduct] = useState({
         name: "",
         description: "",
-        price: 0,
+        colorPrices: {} as Record<string, number>,
         categoryId: "",
         typeOfProductId: "",
         materialId: "",
@@ -79,7 +79,7 @@ export default function AdminProductsPage() {
     const [editProduct, setEditProduct] = useState({
         name: "",
         description: "",
-        price: 0,
+        colorPrices: {} as Record<string, number>,
         categoryId: "",
         typeOfProductId: "",
         materialId: "",
@@ -155,7 +155,7 @@ export default function AdminProductsPage() {
             const productId = await createProduct({
                 name: newProduct.name,
                 description: newProduct.description,
-                price: newProduct.price,
+                colorPrices: newProduct.colorPrices,
                 categoryId: newProduct.categoryId,
                 typeOfProductId: newProduct.typeOfProductId,
                 materialId: newProduct.materialId,
@@ -186,7 +186,7 @@ export default function AdminProductsPage() {
             setNewProduct({
                 name: "",
                 description: "",
-                price: 0,
+                colorPrices: {},
                 categoryId: "",
                 typeOfProductId: "",
                 materialId: "",
@@ -213,6 +213,14 @@ export default function AdminProductsPage() {
     ) => {
         if (confirm(`Are you sure you want to delete "${productName}"?`)) {
             try {
+                // Удаляем картинки из Cloudinary и Firestore
+                const images = await getImagesByProductId(productId);
+                for (const image of images) {
+                    await deleteProductImage(image.url);
+                    if (image.id) {
+                        await deleteImage(image.id);
+                    }
+                }
                 await deleteProduct(productId);
                 loadProducts();
             } catch (error) {
@@ -231,7 +239,7 @@ export default function AdminProductsPage() {
         setEditProduct({
             name: product.name,
             description: product.description || "",
-            price: product.price,
+            colorPrices: product.colorPrices || {},
             categoryId: product.categoryId || "",
             typeOfProductId: product.typeOfProductId || "",
             materialId: product.materialId || "",
@@ -285,7 +293,7 @@ export default function AdminProductsPage() {
             await updateProduct(editingProduct.id, {
                 name: editProduct.name,
                 description: editProduct.description,
-                price: editProduct.price,
+                colorPrices: editProduct.colorPrices,
                 categoryId: editProduct.categoryId,
                 typeOfProductId: editProduct.typeOfProductId,
                 materialId: editProduct.materialId,
@@ -516,7 +524,15 @@ export default function AdminProductsPage() {
                                             </td>
                                             <td className="p-6">
                                                 <span className="font-semibold text-[var(--color-primary)]">
-                                                    ${product.price}
+                                                    {(() => {
+                                                        const cp = product.colorPrices;
+                                                        if (!cp || typeof cp !== "object") return "-";
+                                                        const prices = Object.values(cp).map(Number).filter((v) => !isNaN(v));
+                                                        if (prices.length === 0) return "-";
+                                                        const min = Math.min(...prices);
+                                                        const max = Math.max(...prices);
+                                                        return min === max ? `$${min}` : `$${min} - $${max}`;
+                                                    })()}
                                                 </span>
                                             </td>
                                             <td className="p-6">
@@ -617,25 +633,6 @@ export default function AdminProductsPage() {
 
                             <div>
                                 <label className="block text-sm font-medium text-[var(--color-text)] mb-2">
-                                    <T>Price</T>
-                                </label>
-                                <input
-                                    type="number"
-                                    value={newProduct.price}
-                                    onChange={(e) =>
-                                        setNewProduct((prev) => ({
-                                            ...prev,
-                                            price: parseFloat(e.target.value),
-                                        }))
-                                    }
-                                    min={0}
-                                    className="w-full px-4 py-2 border border-[var(--color-text)]/30 rounded-xl bg-[var(--color-background)] text-[var(--color-text)] focus:ring-2 focus:ring-[var(--color-accent)] focus:border-[var(--color-accent)]"
-                                    required
-                                />
-                            </div>
-
-                            <div>
-                                <label className="block text-sm font-medium text-[var(--color-text)] mb-2">
                                     <T>Category</T>
                                 </label>
                                 <select
@@ -711,56 +708,58 @@ export default function AdminProductsPage() {
 
                             <div>
                                 <label className="block text-sm font-medium text-[var(--color-text)] mb-2">
-                                    <T>Colors</T>
+                                    <T>Colors & Prices</T>
                                 </label>
-                                <div className="grid grid-cols-3 gap-2">
-                                    {colors.map((color) => (
-                                        <label
-                                            key={color.id}
-                                            className={`flex items-center gap-2 p-2 border rounded-lg cursor-pointer transition-all ${
-                                                newProduct.colorIds.includes(
-                                                    color.id!
-                                                )
+                                <div className="grid grid-cols-2 gap-2">
+                                    {colors.map((color) => {
+                                        const colorId = color.id!;
+                                        const isSelected = newProduct.colorIds.includes(colorId);
+                                        return (
+                                            <div key={colorId} className={`p-2 border rounded-lg transition-all ${
+                                                isSelected
                                                     ? "border-[var(--color-accent)] bg-[var(--color-accent)]/10"
                                                     : "border-[var(--color-text)]/30 hover:border-[var(--color-accent)]/50"
-                                            }`}
-                                        >
-                                            <input
-                                                type="checkbox"
-                                                checked={newProduct.colorIds.includes(
-                                                    color.id!
+                                            }`}>
+                                                <label className="flex items-center gap-2 cursor-pointer">
+                                                    <input
+                                                        type="checkbox"
+                                                        checked={isSelected}
+                                                        onChange={(e) => {
+                                                            setNewProduct((prev) => {
+                                                                const newColorPrices = { ...prev.colorPrices };
+                                                                if (e.target.checked) {
+                                                                    newColorPrices[colorId] = 0;
+                                                                    return { ...prev, colorIds: [...prev.colorIds, colorId], colorPrices: newColorPrices };
+                                                                } else {
+                                                                    delete newColorPrices[colorId];
+                                                                    return { ...prev, colorIds: prev.colorIds.filter((id) => id !== colorId), colorPrices: newColorPrices };
+                                                                }
+                                                            });
+                                                        }}
+                                                        className="sr-only"
+                                                    />
+                                                    <div
+                                                        className="w-6 h-6 rounded border-2 border-[var(--color-text)]/20 flex-shrink-0"
+                                                        style={{ backgroundColor: color.hexCode }}
+                                                    />
+                                                    <span className="text-sm text-[var(--color-text)] truncate">{color.name}</span>
+                                                </label>
+                                                {isSelected && (
+                                                    <input
+                                                        type="number"
+                                                        placeholder="Price"
+                                                        value={newProduct.colorPrices[colorId] || ""}
+                                                        onChange={(e) => setNewProduct((prev) => ({
+                                                            ...prev,
+                                                            colorPrices: { ...prev.colorPrices, [colorId]: parseFloat(e.target.value) || 0 },
+                                                        }))}
+                                                        min={0}
+                                                        className="mt-2 w-full px-3 py-1 text-sm border border-[var(--color-text)]/30 rounded-lg bg-[var(--color-background)] text-[var(--color-text)] focus:ring-2 focus:ring-[var(--color-accent)]"
+                                                    />
                                                 )}
-                                                onChange={(e) => {
-                                                    const colorId = color.id!;
-                                                    setNewProduct((prev) => ({
-                                                        ...prev,
-                                                        colorIds: e.target
-                                                            .checked
-                                                            ? [
-                                                                  ...prev.colorIds,
-                                                                  colorId,
-                                                              ]
-                                                            : prev.colorIds.filter(
-                                                                  (id) =>
-                                                                      id !==
-                                                                      colorId
-                                                              ),
-                                                    }));
-                                                }}
-                                                className="sr-only"
-                                            />
-                                            <div
-                                                className="w-6 h-6 rounded border-2 border-[var(--color-text)]/20 flex-shrink-0"
-                                                style={{
-                                                    backgroundColor:
-                                                        color.hexCode,
-                                                }}
-                                            />
-                                            <span className="text-sm text-[var(--color-text)] truncate">
-                                                {color.name}
-                                            </span>
-                                        </label>
-                                    ))}
+                                            </div>
+                                        );
+                                    })}
                                 </div>
                             </div>
 
@@ -949,26 +948,6 @@ export default function AdminProductsPage() {
 
                             <div>
                                 <label className="block text-sm font-medium text-[var(--color-text)] mb-2">
-                                    <T>Price</T>
-                                </label>
-                                <input
-                                    type="number"
-                                    step="0.01"
-                                    value={editProduct.price}
-                                    onChange={(e) =>
-                                        setEditProduct((prev) => ({
-                                            ...prev,
-                                            price: parseFloat(e.target.value),
-                                        }))
-                                    }
-                                    min={0}
-                                    className="w-full px-4 py-2 border border-[var(--color-text)]/30 rounded-xl bg-[var(--color-background)] text-[var(--color-text)] focus:ring-2 focus:ring-[var(--color-accent)] focus:border-[var(--color-accent)]"
-                                    required
-                                />
-                            </div>
-
-                            <div>
-                                <label className="block text-sm font-medium text-[var(--color-text)] mb-2">
                                     <T>Category</T>
                                 </label>
                                 <select
@@ -1044,56 +1023,59 @@ export default function AdminProductsPage() {
 
                             <div>
                                 <label className="block text-sm font-medium text-[var(--color-text)] mb-2">
-                                    <T>Colors</T>
+                                    <T>Colors & Prices</T>
                                 </label>
-                                <div className="grid grid-cols-4 gap-2">
-                                    {colors.map((color) => (
-                                        <label
-                                            key={color.id}
-                                            className={`flex items-center gap-2 p-2 border rounded-lg cursor-pointer transition-all ${
-                                                editProduct.colorIds.includes(
-                                                    color.id!
-                                                )
+                                <div className="grid grid-cols-2 gap-2">
+                                    {colors.map((color) => {
+                                        const colorId = color.id!;
+                                        const isSelected = editProduct.colorIds.includes(colorId);
+                                        return (
+                                            <div key={colorId} className={`p-2 border rounded-lg transition-all ${
+                                                isSelected
                                                     ? "border-[var(--color-accent)] bg-[var(--color-accent)]/10"
                                                     : "border-[var(--color-text)]/30 hover:border-[var(--color-accent)]/50"
-                                            }`}
-                                        >
-                                            <input
-                                                type="checkbox"
-                                                checked={editProduct.colorIds.includes(
-                                                    color.id!
+                                            }`}>
+                                                <label className="flex items-center gap-2 cursor-pointer">
+                                                    <input
+                                                        type="checkbox"
+                                                        checked={isSelected}
+                                                        onChange={(e) => {
+                                                            setEditProduct((prev) => {
+                                                                const newColorPrices = { ...prev.colorPrices };
+                                                                if (e.target.checked) {
+                                                                    newColorPrices[colorId] = 0;
+                                                                    return { ...prev, colorIds: [...prev.colorIds, colorId], colorPrices: newColorPrices };
+                                                                } else {
+                                                                    delete newColorPrices[colorId];
+                                                                    return { ...prev, colorIds: prev.colorIds.filter((id) => id !== colorId), colorPrices: newColorPrices };
+                                                                }
+                                                            });
+                                                        }}
+                                                        className="sr-only"
+                                                    />
+                                                    <div
+                                                        className="w-6 h-6 rounded border-2 border-[var(--color-text)]/20 flex-shrink-0"
+                                                        style={{ backgroundColor: color.hexCode }}
+                                                    />
+                                                    <span className="text-sm text-[var(--color-text)] truncate">{color.name}</span>
+                                                </label>
+                                                {isSelected && (
+                                                    <input
+                                                        type="number"
+                                                        step="0.01"
+                                                        placeholder="Price"
+                                                        value={editProduct.colorPrices[colorId] || ""}
+                                                        onChange={(e) => setEditProduct((prev) => ({
+                                                            ...prev,
+                                                            colorPrices: { ...prev.colorPrices, [colorId]: parseFloat(e.target.value) || 0 },
+                                                        }))}
+                                                        min={0}
+                                                        className="mt-2 w-full px-3 py-1 text-sm border border-[var(--color-text)]/30 rounded-lg bg-[var(--color-background)] text-[var(--color-text)] focus:ring-2 focus:ring-[var(--color-accent)]"
+                                                    />
                                                 )}
-                                                onChange={(e) => {
-                                                    const colorId = color.id!;
-                                                    setEditProduct((prev) => ({
-                                                        ...prev,
-                                                        colorIds: e.target
-                                                            .checked
-                                                            ? [
-                                                                  ...prev.colorIds,
-                                                                  colorId,
-                                                              ]
-                                                            : prev.colorIds.filter(
-                                                                  (id) =>
-                                                                      id !==
-                                                                      colorId
-                                                              ),
-                                                    }));
-                                                }}
-                                                className="sr-only"
-                                            />
-                                            <div
-                                                className="w-6 h-6 rounded border-2 border-[var(--color-text)]/20 flex-shrink-0"
-                                                style={{
-                                                    backgroundColor:
-                                                        color.hexCode,
-                                                }}
-                                            />
-                                            <span className="text-sm text-[var(--color-text)] truncate">
-                                                {color.name}
-                                            </span>
-                                        </label>
-                                    ))}
+                                            </div>
+                                        );
+                                    })}
                                 </div>
                             </div>
 

@@ -1,5 +1,4 @@
 "use client";
-
 import React from "react";
 import { FaTimes, FaCreditCard } from "react-icons/fa";
 import { T } from "./T";
@@ -52,73 +51,194 @@ export default function CheckoutModal({
 
                     <form onSubmit={onSubmit}>
                         <div className="space-y-6">
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <div>
-                                    <label className="block text-sm font-semibold text-gray-700 mb-2">
-                                        <T>Full Name</T> *
-                                    </label>
-                                    <input
-                                        type="text"
-                                        required
-                                        value={customerInfo.name}
-                                        onChange={(e) =>
-                                            updateCustomerInfo({
-                                                name: e.target.value,
-                                            })
-                                        }
-                                        className="w-full px-4 py-3 border border-gray-300 bg-white text-gray-900 rounded-xl focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] focus:border-transparent transition-all"
-                                        placeholder="John Doe"
-                                    />
+                            {/* Contact Information */}
+                            <div>
+                                <h3 className="text-lg font-bold text-gray-900 mb-4">
+                                    <T>Contact Information</T>
+                                </h3>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div>
+                                        <label className="block text-sm font-semibold text-gray-700 mb-2">
+                                            <T>Full Name</T> *
+                                        </label>
+                                        <input
+                                            type="text"
+                                            required
+                                            value={customerInfo.name}
+                                            onChange={(e) =>
+                                                updateCustomerInfo({
+                                                    name: e.target.value,
+                                                })
+                                            }
+                                            className="w-full px-4 py-3 border border-gray-300 bg-white text-gray-900 rounded-xl focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] focus:border-transparent transition-all"
+                                            placeholder="John Doe"
+                                        />
+                                    </div>
+
+                                    <div>
+                                        <label className="block text-sm font-semibold text-gray-700 mb-2">
+                                            <T>Email</T> *
+                                        </label>
+                                        <input
+                                            type="email"
+                                            required
+                                            value={customerInfo.email}
+                                            onChange={(e) =>
+                                                updateCustomerInfo({
+                                                    email: e.target.value,
+                                                })
+                                            }
+                                            className="w-full px-4 py-3 border border-gray-300 bg-white text-gray-900 rounded-xl focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] focus:border-transparent transition-all"
+                                            placeholder="john@example.com"
+                                        />
+                                    </div>
+
+                                    <div className="md:col-span-2">
+                                        <label className="block text-sm font-semibold text-gray-700 mb-2">
+                                            <T>Phone Number</T>
+                                        </label>
+                                        <input
+                                            type="tel"
+                                            value={customerInfo.phone}
+                                            onChange={(e) =>
+                                                updateCustomerInfo({
+                                                    phone: e.target.value,
+                                                })
+                                            }
+                                            className="w-full px-4 py-3 border border-gray-300 bg-white text-gray-900 rounded-xl focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] focus:border-transparent transition-all"
+                                            placeholder="+1 (555) 123-4567"
+                                        />
+                                    </div>
                                 </div>
-                                <div>
-                                    <label className="block text-sm font-semibold text-gray-700 mb-2">
-                                        <T>Email</T> *
-                                    </label>
-                                    <input
-                                        type="email"
-                                        required
-                                        value={customerInfo.email}
-                                        onChange={(e) =>
-                                            updateCustomerInfo({
-                                                email: e.target.value,
-                                            })
-                                        }
-                                        className="w-full px-4 py-3 border border-gray-300 bg-white text-gray-900 rounded-xl focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] focus:border-transparent transition-all"
-                                        placeholder="john@example.com"
-                                    />
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-semibold text-gray-700 mb-2">
-                                        <T>Phone Number</T>
-                                    </label>
-                                    <input
-                                        type="tel"
-                                        value={customerInfo.phone}
-                                        onChange={(e) =>
-                                            updateCustomerInfo({
-                                                phone: e.target.value,
-                                            })
-                                        }
-                                        className="w-full px-4 py-3 border border-gray-300 bg-white text-gray-900 rounded-xl focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] focus:border-transparent transition-all"
-                                        placeholder="+1 (555) 123-4567"
-                                    />
-                                </div>
-                                <div className="md:col-span-2">
-                                    <label className="block text-sm font-semibold text-gray-700 mb-2">
-                                        <T>Delivery Address</T> *
-                                    </label>
-                                    <textarea
-                                        required
-                                        value={customerInfo.address}
-                                        onChange={(e) =>
-                                            updateCustomerInfo({
-                                                address: e.target.value,
-                                            })
-                                        }
-                                        rows={3}
-                                        className="w-full px-4 py-3 border border-gray-300 bg-white text-gray-900 rounded-xl focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] focus:border-transparent transition-all resize-none"
-                                        placeholder="Street, City, State, ZIP Code"
-                                    />
+                            </div>
+
+                            {/* Delivery Address */}
+                            <div>
+                                <h3 className="text-lg font-bold text-gray-900 mb-4">
+                                    <T>Delivery Address</T>
+                                </h3>
+                                <div className="space-y-4">
+                                    {/* Street and House Number */}
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <div>
+                                            <label className="block text-sm font-semibold text-gray-700 mb-2">
+                                                <T>Street</T> *
+                                            </label>
+                                            <input
+                                                type="text"
+                                                required
+                                                value={
+                                                    customerInfo.address.split(
+                                                        ",",
+                                                    )[0] || customerInfo.address
+                                                }
+                                                onChange={(e) => {
+                                                    const parts =
+                                                        customerInfo.address.split(
+                                                            ",",
+                                                        );
+                                                    parts[0] = e.target.value;
+                                                    updateCustomerInfo({
+                                                        address: parts
+                                                            .filter((p) =>
+                                                                p.trim(),
+                                                            )
+                                                            .join(","),
+                                                    });
+                                                }}
+                                                className="w-full px-4 py-3 border border-gray-300 bg-white text-gray-900 rounded-xl focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] focus:border-transparent transition-all"
+                                                placeholder="Main Street"
+                                            />
+                                        </div>
+
+                                        <div>
+                                            <label className="block text-sm font-semibold text-gray-700 mb-2">
+                                                <T>House No.</T> *
+                                            </label>
+                                            <input
+                                                type="text"
+                                                required
+                                                value={
+                                                    customerInfo.houseNumber ||
+                                                    ""
+                                                }
+                                                onChange={(e) =>
+                                                    updateCustomerInfo({
+                                                        houseNumber:
+                                                            e.target.value,
+                                                    })
+                                                }
+                                                className="w-full px-4 py-3 border border-gray-300 bg-white text-gray-900 rounded-xl focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] focus:border-transparent transition-all"
+                                                placeholder="123"
+                                            />
+                                        </div>
+                                    </div>
+
+                                    {/* Apartment Number */}
+                                    <div>
+                                        <label className="block text-sm font-semibold text-gray-700 mb-2">
+                                            <T>Apartment/Unit</T>
+                                        </label>
+                                        <input
+                                            type="text"
+                                            value={
+                                                customerInfo.apartmentNumber ||
+                                                ""
+                                            }
+                                            onChange={(e) =>
+                                                updateCustomerInfo({
+                                                    apartmentNumber:
+                                                        e.target.value,
+                                                })
+                                            }
+                                            className="w-full px-4 py-3 border border-gray-300 bg-white text-gray-900 rounded-xl focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] focus:border-transparent transition-all"
+                                            placeholder="Apt 4B"
+                                        />
+                                    </div>
+
+                                    {/* City, State, ZIP Code */}
+                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                        <div>
+                                            <label className="block text-sm font-semibold text-gray-700 mb-2">
+                                                <T>City</T> *
+                                            </label>
+                                            <input
+                                                type="text"
+                                                required
+                                                value={customerInfo.city || ""}
+                                                onChange={(e) =>
+                                                    updateCustomerInfo({
+                                                        city: e.target.value,
+                                                    })
+                                                }
+                                                className="w-full px-4 py-3 border border-gray-300 bg-white text-gray-900 rounded-xl focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] focus:border-transparent transition-all"
+                                                placeholder="Seattle"
+                                            />
+                                        </div>
+
+                                      
+
+                                        <div>
+                                            <label className="block text-sm font-semibold text-gray-700 mb-2">
+                                                <T>ZIP Code</T> *
+                                            </label>
+                                            <input
+                                                type="text"
+                                                required
+                                                value={
+                                                    customerInfo.zipCode || ""
+                                                }
+                                                onChange={(e) =>
+                                                    updateCustomerInfo({
+                                                        zipCode: e.target.value,
+                                                    })
+                                                }
+                                                className="w-full px-4 py-3 border border-gray-300 bg-white text-gray-900 rounded-xl focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] focus:border-transparent transition-all"
+                                                placeholder="98101"
+                                                maxLength={10}
+                                            />
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
 

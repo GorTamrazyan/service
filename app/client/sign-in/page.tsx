@@ -59,11 +59,14 @@ export default function SignInPage() {
                     "✅ User profile created in Firestore:",
                     newProfile,
                 );
+                return true; // New user
             } else {
                 console.log("ℹ️ User profile already exists");
+                return false; // Existing user
             }
         } catch (error) {
             console.error("❌ Error creating profile:", error);
+            return false;
         }
     };
 
@@ -99,7 +102,7 @@ export default function SignInPage() {
             ) {
                 setError("Invalid email or password. Please try again.");
             } else if (firebaseError.code === "auth/too-many-requests") {
-                setError("Too many failed attempts. Please try again later.");
+                setError("Too many attempts. Please wait 10-15 minutes before trying again. Check your email (including Spam) for the verification link.");
             } else {
                 setError("Failed to sign in. Please try again.");
             }
@@ -125,7 +128,11 @@ export default function SignInPage() {
             }
         } catch (error: any) {
             console.error("❌ Error resending verification email:", error);
-            setError(`Failed to send verification email: ${error.message}`);
+            if (error.code === "auth/too-many-requests") {
+                setError("Too many requests. Please wait 10-15 minutes and check your inbox (including Spam folder) for the verification email.");
+            } else {
+                setError(`Failed to send verification email: ${error.message}`);
+            }
         }
     };
 
@@ -137,9 +144,32 @@ export default function SignInPage() {
             const user = result.user;
             console.log("Successful sign in via Google:", user);
 
-            // Create user profile in Firestore if it doesn't exist
+            // Check if this is a new user by checking if profile exists
             if (user.email) {
+                const userDocRef = doc(db, "users", user.uid);
+                const docSnap = await getDoc(userDocRef);
+                const isNewUser = !docSnap.exists();
+
+                // Create user profile in Firestore if it doesn't exist
                 await createUserProfileIfNotExists(user.uid, user.email);
+
+                // Send welcome email only for new users
+                if (isNewUser) {
+                    try {
+                        const { sendWelcomeEmailHelper } =
+                            await import("../../lib/email/helpers");
+                        await sendWelcomeEmailHelper(
+                            user.email,
+                            user.displayName || user.email.split("@")[0],
+                        );
+                        console.log("✅ Welcome email sent to new Google user");
+                    } catch (welcomeEmailError) {
+                        console.error(
+                            "⚠️ Error sending welcome email:",
+                            welcomeEmailError,
+                        );
+                    }
+                }
             }
 
             router.push("/client/dashboard/home");
@@ -161,9 +191,32 @@ export default function SignInPage() {
             const user = result.user;
             console.log("Successful sign in via Apple/iCloud:", user);
 
-            // Create user profile in Firestore if it doesn't exist
+            // Check if this is a new user
             if (user.email) {
+                const userDocRef = doc(db, "users", user.uid);
+                const docSnap = await getDoc(userDocRef);
+                const isNewUser = !docSnap.exists();
+
+                // Create user profile in Firestore if it doesn't exist
                 await createUserProfileIfNotExists(user.uid, user.email);
+
+                // Send welcome email only for new users
+                if (isNewUser) {
+                    try {
+                        const { sendWelcomeEmailHelper } =
+                            await import("../../lib/email/helpers");
+                        await sendWelcomeEmailHelper(
+                            user.email,
+                            user.displayName || user.email.split("@")[0],
+                        );
+                        console.log("✅ Welcome email sent to new Apple user");
+                    } catch (welcomeEmailError) {
+                        console.error(
+                            "⚠️ Error sending welcome email:",
+                            welcomeEmailError,
+                        );
+                    }
+                }
             }
 
             router.push("/client/dashboard/home");

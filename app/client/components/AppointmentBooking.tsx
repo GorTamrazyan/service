@@ -49,6 +49,11 @@ export default function AppointmentBookingModal({
     const [isLoadingSlots, setIsLoadingSlots] = useState(false);
     const [availableDays, setAvailableDays] = useState<string[]>([]);
     const [isLoadingDays, setIsLoadingDays] = useState(false);
+    const [daysLoadError, setDaysLoadError] = useState(false);
+    const [showConfirmation, setShowConfirmation] = useState(false);
+    const [formName, setFormName] = useState("");
+    const [formEmail, setFormEmail] = useState("");
+    const [formPhone, setFormPhone] = useState("");
 
     const dynamicCalendarLink = useMemo(() => {
         const baseUrl =
@@ -122,6 +127,7 @@ export default function AppointmentBookingModal({
 
             const data = await response.json();
             setAvailableDays(data.availableDays || []);
+            setDaysLoadError(false);
             console.log('✅ Available days loaded:', data.availableDays);
         } catch (error) {
             console.error('❌ Error fetching available days:', error);
@@ -129,6 +135,7 @@ export default function AppointmentBookingModal({
                 console.error('Запрос занял слишком много времени');
             }
             setAvailableDays([]);
+            setDaysLoadError(true);
         } finally {
             setIsLoadingDays(false);
         }
@@ -144,6 +151,12 @@ export default function AppointmentBookingModal({
 
         // Если еще загружаем информацию о доступных днях, не блокируем
         if (isLoadingDays) return false;
+
+        // Если ошибка загрузки — разрешаем все будущие дни (кроме выходных)
+        if (daysLoadError) {
+            const dayOfWeek = date.getDay();
+            return dayOfWeek === 0 || dayOfWeek === 6; // блокируем только Сб и Вс
+        }
 
         // Проверяем, есть ли этот день в списке доступных
         const year = date.getFullYear();
@@ -226,6 +239,10 @@ export default function AppointmentBookingModal({
             setBookedSlots([]);
             setAllSlots([]);
             setAvailableDays([]);
+            setShowConfirmation(false);
+            setFormName("");
+            setFormEmail("");
+            setFormPhone("");
         }
     }, [isOpen]);
 
@@ -237,15 +254,24 @@ export default function AppointmentBookingModal({
         }
     }, [selectedDate, isBooked, fetchAvailableSlots]);
 
+    // Открывает окно подтверждения после выбора времени
+    const handleOpenConfirmation = () => {
+        if (!selectedDate || !selectedTime) return;
+        setFormName(profile ? `${profile.firstName || ""} ${profile.lastName || ""}`.trim() : "");
+        setFormEmail(profile?.email || "");
+        setFormPhone(profile?.phone || "");
+        setShowConfirmation(true);
+    };
+
     // Объединенная функция для бронирования консультации и создания события в Google Calendar
     const handleBookConsultation = async () => {
-        if (!user || !profile) {
-            alert("Пожалуйста, заполните информацию профиля перед бронированием");
+        if (!user) {
+            alert("Пожалуйста, войдите в аккаунт");
             return;
         }
 
-        if (!profile.firstName || !profile.email || !profile.phone) {
-            alert("Пожалуйста, заполните имя, email и телефон в профиле");
+        if (!formName || !formEmail || !formPhone) {
+            alert("Пожалуйста, заполните все поля");
             return;
         }
 
@@ -262,9 +288,9 @@ export default function AppointmentBookingModal({
 
         try {
             const customerInfo = {
-                name: `${profile.firstName} ${profile.lastName}`.trim(),
-                email: profile.email,
-                phone: profile.phone,
+                name: formName,
+                email: formEmail,
+                phone: formPhone,
             };
 
             // Создаем полную дату со временем в локальном часовом поясе
@@ -506,30 +532,26 @@ export default function AppointmentBookingModal({
                                 </div>
 
                                 {/* User Info Display */}
-                                {profile &&
-                                    profile.firstName &&
-                                    profile.email &&
-                                    profile.phone && (
-                                        <div className="bg-gradient-to-br from-[var(--color-accent)]/10 to-[var(--color-accent)]/5 border border-[var(--color-accent)]/20 rounded-2xl p-4">
-                                            <div className="flex items-center gap-3">
-                                                <div className="bg-[var(--color-accent)] p-2 rounded-xl">
-                                                    <FaInfoCircle className="w-4 h-4 text-white" />
-                                                </div>
-                                                <div>
-                                                    <p className="text-xs text-[var(--color-gray-500)] mb-1">
-                                                        <T>Booking as:</T>
-                                                    </p>
-                                                    <p className="font-semibold text-[var(--color-text)]">
-                                                        {profile.firstName}{" "}
-                                                        {profile.lastName}
-                                                    </p>
-                                                    <p className="text-sm text-[var(--color-gray-500)]">
-                                                        {profile.email}
-                                                    </p>
-                                                </div>
+                                {profile && profile.firstName && profile.email && (
+                                    <div className="bg-gradient-to-br from-[var(--color-accent)]/10 to-[var(--color-accent)]/5 border border-[var(--color-accent)]/20 rounded-2xl p-4">
+                                        <div className="flex items-center gap-3">
+                                            <div className="bg-[var(--color-accent)] p-2 rounded-xl">
+                                                <FaInfoCircle className="w-4 h-4 text-white" />
+                                            </div>
+                                            <div>
+                                                <p className="text-xs text-[var(--color-gray-500)] mb-1">
+                                                    <T>Booking as:</T>
+                                                </p>
+                                                <p className="font-semibold text-[var(--color-text)]">
+                                                    {profile.firstName} {profile.lastName}
+                                                </p>
+                                                <p className="text-sm text-[var(--color-gray-500)]">
+                                                    {profile.email}
+                                                </p>
                                             </div>
                                         </div>
-                                    )}
+                                    </div>
+                                )}
                             </div>
 
                             {/* Right Side: Calendar & Time Selection - Takes 3 columns */}
@@ -778,14 +800,9 @@ export default function AppointmentBookingModal({
                                     <T>Cancel</T>
                                 </button>
                                 <button
-                                    onClick={handleBookConsultation}
+                                    onClick={handleOpenConfirmation}
                                     disabled={
-                                        isSaving ||
                                         isBooked ||
-                                        !profile ||
-                                        !profile.firstName ||
-                                        !profile.email ||
-                                        !profile.phone ||
                                         !selectedDate ||
                                         !selectedTime
                                     }
@@ -801,20 +818,15 @@ export default function AppointmentBookingModal({
                                         }
                                     `}
                                 >
-                                    {isSaving ? (
-                                        <>
-                                            <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent"></div>
-                                            <T>Booking...</T>
-                                        </>
-                                    ) : isBooked ? (
+                                    {isBooked ? (
                                         <>
                                             <FaCheckCircle className="w-5 h-5" />
                                             <T>Booked!</T>
                                         </>
                                     ) : (
                                         <>
-                                            <FaCalendarCheck className="w-5 h-5" />
-                                            <T>Confirm Booking</T>
+                                            <FaChevronRight className="w-5 h-5" />
+                                            <T>Continue</T>
                                         </>
                                     )}
                                 </button>
@@ -823,6 +835,125 @@ export default function AppointmentBookingModal({
                     </div>
                 </div>
             </div>
+
+            {/* Confirmation Modal */}
+            {showConfirmation && selectedDate && selectedTime && (
+                <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
+                    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setShowConfirmation(false)} />
+                    <div className="relative bg-[var(--color-card-bg)] rounded-2xl shadow-2xl w-full max-w-lg border border-[var(--color-border)] overflow-hidden">
+                        {/* Header */}
+                        <div className="bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-accent)] px-6 py-5">
+                            <div className="flex items-center justify-between">
+                                <h3 className="text-xl font-bold text-white flex items-center gap-3">
+                                    <FaCalendarCheck className="w-5 h-5" />
+                                    <T>Confirm Booking</T>
+                                </h3>
+                                <button onClick={() => setShowConfirmation(false)} className="p-2 hover:bg-white/20 rounded-full transition-colors">
+                                    <FaTimes className="w-5 h-5 text-white" />
+                                </button>
+                            </div>
+                        </div>
+
+                        {/* Loading Overlay */}
+                        {isSaving && (
+                            <div className="absolute inset-0 bg-black/30 backdrop-blur-sm z-10 flex items-center justify-center rounded-2xl">
+                                <div className="bg-[var(--color-card-bg)] rounded-2xl p-6 shadow-2xl flex flex-col items-center gap-3">
+                                    <div className="animate-spin rounded-full h-12 w-12 border-4 border-[var(--color-gray-200)] border-t-[var(--color-primary)]"></div>
+                                    <span className="text-[var(--color-text)] font-semibold"><T>Processing your booking...</T></span>
+                                </div>
+                            </div>
+                        )}
+
+                        <div className="p-6 space-y-5">
+                            {/* Booking Summary */}
+                            <div className="bg-[var(--color-gray-50)] rounded-xl p-4 space-y-3 border border-[var(--color-border)]">
+                                <div className="flex justify-between items-center">
+                                    <span className="text-sm text-[var(--color-gray-500)]"><T>Consultation</T></span>
+                                    <span className="font-semibold text-[var(--color-text)]">{consultationType}</span>
+                                </div>
+                                <div className="flex justify-between items-center">
+                                    <span className="text-sm text-[var(--color-gray-500)]"><T>Date</T></span>
+                                    <span className="font-semibold text-[var(--color-text)]">{selectedDate.toLocaleDateString()}</span>
+                                </div>
+                                <div className="flex justify-between items-center">
+                                    <span className="text-sm text-[var(--color-gray-500)]"><T>Time</T></span>
+                                    <span className="font-semibold text-[var(--color-text)]">{selectedTime}</span>
+                                </div>
+                                <div className="flex justify-between items-center">
+                                    <span className="text-sm text-[var(--color-gray-500)]"><T>Duration</T></span>
+                                    <span className="font-semibold text-[var(--color-text)]">{duration} <T>min</T></span>
+                                </div>
+                                <div className="flex justify-between items-center pt-2 border-t border-[var(--color-border)]">
+                                    <span className="text-sm font-semibold text-[var(--color-text)]"><T>Price</T></span>
+                                    <span className="text-xl font-bold text-[var(--color-success)]">${price}</span>
+                                </div>
+                            </div>
+
+                            {/* Contact Info Form */}
+                            <div className="space-y-3">
+                                <h4 className="font-semibold text-[var(--color-text)]"><T>Your Information</T></h4>
+                                <div>
+                                    <label className="block text-sm text-[var(--color-gray-500)] mb-1"><T>Full Name</T> *</label>
+                                    <input
+                                        type="text"
+                                        value={formName}
+                                        onChange={(e) => setFormName(e.target.value)}
+                                        placeholder="John Doe"
+                                        className="w-full px-4 py-3 border border-[var(--color-border)] rounded-xl bg-[var(--color-card-bg)] text-[var(--color-text)] focus:ring-2 focus:ring-[var(--color-accent)] focus:border-[var(--color-accent)] outline-none"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-sm text-[var(--color-gray-500)] mb-1">Email *</label>
+                                    <input
+                                        type="email"
+                                        value={formEmail}
+                                        onChange={(e) => setFormEmail(e.target.value)}
+                                        placeholder="email@example.com"
+                                        className="w-full px-4 py-3 border border-[var(--color-border)] rounded-xl bg-[var(--color-card-bg)] text-[var(--color-text)] focus:ring-2 focus:ring-[var(--color-accent)] focus:border-[var(--color-accent)] outline-none"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-sm text-[var(--color-gray-500)] mb-1"><T>Phone</T> *</label>
+                                    <input
+                                        type="tel"
+                                        value={formPhone}
+                                        onChange={(e) => setFormPhone(e.target.value)}
+                                        placeholder="+1 (555) 123-4567"
+                                        className="w-full px-4 py-3 border border-[var(--color-border)] rounded-xl bg-[var(--color-card-bg)] text-[var(--color-text)] focus:ring-2 focus:ring-[var(--color-accent)] focus:border-[var(--color-accent)] outline-none"
+                                    />
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Footer */}
+                        <div className="px-6 py-4 border-t border-[var(--color-border)] flex gap-3">
+                            <button
+                                onClick={() => setShowConfirmation(false)}
+                                className="flex-1 px-4 py-3 border-2 border-[var(--color-border)] rounded-xl text-[var(--color-text)] font-semibold hover:bg-[var(--color-gray-100)] transition-colors"
+                            >
+                                <T>Back</T>
+                            </button>
+                            <button
+                                onClick={handleBookConsultation}
+                                disabled={isSaving || !formName || !formEmail || !formPhone}
+                                className="flex-1 px-4 py-3 bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-accent)] text-white font-bold rounded-xl shadow-lg hover:shadow-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                            >
+                                {isSaving ? (
+                                    <>
+                                        <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent"></div>
+                                        <T>Booking...</T>
+                                    </>
+                                ) : (
+                                    <>
+                                        <FaCalendarCheck className="w-5 h-5" />
+                                        <T>Confirm Booking</T>
+                                    </>
+                                )}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

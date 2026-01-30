@@ -15,8 +15,6 @@ import { createOrder } from "../../lib/firebase/orders";
 import type { Color } from "../../lib/firebase/products/types";
 import { sendOrderEmail } from "../../lib/email/helpers";
 
-
-
 // Интерфейс для продукта в корзине
 export interface CartItem {
     id: string;
@@ -24,17 +22,14 @@ export interface CartItem {
     price: string;
     imageUrl: string | null;
     quantity: number;
-    type: 'product' | 'consultation' | 'service'; // Тип элемента
-    // Поля для продуктов
+    type: "product" | "consultation" | "service"; // Тип элемента
     color?: Color | null;
     height?: number;
     length?: number;
-    // Поля для консультаций
     duration?: number; // Продолжительность в минутах
     features?: string[]; // Что включено в консультацию
-    // Поля для услуг
     description?: string; // Описание услуги
-    serviceType?: 'delivery' | 'installation' | 'assembly' | 'other'; // Тип услуги
+    serviceType?: "delivery" | "installation" | "assembly" | "other"; // Тип услуги
 }
 
 // Интерфейс для информации о клиенте
@@ -42,7 +37,11 @@ export interface CustomerInfo {
     name: string;
     email: string;
     phone: string;
-    address: string;
+    address: string; 
+    houseNumber: string; 
+    apartmentNumber?: string; 
+    city: string; 
+    zipCode: string; 
 }
 
 // Интерфейс для значений контекста корзины
@@ -69,12 +68,20 @@ interface CartContextType {
         name: string;
         price: number;
         description: string;
-        serviceType?: 'delivery' | 'installation' | 'assembly' | 'other';
+        serviceType?: "delivery" | "installation" | "assembly" | "other";
     }) => void;
-    removeFromCart: (id: string, colorId?:string) => void;
-    updateQuantity: (id: string, newQuantity: number,colorId?:string) => void;
-    incrementQuantity: (id: string, currentQuantity: number, colorId?: string) => void;
-    decrementQuantity: (id: string, currentQuantity: number, colorId?: string) => void;
+    removeFromCart: (id: string, colorId?: string) => void;
+    updateQuantity: (id: string, newQuantity: number, colorId?: string) => void;
+    incrementQuantity: (
+        id: string,
+        currentQuantity: number,
+        colorId?: string,
+    ) => void;
+    decrementQuantity: (
+        id: string,
+        currentQuantity: number,
+        colorId?: string,
+    ) => void;
     clearCart: () => void;
     getTotalItems: () => number;
     getTotalPrice: () => number;
@@ -103,7 +110,7 @@ export const CartProvider = ({ children }: CartProviderProps) => {
     // Инициализируем состояние корзины как пустой массив на сервере.
     // Фактические данные из localStorage будут загружены только на клиенте.
     const [cartItems, setCartItems] = useState<CartItem[]>([]);
-    const [isClient, setIsClient] = useState(false); // <--- Добавляем состояние для проверки клиента
+    const [isClient, setIsClient] = useState(false);
     const [user, loading] = useAuthState();
     const { profile } = useProfile();
 
@@ -114,6 +121,10 @@ export const CartProvider = ({ children }: CartProviderProps) => {
         email: "",
         phone: "",
         address: "",
+        houseNumber: "",
+        apartmentNumber: "",
+        city: "",
+        zipCode: "",
     });
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [orderSuccess, setOrderSuccess] = useState(false);
@@ -128,49 +139,62 @@ export const CartProvider = ({ children }: CartProviderProps) => {
                     // Преобразуем даты обратно в объекты Date при загрузке
                     const cartWithDates = parsedCart.map((item: any) => ({
                         ...item,
-                        color: item.color ? {
-                            ...item.color,
-                            createdAt: item.color.createdAt ? new Date(item.color.createdAt) : undefined,
-                            updatedAt: item.color.updatedAt ? new Date(item.color.updatedAt) : undefined
-                        } : null
+                        color: item.color
+                            ? {
+                                  ...item.color,
+                                  createdAt: item.color.createdAt
+                                      ? new Date(item.color.createdAt)
+                                      : undefined,
+                                  updatedAt: item.color.updatedAt
+                                      ? new Date(item.color.updatedAt)
+                                      : undefined,
+                              }
+                            : null,
                     }));
                     setCartItems(cartWithDates);
                 } catch (error) {
-                    console.error('Error parsing cart from localStorage:', error);
+                    console.error(
+                        "Error parsing cart from localStorage:",
+                        error,
+                    );
                     setCartItems([]);
                 }
             }
-            setIsClient(true); // <--- Устанавливаем isClient в true
+            setIsClient(true);
         }
-    }, []); // Пустой массив зависимостей, выполняется один раз при монтировании
+    }, []);
 
     // Эффект для сохранения корзины в localStorage при каждом изменении
-    // Он должен запускаться только после того, как isClient станет true
     useEffect(() => {
         if (isClient) {
-            // <--- Сохраняем только после гидрации
             try {
                 localStorage.setItem("cart", JSON.stringify(cartItems));
             } catch (error) {
-                console.error('Error saving cart to localStorage:', error);
+                console.error("Error saving cart to localStorage:", error);
             }
         }
-    }, [cartItems, isClient]); // Зависит от cartItems и isClient
+    }, [cartItems, isClient]);
 
     // Проверка авторизации
     const isAuthenticated = !loading && !!user;
 
     // Функция для определения, требует ли действие авторизации
     const requiresAuth = (action: string) => {
-        const actionsRequiringAuth = ['addToCart', 'removeFromCart', 'updateQuantity', 'clearCart'];
+        const actionsRequiringAuth = [
+            "addToCart",
+            "removeFromCart",
+            "updateQuantity",
+            "clearCart",
+        ];
         return actionsRequiringAuth.includes(action);
     };
 
     // Функция для показа предупреждения о необходимости авторизации
     const showAuthRequired = () => {
-        alert('Для добавления товаров в корзину необходимо войти в аккаунт или зарегистрироваться');
-        // Перенаправляем на страницу входа
-        window.location.href = '/client/sign-in';
+        alert(
+            "Для добавления товаров в корзину необходимо войти в аккаунт или зарегистрироваться",
+        );
+        window.location.href = "/client/sign-in";
     };
 
     // Добавление продукта в корзину
@@ -190,13 +214,12 @@ export const CartProvider = ({ children }: CartProviderProps) => {
             }
 
             setCartItems((prevItems) => {
-                // Создаем уникальный ключ для товара с учетом цвета
                 const itemKey = product.color
                     ? `${product.id}-${product.color.id}`
                     : product.id;
 
                 const existingItemIndex = prevItems.findIndex((item) => {
-                    if (item.type !== 'product') return false;
+                    if (item.type !== "product") return false;
                     const existingItemKey = item.color
                         ? `${item.id}-${item.color.id}`
                         : item.id;
@@ -204,19 +227,20 @@ export const CartProvider = ({ children }: CartProviderProps) => {
                 });
 
                 if (existingItemIndex !== -1) {
-                    // Если товар с таким цветом уже есть, увеличиваем количество
                     return prevItems.map((item, index) =>
                         index === existingItemIndex
                             ? { ...item, quantity: item.quantity + 1 }
-                            : item
+                            : item,
                     );
                 } else {
-                    // Добавляем новый товар
-                    return [...prevItems, { ...product, quantity: 1, type: 'product' }];
+                    return [
+                        ...prevItems,
+                        { ...product, quantity: 1, type: "product" },
+                    ];
                 }
             });
         },
-        [isAuthenticated]
+        [isAuthenticated],
     );
 
     // Добавление консультации в корзину
@@ -234,17 +258,16 @@ export const CartProvider = ({ children }: CartProviderProps) => {
             }
 
             setCartItems((prevItems) => {
-                // Проверяем, есть ли уже такая консультация в корзине
                 const existingItemIndex = prevItems.findIndex(
-                    (item) => item.type === 'consultation' && item.id === consultation.id
+                    (item) =>
+                        item.type === "consultation" &&
+                        item.id === consultation.id,
                 );
 
                 if (existingItemIndex !== -1) {
-                    // Консультации не увеличиваются в количестве, просто уведомляем
-                    alert('This consultation is already in your cart');
+                    alert("This consultation is already in your cart");
                     return prevItems;
                 } else {
-                    // Добавляем новую консультацию
                     return [
                         ...prevItems,
                         {
@@ -253,7 +276,7 @@ export const CartProvider = ({ children }: CartProviderProps) => {
                             price: consultation.price.toString(),
                             imageUrl: null,
                             quantity: 1,
-                            type: 'consultation',
+                            type: "consultation",
                             duration: consultation.duration,
                             features: consultation.features,
                         },
@@ -261,7 +284,7 @@ export const CartProvider = ({ children }: CartProviderProps) => {
                 }
             });
         },
-        [isAuthenticated]
+        [isAuthenticated],
     );
 
     // Добавление услуги в корзину
@@ -271,7 +294,7 @@ export const CartProvider = ({ children }: CartProviderProps) => {
             name: string;
             price: number;
             description: string;
-            serviceType?: 'delivery' | 'installation' | 'assembly' | 'other';
+            serviceType?: "delivery" | "installation" | "assembly" | "other";
         }) => {
             if (!isAuthenticated) {
                 showAuthRequired();
@@ -279,20 +302,17 @@ export const CartProvider = ({ children }: CartProviderProps) => {
             }
 
             setCartItems((prevItems) => {
-                // Проверяем, есть ли уже такая услуга в корзине
                 const existingItemIndex = prevItems.findIndex(
-                    (item) => item.type === 'service' && item.id === service.id
+                    (item) => item.type === "service" && item.id === service.id,
                 );
 
                 if (existingItemIndex !== -1) {
-                    // Увеличиваем количество услуги
                     return prevItems.map((item, index) =>
                         index === existingItemIndex
                             ? { ...item, quantity: item.quantity + 1 }
-                            : item
+                            : item,
                     );
                 } else {
-                    // Добавляем новую услугу
                     return [
                         ...prevItems,
                         {
@@ -301,15 +321,15 @@ export const CartProvider = ({ children }: CartProviderProps) => {
                             price: service.price.toString(),
                             imageUrl: null,
                             quantity: 1,
-                            type: 'service',
+                            type: "service",
                             description: service.description,
-                            serviceType: service.serviceType || 'other',
+                            serviceType: service.serviceType || "other",
                         },
                     ];
                 }
             });
         },
-        [isAuthenticated]
+        [isAuthenticated],
     );
 
     const removeFromCart = useCallback(
@@ -321,15 +341,15 @@ export const CartProvider = ({ children }: CartProviderProps) => {
 
             setCartItems((prevItems) =>
                 prevItems.filter(
-                    (item) => item.id !== id || item.color?.id !== colorId
-                )
+                    (item) => item.id !== id || item.color?.id !== colorId,
+                ),
             );
         },
-        [isAuthenticated, showAuthRequired]
+        [isAuthenticated],
     );
 
     const updateQuantity = useCallback(
-        (id: string, newQuantity: number,colorId?: string) => {
+        (id: string, newQuantity: number, colorId?: string) => {
             if (!isAuthenticated) {
                 showAuthRequired();
                 return;
@@ -338,18 +358,18 @@ export const CartProvider = ({ children }: CartProviderProps) => {
             setCartItems((prevItems) => {
                 if (newQuantity <= 0) {
                     return prevItems.filter(
-                        (item) => item.id !== id || item.color?.id !== colorId
+                        (item) => item.id !== id || item.color?.id !== colorId,
                     );
                 }
 
                 return prevItems.map((item) =>
                     item.id === id && item.color?.id === colorId
                         ? { ...item, quantity: newQuantity }
-                        : item
+                        : item,
                 );
             });
         },
-        [isAuthenticated, showAuthRequired]
+        [isAuthenticated],
     );
 
     // Очистка всей корзины
@@ -362,21 +382,18 @@ export const CartProvider = ({ children }: CartProviderProps) => {
         setCartItems([]);
     }, [isAuthenticated]);
 
-    // Получение количества уникальных типов товаров (не общее количество)
+    // Получение количества уникальных типов товаров
     const getTotalItems = useCallback(() => {
-        // Возвращаем 0, если мы еще не на клиенте (до гидрации)
-        // чтобы сервер и клиент рендерили одно и то же значение по умолчанию
         return isClient ? cartItems.length : 0;
     }, [cartItems, isClient]);
 
     // Получение общей стоимости
     const getTotalPrice = useCallback(() => {
-        // Возвращаем 0, если мы еще не на клиенте (до гидрации)
         return isClient
             ? cartItems.reduce(
                   (total, item) =>
                       total + parseFloat(item.price) * item.quantity,
-                  0
+                  0,
               )
             : 0;
     }, [cartItems, isClient]);
@@ -388,7 +405,7 @@ export const CartProvider = ({ children }: CartProviderProps) => {
                 updateQuantity(id, currentQuantity + 1, colorId);
             }
         },
-        [updateQuantity]
+        [updateQuantity],
     );
 
     // Уменьшение количества товара
@@ -398,25 +415,21 @@ export const CartProvider = ({ children }: CartProviderProps) => {
                 updateQuantity(id, currentQuantity - 1, colorId);
             }
         },
-        [updateQuantity]
+        [updateQuantity],
     );
 
     // Открытие модального окна оформления заказа
     const openCheckoutModal = useCallback(() => {
         if (profile) {
-            const fullAddress = `${profile.address.city}, ${
-                profile.address.street
-            } ${profile.address.houseNumber}${
-                profile.address.apartmentNumber
-                    ? `, apt. ${profile.address.apartmentNumber}`
-                    : ""
-            }, ${profile.address.zipCode}`.trim();
-
             setCustomerInfo({
                 name: `${profile.firstName} ${profile.lastName}`.trim() || "",
                 email: profile.email || user?.email || "",
                 phone: profile.phone || "",
-                address: fullAddress || "",
+                address: profile.address.street || "",
+                houseNumber: profile.address.houseNumber || "",
+                apartmentNumber: profile.address.apartmentNumber || "",
+                city: profile.address.city || "",
+                zipCode: profile.address.zipCode || "",
             });
         } else {
             setCustomerInfo({
@@ -424,6 +437,10 @@ export const CartProvider = ({ children }: CartProviderProps) => {
                 email: user?.email || "",
                 phone: "",
                 address: "",
+                houseNumber: "",
+                apartmentNumber: "",
+                city: "",
+                zipCode: "",
             });
         }
         setShowCheckoutModal(true);
@@ -453,18 +470,25 @@ export const CartProvider = ({ children }: CartProviderProps) => {
             setIsSubmitting(true);
             try {
                 const hasProducts = cartItems.some(
-                    (item) => item.type === "product"
+                    (item) => item.type === "product",
                 );
                 const hasServices = cartItems.some(
-                    (item) => item.type === "service"
+                    (item) => item.type === "service",
                 );
 
                 const productItems = cartItems.filter(
-                    (item) => item.type === "product"
+                    (item) => item.type === "product",
                 );
                 const serviceItems = cartItems.filter(
-                    (item) => item.type === "service"
+                    (item) => item.type === "service",
                 );
+
+                // Формируем полный адрес для отправки
+                const fullAddress = `${customerInfo.address} ${customerInfo.houseNumber}${
+                    customerInfo.apartmentNumber
+                        ? `, ${customerInfo.apartmentNumber}`
+                        : ""
+                }, ${customerInfo.city},  ${customerInfo.zipCode}`;
 
                 const orderData = {
                     userId: user.uid,
@@ -491,7 +515,12 @@ export const CartProvider = ({ children }: CartProviderProps) => {
                             : undefined,
                     totalPrice: getTotalPrice().toFixed(2),
                     status: "pending" as const,
-                    customerInfo,
+                    customerInfo: {
+                        name: customerInfo.name,
+                        email: customerInfo.email,
+                        phone: customerInfo.phone,
+                        address: fullAddress, // Используем полный адрес для заказа
+                    },
                 };
 
                 const orderId = await createOrder(orderData);
@@ -499,20 +528,23 @@ export const CartProvider = ({ children }: CartProviderProps) => {
                 // Отправляем email подтверждение заказа
                 try {
                     await sendOrderEmail({
-                        orderId: orderId || 'unknown',
+                        orderId: orderId || "unknown",
                         customerEmail: customerInfo.email,
                         customerName: customerInfo.name,
-                        items: productItems.map(item => ({
+                        items: productItems.map((item) => ({
                             name: item.name,
                             quantity: item.quantity,
-                            price: item.price
+                            price: item.price,
                         })),
                         totalPrice: getTotalPrice().toFixed(2),
-                        shippingAddress: customerInfo.address
+                        shippingAddress: fullAddress, // Используем полный адрес для email
                     });
                     console.log("✅ Order confirmation email sent");
                 } catch (emailError) {
-                    console.error("⚠️ Error sending order confirmation email:", emailError);
+                    console.error(
+                        "⚠️ Error sending order confirmation email:",
+                        emailError,
+                    );
                     // Не прерываем процесс - заказ уже создан
                 }
 
@@ -521,12 +553,14 @@ export const CartProvider = ({ children }: CartProviderProps) => {
                 setOrderSuccess(true);
             } catch (error) {
                 console.error("Error creating order:", error);
-                alert("There was an error placing your order. Please try again.");
+                alert(
+                    "There was an error placing your order. Please try again.",
+                );
             } finally {
                 setIsSubmitting(false);
             }
         },
-        [user, cartItems, getTotalPrice, customerInfo, clearCart]
+        [user, cartItems, getTotalPrice, customerInfo, clearCart],
     );
 
     // Значения, которые будут доступны через контекст

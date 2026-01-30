@@ -88,11 +88,8 @@ export async function GET(request: NextRequest) {
 
             for (let hour = workingHoursStart; hour < workingHoursEnd; hour++) {
                 const timeString = `${hour.toString().padStart(2, "0")}:00`;
-                const slotDate = new Date(
-                    new Date(`${dateString}T${timeString}:00`).toLocaleString("en-US", {
-                        timeZone: calendarTimezone,
-                    })
-                );
+                // Создаём время слота в локальном часовом поясе календаря
+                const slotDate = new Date(`${dateString}T${timeString}:00`);
                 const slotEnd = new Date(slotDate.getTime() + 60 * 60 * 1000);
 
                 // Пропускаем прошедшие слоты

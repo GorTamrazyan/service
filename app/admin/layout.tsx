@@ -6,6 +6,7 @@ import { useRouter, usePathname } from "next/navigation";
 import AdminSidebar from "./components/AdminSidebar";
 import AdminHeader from "./components/AdminHeader";
 import { Shield } from "lucide-react";
+import { ThemeProvider } from "../contexts/ThemeContext";
 
 export default function AdminLayout({
     children,
@@ -90,20 +91,22 @@ export default function AdminLayout({
 
     // Login page - render without sidebar/header
     if (pathname === "/admin/login") {
-        return <>{children}</>;
+        return <ThemeProvider scope="admin">{children}</ThemeProvider>;
     }
 
     // Authenticated - render full admin layout
     return (
-        <div className="min-h-screen bg-[var(--color-background)] flex">
-            {/* Sidebar */}
-            <AdminSidebar />
+        <ThemeProvider scope="admin">
+            <div className="min-h-screen bg-[var(--color-background)] flex">
+                {/* Sidebar */}
+                <AdminSidebar />
 
-            {/* Main Content */}
-            <div className="flex-1 flex flex-col">
-                <AdminHeader />
-                <main className="flex-1 p-8 overflow-y-auto">{children}</main>
+                {/* Main Content */}
+                <div className="flex-1 flex flex-col">
+                    <AdminHeader />
+                    <main className="flex-1 p-8 overflow-y-auto">{children}</main>
+                </div>
             </div>
-        </div>
+        </ThemeProvider>
     );
 }

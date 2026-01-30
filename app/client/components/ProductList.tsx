@@ -12,7 +12,7 @@ interface Product {
     id: string;
     name: string;
     description: string | null;
-    price: string;
+    colorPrices?: Record<string, number>;
     imageUrl: string | null;
     categorId: string | null;
     typeOfProductId?: string;
@@ -182,7 +182,13 @@ export function ProductCard({ product }: { product: Product }) {
             <div className="flex items-center justify-between">
                 <div className="flex items-baseline gap-2">
                     <span className="text-2xl font-extrabold text-[var(--color-accent)]">
-                        ${parseFloat(product.price).toFixed(2)}
+                        {(() => {
+                            const prices = Object.values(product.colorPrices || {}).filter((v) => !isNaN(v));
+                            if (prices.length === 0) return "-";
+                            const min = Math.min(...prices);
+                            const max = Math.max(...prices);
+                            return min === max ? `$${min.toFixed(2)}` : `$${min.toFixed(2)} - $${max.toFixed(2)}`;
+                        })()}
                     </span>
                     
                 </div>

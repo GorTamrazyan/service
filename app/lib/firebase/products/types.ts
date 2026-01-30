@@ -55,7 +55,7 @@ export interface Product {
   id?: string;
   name: string;
   description?: string;
-  price: number;
+  colorPrices: Record<string, number>;
 
   // Связи с другими коллекциями
   categoryId?: string;

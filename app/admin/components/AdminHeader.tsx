@@ -3,7 +3,7 @@
 
 import React, { useState } from "react";
 import { Search, User, Moon, Sun } from "lucide-react";
-import { useTheme } from "@/app/hooks/useTheme";
+import { useTheme } from "../../contexts/ThemeContext";
 import { T } from "@/app/client/components/T";
 import NotificationsDropdown from "../components/modals/NotificationsDropdown";
 

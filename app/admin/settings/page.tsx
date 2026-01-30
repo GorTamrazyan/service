@@ -1,7 +1,7 @@
 // app/admin/before-after/page.tsx
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
     Plus,
     Edit,
@@ -47,6 +47,10 @@ export default function AdminBeforeAfterPage() {
     const [location, setLocation] = useState("");
     const [isActive, setIsActive] = useState(true);
 
+    // Refs for file inputs
+    const beforeImageInputRef = useRef<HTMLInputElement>(null);
+    const afterImageInputRef = useRef<HTMLInputElement>(null);
+
     useEffect(() => {
         loadProjects();
     }, []);
@@ -66,7 +70,7 @@ export default function AdminBeforeAfterPage() {
     };
 
     const handleBeforeImageChange = (
-        e: React.ChangeEvent<HTMLInputElement>
+        e: React.ChangeEvent<HTMLInputElement>,
     ) => {
         const file = e.target.files?.[0];
         if (file) {
@@ -151,7 +155,7 @@ export default function AdminBeforeAfterPage() {
                 {
                     method: "PUT",
                     body: formData,
-                }
+                },
             );
 
             if (!response.ok) throw new Error("Failed to update project");
@@ -398,29 +402,60 @@ export default function AdminBeforeAfterPage() {
                             {/* Before Image */}
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                                    <T>Before Image</T> *
+                                    Before Image *
                                 </label>
-                                <div className="border-2 border-dashed border-gray-300 rounded-xl p-4">
+                                <div className="border-2 border-dashed border-gray-300 rounded-xl p-4 hover:border-[var(--color-accent)] transition-colors">
                                     {beforeImagePreview ? (
-                                        <div className="relative aspect-video rounded-lg overflow-hidden mb-3">
-                                            <Image
-                                                src={beforeImagePreview}
-                                                alt="Before Preview"
-                                                fill
-                                                className="object-cover"
-                                            />
+                                        <div className="space-y-3">
+                                            <div className="relative aspect-video rounded-lg overflow-hidden">
+                                                <Image
+                                                    src={beforeImagePreview}
+                                                    alt="Before Preview"
+                                                    fill
+                                                    className="object-cover"
+                                                />
+                                            </div>
+                                            <button
+                                                type="button"
+                                                onClick={() =>
+                                                    beforeImageInputRef.current?.click()
+                                                }
+                                                className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors text-sm font-medium"
+                                            >
+                                                <Upload className="w-4 h-4" />
+                                                Change Image
+                                            </button>
                                         </div>
                                     ) : (
-                                        <div className="aspect-video rounded-lg bg-gray-100 flex items-center justify-center mb-3">
-                                            <ImageIcon className="w-12 h-12 text-gray-400" />
+                                        <div
+                                            onClick={() =>
+                                                beforeImageInputRef.current?.click()
+                                            }
+                                            className="cursor-pointer"
+                                        >
+                                            <div className="aspect-video rounded-lg bg-gray-50 flex flex-col items-center justify-center gap-3 hover:bg-gray-100 transition-colors">
+                                                <ImageIcon className="w-12 h-12 text-gray-400" />
+                                                <div className="text-center">
+                                                    <p className="text-sm text-gray-600 font-medium mb-1">
+                                                        Upload Before Image
+                                                    </p>
+                                                    <p className="text-xs text-gray-400">
+                                                        Click to browse or drag
+                                                        and drop
+                                                    </p>
+                                                </div>
+                                            </div>
                                         </div>
                                     )}
                                     <input
+                                        ref={beforeImageInputRef}
                                         type="file"
                                         accept="image/*"
                                         onChange={handleBeforeImageChange}
-                                        className="w-full text-sm"
-                                        required={!showEditForm}
+                                        className="hidden"
+                                        required={
+                                            !showEditForm && !beforeImagePreview
+                                        }
                                     />
                                 </div>
                             </div>
@@ -428,29 +463,60 @@ export default function AdminBeforeAfterPage() {
                             {/* After Image */}
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                                    <T>After Image</T> *
+                                    After Image *
                                 </label>
-                                <div className="border-2 border-dashed border-gray-300 rounded-xl p-4">
+                                <div className="border-2 border-dashed border-gray-300 rounded-xl p-4 hover:border-[var(--color-accent)] transition-colors">
                                     {afterImagePreview ? (
-                                        <div className="relative aspect-video rounded-lg overflow-hidden mb-3">
-                                            <Image
-                                                src={afterImagePreview}
-                                                alt="After Preview"
-                                                fill
-                                                className="object-cover"
-                                            />
+                                        <div className="space-y-3">
+                                            <div className="relative aspect-video rounded-lg overflow-hidden">
+                                                <Image
+                                                    src={afterImagePreview}
+                                                    alt="After Preview"
+                                                    fill
+                                                    className="object-cover"
+                                                />
+                                            </div>
+                                            <button
+                                                type="button"
+                                                onClick={() =>
+                                                    afterImageInputRef.current?.click()
+                                                }
+                                                className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors text-sm font-medium"
+                                            >
+                                                <Upload className="w-4 h-4" />
+                                                Change Image
+                                            </button>
                                         </div>
                                     ) : (
-                                        <div className="aspect-video rounded-lg bg-gray-100 flex items-center justify-center mb-3">
-                                            <ImageIcon className="w-12 h-12 text-gray-400" />
+                                        <div
+                                            onClick={() =>
+                                                afterImageInputRef.current?.click()
+                                            }
+                                            className="cursor-pointer"
+                                        >
+                                            <div className="aspect-video rounded-lg bg-gray-50 flex flex-col items-center justify-center gap-3 hover:bg-gray-100 transition-colors">
+                                                <ImageIcon className="w-12 h-12 text-gray-400" />
+                                                <div className="text-center">
+                                                    <p className="text-sm text-gray-600 font-medium mb-1">
+                                                        Upload After Image
+                                                    </p>
+                                                    <p className="text-xs text-gray-400">
+                                                        Click to browse or drag
+                                                        and drop
+                                                    </p>
+                                                </div>
+                                            </div>
                                         </div>
                                     )}
                                     <input
+                                        ref={afterImageInputRef}
                                         type="file"
                                         accept="image/*"
                                         onChange={handleAfterImageChange}
-                                        className="w-full text-sm"
-                                        required={!showEditForm}
+                                        className="hidden"
+                                        required={
+                                            !showEditForm && !afterImagePreview
+                                        }
                                     />
                                 </div>
                             </div>
@@ -458,7 +524,7 @@ export default function AdminBeforeAfterPage() {
                             {/* Description */}
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                                    <T>Description</T> *
+                                    Description *
                                 </label>
                                 <textarea
                                     value={description}
@@ -475,7 +541,7 @@ export default function AdminBeforeAfterPage() {
                             {/* Location */}
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                                    <T>Location</T> *
+                                    Location *
                                 </label>
                                 <input
                                     type="text"
@@ -504,7 +570,7 @@ export default function AdminBeforeAfterPage() {
                                     htmlFor="isActive"
                                     className="text-sm font-medium text-gray-700"
                                 >
-                                    <T>Show on website</T>
+                                    Show on website
                                 </label>
                             </div>
 
@@ -515,13 +581,11 @@ export default function AdminBeforeAfterPage() {
                                     disabled={isLoading}
                                     className="flex-1 bg-[var(--color-accent)] text-white px-6 py-3 rounded-lg font-medium hover:opacity-90 transition-opacity disabled:opacity-50"
                                 >
-                                    {isLoading ? (
-                                        <T>Saving...</T>
-                                    ) : showEditForm ? (
-                                        <T>Update Project</T>
-                                    ) : (
-                                        <T>Create Project</T>
-                                    )}
+                                    {isLoading
+                                        ? "Saving..."
+                                        : showEditForm
+                                          ? "Update Project"
+                                          : "Create Project"}
                                 </button>
                                 <button
                                     type="button"
@@ -533,7 +597,7 @@ export default function AdminBeforeAfterPage() {
                                     }}
                                     className="px-6 py-3 border border-gray-300 rounded-lg font-medium hover:bg-gray-50 transition-colors"
                                 >
-                                    <T>Cancel</T>
+                                    Cancel
                                 </button>
                             </div>
                         </form>

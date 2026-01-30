@@ -31,7 +31,14 @@ export const firestoreToProduct = (doc: DocumentSnapshot<DocumentData>): Product
     id: doc.id,
     name: data.name,
     description: data.description,
-    price: data.price,
+    colorPrices: (() => {
+      const raw: Record<string, number> = data.colorPrices || (data.price && data.colorIds?.length
+        ? Object.fromEntries((data.colorIds as string[]).map((id: string) => [id, data.price as number]))
+        : {});
+      return Object.fromEntries(
+        Object.entries(raw).filter(([, v]) => typeof v === 'number' && !isNaN(v))
+      ) as Record<string, number>;
+    })(),
     categoryId: data.categoryId,
     typeOfProductId: data.typeOfProductId,
     materialId: data.materialId,
@@ -51,7 +58,9 @@ export const productToFirestore = (product: Omit<Product, 'id'>): DocumentData =
   return {
     name: product.name,
     description: product.description || null,
-    price: product.price,
+    colorPrices: Object.fromEntries(
+      Object.entries(product.colorPrices || {}).filter(([, v]) => typeof v === 'number' && !isNaN(v))
+    ),
     categoryId: product.categoryId || null,
     typeOfProductId: product.typeOfProductId || null,
     materialId: product.materialId || null,
@@ -119,10 +128,13 @@ export const getFilteredProducts = async (filters: {
     // Фильтрация по цене (на клиенте)
     if (filters.minPrice !== undefined || filters.maxPrice !== undefined) {
       products = products.filter(product => {
-        const price = product.price;
+        const prices = Object.values(product.colorPrices);
+        if (prices.length === 0) return false;
+        const minProductPrice = Math.min(...prices);
+        const maxProductPrice = Math.max(...prices);
         const min = filters.minPrice ?? 0;
         const max = filters.maxPrice ?? Infinity;
-        return price >= min && price <= max;
+        return maxProductPrice >= min && minProductPrice <= max;
       });
     }
 
