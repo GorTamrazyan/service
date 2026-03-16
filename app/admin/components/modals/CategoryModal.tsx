@@ -100,7 +100,6 @@ export default function CategoryModal({
                     </button>
                 </div>
 
-                {/* Existing Categories List */}
                 {categories.length > 0 && (
                     <div className="mb-6">
                         <h3 className="text-sm font-semibold text-[var(--color-text)] mb-3">
@@ -140,7 +139,6 @@ export default function CategoryModal({
                     </div>
                 )}
 
-                {/* Add New Category Form */}
                 <div className="border-t border-[var(--color-text)]/10 pt-4">
                     <h3 className="text-sm font-semibold text-[var(--color-text)] mb-3">
                         <T>Add New Category</T>

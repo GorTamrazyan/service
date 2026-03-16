@@ -1,4 +1,3 @@
-// components/NotificationsDropdown.tsx
 "use client";
 
 import React, { useState, useEffect, useCallback, useRef } from "react";
@@ -21,10 +20,6 @@ export default function NotificationsDropdown() {
     const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
     const unreadCount = notifications.filter((n) => !n.read).length;
-
-    // ----------------------------------------------------
-    //  API CALLS WITH DEBUGGING
-    // ----------------------------------------------------
 
     const fetchNotifications = useCallback(async (silent = false) => {
         if (!silent) {
@@ -56,7 +51,6 @@ export default function NotificationsDropdown() {
                 data.notifications?.length || 0
             );
 
-            // Детальный лог каждого уведомления
             if (data.notifications && data.notifications.length > 0) {
                 console.log("🔍 Detailed notifications:");
                 data.notifications.forEach(
@@ -102,7 +96,6 @@ export default function NotificationsDropdown() {
 
             if (!response.ok) throw new Error("Failed to mark as read");
 
-            // Optimistic update
             setNotifications((prev) =>
                 prev.map((n) =>
                     n.id === notificationId ? { ...n, read: true } : n
@@ -111,7 +104,7 @@ export default function NotificationsDropdown() {
             console.log("✅ Notification marked as read");
         } catch (error) {
             console.error("❌ Failed to mark as read:", error);
-            await fetchNotifications(true); // Re-fetch on error
+            await fetchNotifications(true); 
         }
     };
 
@@ -147,7 +140,6 @@ export default function NotificationsDropdown() {
             const result = await response.json();
             console.log("✅ API Response:", result);
 
-            // Optimistic update
             setNotifications((prev) => {
                 const updated = prev.map((n) => ({ ...n, read: true }));
                 console.log("📊 Updated notifications in state:", updated);
@@ -156,7 +148,6 @@ export default function NotificationsDropdown() {
 
             console.log("✅ All notifications marked as read in UI");
 
-            // Принудительно обновляем через 500ms для синхронизации
             setTimeout(() => {
                 console.log("🔄 Syncing with server...");
                 fetchNotifications(true);
@@ -186,7 +177,6 @@ export default function NotificationsDropdown() {
 
             if (!response.ok) throw new Error("Failed to delete notification");
 
-            // Optimistic update - удаляем из списка
             setNotifications((prev) =>
                 prev.filter((n) => n.id !== notificationId)
             );
@@ -200,12 +190,10 @@ export default function NotificationsDropdown() {
     const handleNotificationClick = async (notification: Notification) => {
         console.log("👆 Notification clicked:", notification);
 
-        // Mark as read if needed
         if (!notification.read && notification.id) {
             await markAsRead(notification.id);
         }
 
-        // Redirect if there's an order_id
         if (notification.order_id) {
             console.log("🔗 Redirecting to order:", notification.order_id);
             setTimeout(() => {
@@ -215,17 +203,11 @@ export default function NotificationsDropdown() {
         }
     };
 
-    // ----------------------------------------------------
-    //  EFFECTS
-    // ----------------------------------------------------
-
-    // Первоначальная загрузка
     useEffect(() => {
         console.log("🚀 Component mounted, fetching initial notifications");
         fetchNotifications();
     }, [fetchNotifications]);
 
-    // Загрузка при открытии dropdown
     useEffect(() => {
         console.log("🔔 Notifications dropdown opened:", isOpen);
         if (isOpen) {
@@ -241,20 +223,17 @@ export default function NotificationsDropdown() {
         });
     }, [notifications, unreadCount]);
 
-    // Auto-refresh каждые 10 секунд (уменьшил для тестирования)
     useEffect(() => {
         console.log("⏰ Setting up auto-refresh interval");
 
-        // Очищаем предыдущий интервал
         if (intervalRef.current) {
             clearInterval(intervalRef.current);
         }
 
-        // Создаем новый интервал
         intervalRef.current = setInterval(() => {
             console.log("🔄 Auto-refresh triggered");
-            fetchNotifications(true); // Silent refresh
-        }, 10000); // Каждые 10 секунд
+            fetchNotifications(true); 
+        }, 10000); 
 
         return () => {
             console.log("🛑 Clearing auto-refresh interval");
@@ -264,7 +243,6 @@ export default function NotificationsDropdown() {
         };
     }, [fetchNotifications]);
 
-    // Close dropdown when clicking outside
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
             const target = event.target as HTMLElement;
@@ -277,10 +255,6 @@ export default function NotificationsDropdown() {
         return () =>
             document.removeEventListener("mousedown", handleClickOutside);
     }, [isOpen]);
-
-    // ----------------------------------------------------
-    //  UTILITIES
-    // ----------------------------------------------------
 
     const formatTime = (timestamp: any) => {
         if (!timestamp) {
@@ -317,13 +291,9 @@ export default function NotificationsDropdown() {
         }
     };
 
-    // ----------------------------------------------------
-    //  RENDER
-    // ----------------------------------------------------
-
     return (
         <div className="relative notifications-dropdown">
-            {/* Notification Bell */}
+
             <button
                 onClick={() => {
                     console.log("🔔 Bell clicked, current state:", isOpen);
@@ -342,10 +312,9 @@ export default function NotificationsDropdown() {
                 )}
             </button>
 
-            {/* Dropdown */}
             {isOpen && (
                 <div className="absolute right-0 top-full mt-2 w-96 bg-[var(--color-background)] border border-[var(--color-text)]/20 rounded-lg shadow-xl z-50 overflow-hidden">
-                    {/* Header */}
+
                     <div className="p-4 border-b border-[var(--color-text)]/10 bg-[var(--color-secondary)]/20">
                         <div className="flex justify-between items-center">
                             <h3 className="font-semibold text-[var(--color-text)]">
@@ -392,7 +361,6 @@ export default function NotificationsDropdown() {
                         </div>
                     </div>
 
-                    {/* Notifications List */}
                     <div className="max-h-96 overflow-y-auto">
                         {loading ? (
                             <div className="p-8 text-center text-[var(--color-text)]/60">
@@ -477,7 +445,6 @@ export default function NotificationsDropdown() {
                         )}
                     </div>
 
-                    {/* Debug Info */}
                     <div className="p-2 border-t border-[var(--color-text)]/10 bg-[var(--color-secondary)]/10">
                         <p className="text-xs text-[var(--color-text)]/40 text-center">
                             Total: {notifications.length} | Unread:{" "}

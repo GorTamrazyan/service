@@ -1,4 +1,3 @@
-// client/sign-in/page.tsx
 "use client";
 import { useState } from "react";
 import React from "react";
@@ -28,7 +27,6 @@ export default function SignInPage() {
 
     const router = useRouter();
 
-    // Create user profile in Firestore (if it doesn't exist)
     const createUserProfileIfNotExists = async (
         userId: string,
         email: string,
@@ -59,10 +57,10 @@ export default function SignInPage() {
                     "✅ User profile created in Firestore:",
                     newProfile,
                 );
-                return true; // New user
+                return true; 
             } else {
                 console.log("ℹ️ User profile already exists");
-                return false; // Existing user
+                return false; 
             }
         } catch (error) {
             console.error("❌ Error creating profile:", error);
@@ -84,7 +82,6 @@ export default function SignInPage() {
             );
             const user = userCredential.user;
 
-            // Check if email is verified
             if (!user.emailVerified) {
                 setEmailNotVerified(true);
                 setError("Please verify your email before signing in.");
@@ -144,16 +141,13 @@ export default function SignInPage() {
             const user = result.user;
             console.log("Successful sign in via Google:", user);
 
-            // Check if this is a new user by checking if profile exists
             if (user.email) {
                 const userDocRef = doc(db, "users", user.uid);
                 const docSnap = await getDoc(userDocRef);
                 const isNewUser = !docSnap.exists();
 
-                // Create user profile in Firestore if it doesn't exist
                 await createUserProfileIfNotExists(user.uid, user.email);
 
-                // Send welcome email only for new users
                 if (isNewUser) {
                     try {
                         const { sendWelcomeEmailHelper } =
@@ -191,16 +185,13 @@ export default function SignInPage() {
             const user = result.user;
             console.log("Successful sign in via Apple/iCloud:", user);
 
-            // Check if this is a new user
             if (user.email) {
                 const userDocRef = doc(db, "users", user.uid);
                 const docSnap = await getDoc(userDocRef);
                 const isNewUser = !docSnap.exists();
 
-                // Create user profile in Firestore if it doesn't exist
                 await createUserProfileIfNotExists(user.uid, user.email);
 
-                // Send welcome email only for new users
                 if (isNewUser) {
                     try {
                         const { sendWelcomeEmailHelper } =
@@ -232,13 +223,12 @@ export default function SignInPage() {
 
     return (
         <div className="min-h-screen bg-[var(--color-background)] flex flex-col relative overflow-hidden">
-            {/* Background decorative elements */}
+
             <div className="absolute inset-0 overflow-hidden pointer-events-none">
                 <div className="absolute top-0 right-0 w-96 h-96 bg-[var(--color-primary)]/5 rounded-full blur-3xl"></div>
                 <div className="absolute bottom-0 left-0 w-96 h-96 bg-[var(--color-accent)]/5 rounded-full blur-3xl"></div>
             </div>
 
-            {/* Modern Header */}
             <div className="relative w-full py-6 bg-[var(--color-secondary)] shadow-sm border-b border-[var(--color-border)]">
                 <div className="max-w-7xl mx-auto px-4">
                     <Link
@@ -246,7 +236,7 @@ export default function SignInPage() {
                         className="flex items-center justify-center group"
                     >
                         <div className="flex items-center space-x-4 transition-transform duration-300 group-hover:scale-105">
-                            {/* Enhanced Fence icon */}
+
                             <div className="text-[var(--color-accent)] transform transition-all duration-300 group-hover:rotate-6">
                                 <svg
                                     width="60"
@@ -275,12 +265,11 @@ export default function SignInPage() {
                 </div>
             </div>
 
-            {/* Main content */}
             <div className="relative flex-1 flex items-center justify-center px-4 py-12">
                 <div className="w-full max-w-md">
-                    {/* Modern card container */}
+
                     <div className="bg-[var(--color-card-bg)] rounded-2xl shadow-2xl border border-[var(--color-border)] p-8 md:p-10 transition-all duration-300 hover:shadow-3xl">
-                        {/* Header section */}
+
                         <div className="text-center mb-8">
                             <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-accent)] rounded-2xl mb-4 shadow-lg">
                                 <svg
@@ -305,12 +294,11 @@ export default function SignInPage() {
                             </p>
                         </div>
 
-                        {/* Form */}
                         <form
                             onSubmit={handleEmailPasswordSignIn}
                             className="space-y-5"
                         >
-                            {/* Email field with icon */}
+
                             <div className="space-y-2">
                                 <label
                                     htmlFor="email"
@@ -339,7 +327,6 @@ export default function SignInPage() {
                                 </div>
                             </div>
 
-                            {/* Password field with icon */}
                             <div className="space-y-2">
                                 <label
                                     htmlFor="password"
@@ -368,7 +355,6 @@ export default function SignInPage() {
                                 </div>
                             </div>
 
-                            {/* Forgot password link */}
                             <div className="text-right">
                                 <Link
                                     href="/forgot-password"
@@ -378,7 +364,6 @@ export default function SignInPage() {
                                 </Link>
                             </div>
 
-                            {/* Error message with modern styling */}
                             {error && (
                                 <div className="bg-[var(--color-error)]/10 border-2 border-[var(--color-error)]/30 text-[var(--color-error)] px-4 py-3 rounded-xl text-sm animate-shake">
                                     <div className="flex items-start space-x-2">
@@ -404,7 +389,6 @@ export default function SignInPage() {
                                 </div>
                             )}
 
-                            {/* Verification sent message */}
                             {verificationSent && (
                                 <div className="bg-[var(--color-success)]/10 border-2 border-[var(--color-success)]/30 text-[var(--color-success)] px-4 py-3 rounded-xl text-sm animate-fadeIn">
                                     <div className="flex items-start space-x-2">
@@ -417,7 +401,6 @@ export default function SignInPage() {
                                 </div>
                             )}
 
-                            {/* Login button with loading state */}
                             <div className="pt-2">
                                 <button
                                     type="submit"
@@ -453,7 +436,6 @@ export default function SignInPage() {
                                 </button>
                             </div>
 
-                            {/* Divider */}
                             <div className="relative py-4">
                                 <div className="absolute inset-0 flex items-center">
                                     <div className="w-full border-t border-[var(--color-border)]"></div>
@@ -465,7 +447,6 @@ export default function SignInPage() {
                                 </div>
                             </div>
 
-                            {/* Social login buttons with modern design */}
                             <div className="grid grid-cols-2 gap-3">
                                 <button
                                     type="button"
@@ -493,7 +474,6 @@ export default function SignInPage() {
                             </div>
                         </form>
 
-                        {/* Create account link */}
                         <div className="text-center mt-8 pt-6 border-t border-[var(--color-border)]">
                             <p className="text-[var(--color-text)]/70 text-sm">
                                 Don't have an account?{" "}
@@ -507,7 +487,6 @@ export default function SignInPage() {
                         </div>
                     </div>
 
-                    {/* Footer note */}
                     <p className="text-center text-[var(--color-text)]/50 text-xs mt-6">
                         Protected by industry-standard security measures
                     </p>

@@ -1,4 +1,3 @@
-// app/api/service/route.ts
 import { NextResponse } from "next/server";
 import {
     getAllServices,
@@ -7,9 +6,6 @@ import {
     deleteService,
 } from "../../lib/firebase/service";
 
-/**
- * GET handler for retrieving all services
- */
 export async function GET(request: Request) {
     try {
         const services = await getAllServices();
@@ -23,15 +19,11 @@ export async function GET(request: Request) {
     }
 }
 
-/**
- * POST handler for creating a new service
- */
 export async function POST(request: Request) {
     try {
         const body = await request.json();
         const { icon, title, description, features, price } = body;
 
-        // Validation
         if (!icon || !title || !description || !Array.isArray(features)) {
             return NextResponse.json(
                 {
@@ -42,7 +34,6 @@ export async function POST(request: Request) {
             );
         }
 
-        // Create service
         const newServiceId = await createService({
             icon,
             title,
@@ -64,9 +55,6 @@ export async function POST(request: Request) {
     }
 }
 
-/**
- * PUT handler for updating a service
- */
 export async function PUT(request: Request) {
     try {
         const { searchParams } = new URL(request.url);
@@ -82,7 +70,6 @@ export async function PUT(request: Request) {
         const body = await request.json();
         const { icon, title, description, features, price } = body;
 
-        // Validation
         if (!icon || !title || !description || !Array.isArray(features)) {
             return NextResponse.json(
                 {
@@ -93,7 +80,6 @@ export async function PUT(request: Request) {
             );
         }
 
-        // Update service
         await updateService(id, {
             icon,
             title,
@@ -115,9 +101,6 @@ export async function PUT(request: Request) {
     }
 }
 
-/**
- * DELETE handler for deleting a service
- */
 export async function DELETE(request: Request) {
     try {
         const { searchParams } = new URL(request.url);
@@ -130,7 +113,6 @@ export async function DELETE(request: Request) {
             );
         }
 
-        // Delete service
         await deleteService(id);
 
         return NextResponse.json(

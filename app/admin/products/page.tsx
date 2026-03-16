@@ -1,4 +1,3 @@
-// admin/products/page.tsx
 "use client";
 
 import React, { useState, useEffect } from "react";
@@ -57,7 +56,6 @@ export default function AdminProductsPage() {
     const [editingProduct, setEditingProduct] = useState<Product | null>(null);
     const [error, setError] = useState("");
 
-    // Modals for managing entities
     const [showCategoryModal, setShowCategoryModal] = useState(false);
     const [showMaterialModal, setShowMaterialModal] = useState(false);
     const [showColorModal, setShowColorModal] = useState(false);
@@ -151,7 +149,7 @@ export default function AdminProductsPage() {
         setIsLoading(true);
 
         try {
-            // Создаём продукт
+            
             const productId = await createProduct({
                 name: newProduct.name,
                 description: newProduct.description,
@@ -164,19 +162,17 @@ export default function AdminProductsPage() {
                 discount: newProduct.discount,
             });
 
-            // Загружаем изображения в Storage если они есть
             if (newProductImages.length > 0) {
                 const imageUrls = await uploadProductImages(
                     newProductImages,
                     productId
                 );
 
-                // Сохраняем информацию об изображениях в Firestore
                 for (let i = 0; i < imageUrls.length; i++) {
                     await createImage({
                         url: imageUrls[i],
                         productId: productId,
-                        isPrimary: i === 0, // Первое изображение - основное
+                        isPrimary: i === 0, 
                         order: i,
                         alt: `${newProduct.name} - Image ${i + 1}`,
                     });
@@ -213,7 +209,7 @@ export default function AdminProductsPage() {
     ) => {
         if (confirm(`Are you sure you want to delete "${productName}"?`)) {
             try {
-                // Удаляем картинки из Cloudinary и Firestore
+                
                 const images = await getImagesByProductId(productId);
                 for (const image of images) {
                     await deleteProductImage(image.url);
@@ -248,7 +244,6 @@ export default function AdminProductsPage() {
             discount: product.discount || 0,
         });
 
-        // Загружаем существующие изображения продукта
         if (product.id) {
             try {
                 const images = await getImagesByProductId(product.id);
@@ -267,13 +262,13 @@ export default function AdminProductsPage() {
         if (!confirm("Are you sure you want to delete this image?")) return;
 
         try {
-            // Удаляем из Cloudinary
+            
             await deleteProductImage(image.url);
-            // Удаляем из Firestore
+            
             if (image.id) {
                 await deleteImage(image.id);
             }
-            // Обновляем локальное состояние
+            
             setExistingImages(prev => prev.filter(img => img.id !== image.id));
         } catch (error) {
             console.error("Error deleting image:", error);
@@ -289,7 +284,7 @@ export default function AdminProductsPage() {
         setIsLoading(true);
 
         try {
-            // Обновляем данные продукта
+            
             await updateProduct(editingProduct.id, {
                 name: editProduct.name,
                 description: editProduct.description,
@@ -302,20 +297,18 @@ export default function AdminProductsPage() {
                 discount: editProduct.discount,
             });
 
-            // Загружаем новые изображения если они есть
             if (editProductImages.length > 0) {
                 const imageUrls = await uploadProductImages(
                     editProductImages,
                     editingProduct.id
                 );
 
-                // Сохраняем информацию о новых изображениях в Firestore
                 for (let i = 0; i < imageUrls.length; i++) {
                     await createImage({
                         url: imageUrls[i],
                         productId: editingProduct.id,
-                        isPrimary: false, // Новые изображения не основные по умолчанию
-                        order: 999 + i, // Добавляем в конец
+                        isPrimary: false, 
+                        order: 999 + i, 
                         alt: `${editProduct.name} - Image ${i + 1}`,
                     });
                 }
@@ -357,7 +350,7 @@ export default function AdminProductsPage() {
 
     return (
         <div className="space-y-8">
-            {/* Header */}
+
             <div className="flex items-center justify-between">
                 <div>
                     <h1 className="text-3xl font-bold text-[var(--color-primary)]">
@@ -377,7 +370,6 @@ export default function AdminProductsPage() {
                 </button>
             </div>
 
-            {/* Quick Actions for Managing Entities */}
             <div className="bg-[var(--color-background)] rounded-2xl shadow-xl border border-[var(--color-text)]/10 p-6">
                 <h3 className="text-lg font-semibold text-[var(--color-primary)] mb-4">
                     <T>Manage Product Attributes</T>
@@ -410,17 +402,15 @@ export default function AdminProductsPage() {
                 </div>
             </div>
 
-            {/* Error Display */}
             {error && (
                 <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-xl">
                     {error}
                 </div>
             )}
 
-            {/* Filters */}
             <div className="bg-[var(--color-background)] rounded-2xl shadow-xl border border-[var(--color-text)]/10 p-6">
                 <div className="flex flex-col lg:flex-row gap-4">
-                    {/* Search */}
+
                     <div className="relative flex-1">
                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--color-text)]/50" />
                         <input
@@ -432,7 +422,6 @@ export default function AdminProductsPage() {
                         />
                     </div>
 
-                    {/* Category Filter */}
                     <div className="relative">
                         <Filter className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--color-text)]/50" />
                         <select
@@ -453,7 +442,6 @@ export default function AdminProductsPage() {
                 </div>
             </div>
 
-            {/* Products Table */}
             {categories.map((categorie) => (
                 <div
                     key={categorie.id}
@@ -579,7 +567,7 @@ export default function AdminProductsPage() {
                     </div>
                 </div>
             ))}
-            {/* Add Product Modal */}
+
             {showAddForm && (
                 <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 overflow-y-auto">
                     <div className="bg-[var(--color-background)] rounded-2xl p-6 w-full max-w-2xl my-auto max-h-[90vh] overflow-y-auto">
@@ -885,7 +873,6 @@ export default function AdminProductsPage() {
                 </div>
             )}
 
-            {/* Edit Product Modal */}
             {showEditForm && editingProduct && (
                 <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 overflow-y-auto">
                     <div className="bg-[var(--color-background)] rounded-2xl p-6 w-full max-w-2xl my-auto max-h-[90vh] overflow-y-auto">
@@ -1084,7 +1071,7 @@ export default function AdminProductsPage() {
                                     <T>Images</T>
                                 </label>
                                 <div className="space-y-4">
-                                    {/* Существующие изображения */}
+
                                     {existingImages.length > 0 && (
                                         <div>
                                             <p className="text-xs text-[var(--color-text)]/60 mb-2">
@@ -1119,7 +1106,6 @@ export default function AdminProductsPage() {
                                         </div>
                                     )}
 
-                                    {/* Загрузка новых изображений */}
                                     <div>
                                         <p className="text-xs text-[var(--color-text)]/60 mb-2">
                                             <T>Add new images</T>
@@ -1245,7 +1231,6 @@ export default function AdminProductsPage() {
                 </div>
             )}
 
-            {/* Modals */}
             <CategoryModal
                 isOpen={showCategoryModal}
                 onClose={() => setShowCategoryModal(false)}
@@ -1267,7 +1252,6 @@ export default function AdminProductsPage() {
                 onSuccess={loadTypeOfProducts}
             />
 
-            {/* Empty State */}
             {filteredProducts.length === 0 && (
                 <div className="text-center py-12">
                     <Package className="w-16 h-16 text-[var(--color-text)]/30 mx-auto mb-4" />

@@ -1,4 +1,3 @@
-// Скрипт для создания админа в Firestore (без Firebase Auth)
 import { initializeDefaultAdmin } from "../lib/firebase/admin";
 
 initializeDefaultAdmin().then(() => {

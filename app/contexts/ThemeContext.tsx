@@ -1,4 +1,3 @@
-// app/contexts/ThemeContext.tsx
 "use client";
 
 import React, {
@@ -20,7 +19,7 @@ const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 interface ThemeProviderProps {
     children: ReactNode;
-    scope?: string; // "admin" | "client" | undefined (global)
+    scope?: string; 
 }
 
 export function ThemeProvider({ children, scope }: ThemeProviderProps) {
@@ -48,10 +47,10 @@ export function ThemeProvider({ children, scope }: ThemeProviderProps) {
             setIsDark(shouldBeDark);
 
             if (scope) {
-                // Scoped: apply class to container div
+                
                 containerRef.current?.classList.toggle("dark", shouldBeDark);
             } else {
-                // Global: apply to documentElement
+                
                 document.documentElement.classList.toggle("dark", shouldBeDark);
             }
 

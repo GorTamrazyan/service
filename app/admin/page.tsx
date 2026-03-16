@@ -1,4 +1,3 @@
-// admin/page.tsx
 "use client";
 
 import React, { useState, useEffect } from "react";
@@ -44,7 +43,7 @@ export default function AdminDashboard() {
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
-        // Load products from database
+        
         const loadData = async () => {
             try {
                 const productsData = await getAllProducts();
@@ -54,7 +53,6 @@ export default function AdminDashboard() {
                 const usersData = await getAllUsers();
                 setUser(usersData);
 
-                // Вычисляем доход из доставленных заказов
                 const revenue = ordersData
                     .filter((order) => order.status === "delivered")
                     .reduce(
@@ -120,7 +118,7 @@ export default function AdminDashboard() {
 
     return (
         <div className="space-y-8">
-            {/* Header */}
+
             <div className="space-y-2">
                 <h1 className="text-4xl font-bold text-[var(--color-primary)]">
                     <T>Admin Dashboard</T>
@@ -133,7 +131,6 @@ export default function AdminDashboard() {
                 </p>
             </div>
 
-            {/* Stats Cards */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 {statsCards.map((card, index) => {
                     const Icon = card.icon;
@@ -177,9 +174,8 @@ export default function AdminDashboard() {
                 })}
             </div>
 
-            {/* Charts and Activity */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                {/* Revenue Chart */}
+
                 <div className="bg-[var(--color-background)] rounded-2xl shadow-xl border border-[var(--color-text)]/10 p-6">
                     <div className="flex items-center gap-3 mb-6">
                         <div className="bg-[var(--color-accent)] rounded-xl p-2">
@@ -204,7 +200,6 @@ export default function AdminDashboard() {
                     </div>
                 </div>
 
-                {/* Recent Activity */}
                 <div className="bg-[var(--color-background)] rounded-2xl shadow-xl border border-[var(--color-text)]/10 p-6">
                     <div className="flex items-center gap-3 mb-6">
                         <div className="bg-[var(--color-primary)] rounded-xl p-2">
@@ -266,7 +261,6 @@ export default function AdminDashboard() {
                 </div>
             </div>
 
-            {/* Quick Actions */}
             <div className="bg-[var(--color-background)] rounded-2xl shadow-xl border border-[var(--color-text)]/10 p-6">
                 <h3 className="text-xl font-semibold text-[var(--color-primary)] mb-6">
                     <T>Quick Actions</T>

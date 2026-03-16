@@ -1,8 +1,6 @@
 const fs = require('fs');
 const path = require('path');
 
-// Простой переводчик используя Google Translate API (бесплатная версия)
-// Для продакшена рекомендуется использовать официальный API
 async function translateText(text, targetLang) {
     try {
         const response = await fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=${targetLang}&dt=t&q=${encodeURIComponent(text)}`);
@@ -10,16 +8,14 @@ async function translateText(text, targetLang) {
         return result[0][0][0];
     } catch (error) {
         console.error(`Ошибка перевода для "${text}":`, error);
-        return text; // возвращаем оригинальный текст если перевод не удался
+        return text; 
     }
 }
 
-// Функция для автоматического перевода всех ключей
 async function autoTranslate() {
     const contextPath = path.join(__dirname, '../app/contexts/LanguageContext.tsx');
     const content = fs.readFileSync(contextPath, 'utf8');
     
-    // Извлекаем английские переводы
     const enMatch = content.match(/en:\s*{([\s\S]*?)},\s*ru:/);
     if (!enMatch) {
         console.error('Не удалось найти английские переводы');
@@ -43,12 +39,10 @@ async function autoTranslate() {
     
     const translations = {};
     
-    // Инициализируем структуру переводов
     Object.keys(languages).forEach(lang => {
         translations[lang] = {};
     });
     
-    // Переводим каждый ключ
     for (const pair of keyValuePairs) {
         const [key, value] = pair.match(/"([^"]*)"/g);
         const cleanKey = key.replace(/"/g, '');
@@ -61,22 +55,19 @@ async function autoTranslate() {
                 const translatedValue = await translateText(cleanValue, googleLangCode);
                 translations[langCode][cleanKey] = translatedValue;
                 
-                // Небольшая задержка чтобы не перегрузить API
                 await new Promise(resolve => setTimeout(resolve, 100));
             } catch (error) {
                 console.error(`Ошибка перевода ${cleanKey} на ${langCode}:`, error);
-                translations[langCode][cleanKey] = cleanValue; // fallback к английскому
+                translations[langCode][cleanKey] = cleanValue; 
             }
         }
     }
     
-    // Создаем новый файл с переводами
     const newTranslations = {
         en: {},
         ...translations
     };
     
-    // Добавляем английские переводы
     keyValuePairs.forEach(pair => {
         const [key, value] = pair.match(/"([^"]*)"/g);
         const cleanKey = key.replace(/"/g, '');
@@ -84,13 +75,10 @@ async function autoTranslate() {
         newTranslations.en[cleanKey] = cleanValue;
     });
     
-    // Генерируем новый код для LanguageContext
     const newContent = generateLanguageContextCode(newTranslations);
     
-    // Создаем резервную копию
     fs.copyFileSync(contextPath, contextPath + '.backup');
     
-    // Записываем новый файл
     fs.writeFileSync(contextPath, newContent, 'utf8');
     
     console.log('✅ Автоматический перевод завершен!');
@@ -206,7 +194,6 @@ export const useAutoTranslate = () => {
 `;
 }
 
-// Запускаем автоперевод
 if (require.main === module) {
     autoTranslate().catch(console.error);
 }

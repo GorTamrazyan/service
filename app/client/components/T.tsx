@@ -10,7 +10,6 @@ interface TProps {
     as?: keyof React.JSX.IntrinsicElements;
 }
 
-// Компонент T для автоматического перевода любого текста
 export function T({ children, fallback, className = "", as = "span" }: TProps) {
     const { t, language, autoTranslate } = useLanguage();
     const [translatedText, setTranslatedText] = useState<string>(children);
@@ -22,14 +21,12 @@ export function T({ children, fallback, className = "", as = "span" }: TProps) {
                 return;
             }
 
-            // Сначала пытаемся найти перевод по ключу
             const keyTranslation = t(children);
             if (keyTranslation !== children) {
                 setTranslatedText(keyTranslation);
                 return;
             }
 
-            // Если ключ не найден и язык не английский - переводим автоматически
             if (language !== "en") {
                 try {
                     const translated = await autoTranslate(children);

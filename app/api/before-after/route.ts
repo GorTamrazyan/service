@@ -1,4 +1,3 @@
-// app/api/before-after/route.ts
 import { NextResponse } from "next/server";
 import {
     getAllProjects,
@@ -9,9 +8,6 @@ import {
     uploadProjectImage,
 } from "../../lib/firebase/beforeAfter";
 
-/**
- * GET - Получить все проекты или только активные
- */
 export async function GET(request: Request) {
     try {
         const { searchParams } = new URL(request.url);
@@ -31,9 +27,6 @@ export async function GET(request: Request) {
     }
 }
 
-/**
- * POST - Создать новый проект
- */
 export async function POST(request: Request) {
     try {
         const formData = await request.formData();
@@ -45,7 +38,6 @@ export async function POST(request: Request) {
         const order = parseInt(formData.get("order") as string) || 0;
         const isActive = formData.get("isActive") === "true";
 
-        // Валидация
         if (!beforeFile || !afterFile || !description || !location) {
             return NextResponse.json(
                 {
@@ -56,11 +48,9 @@ export async function POST(request: Request) {
             );
         }
 
-        // Загружаем изображения
         const beforeImageUrl = await uploadProjectImage(beforeFile, "before");
         const afterImageUrl = await uploadProjectImage(afterFile, "after");
 
-        // Создаем проект
         const projectId = await createProject({
             beforeImage: beforeImageUrl,
             afterImage: afterImageUrl,
@@ -86,9 +76,6 @@ export async function POST(request: Request) {
     }
 }
 
-/**
- * PUT - Обновить проект
- */
 export async function PUT(request: Request) {
     try {
         const { searchParams } = new URL(request.url);
@@ -116,7 +103,6 @@ export async function PUT(request: Request) {
 
         const updates: any = {};
 
-        // Загружаем новые изображения если они предоставлены
         if (beforeFile && beforeFile.size > 0) {
             updates.beforeImage = await uploadProjectImage(
                 beforeFile,
@@ -147,9 +133,6 @@ export async function PUT(request: Request) {
     }
 }
 
-/**
- * DELETE - Удалить проект
- */
 export async function DELETE(request: Request) {
     try {
         const { searchParams } = new URL(request.url);

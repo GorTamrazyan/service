@@ -1,8 +1,7 @@
-// app/client/components/ProductFilters.tsx
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { X, Filter } from "lucide-react"; // Добавили Filter
+import { X, Filter } from "lucide-react"; 
 import { T } from "./T";
 import type {
     Material,
@@ -35,14 +34,12 @@ export default function ProductFilters({
 }: ProductFiltersProps) {
     const [filters, setFilters] = useState<FilterState>(initialFilters);
 
-    // Загружаем данные для фильтров
     const [categories, setCategories] = useState<Category[]>([]);
     const [materials, setMaterials] = useState<Material[]>([]);
     const [colors, setColors] = useState<Color[]>([]);
     const [typeOfProducts, setTypeOfProducts] = useState<TypeOfProduct[]>([]);
     const [loading, setLoading] = useState(true);
 
-    // Загрузка данных для фильтров
     useEffect(() => {
         async function loadFilterData() {
             setLoading(true);
@@ -79,7 +76,6 @@ export default function ProductFilters({
         }
     }, [isOpen]);
 
-    // Синхронизация с initialFilters
     useEffect(() => {
         setFilters(initialFilters);
     }, [initialFilters]);
@@ -123,15 +119,14 @@ export default function ProductFilters({
 
     return (
         <>
-            {/* Overlay */}
+
             <div
                 className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 transition-all duration-300 animate-in fade-in"
                 onClick={onClose}
             />
 
-            {/* Sidebar */}
             <div className="fixed left-0 top-0 h-full w-80 md:w-96 bg-gradient-to-b from-[var(--color-card-bg)] to-[var(--color-background)] z-50 shadow-2xl overflow-y-auto transform transition-transform duration-300 animate-in slide-in-from-left">
-                {/* Header */}
+
                 <div className="sticky top-0 bg-gradient-to-r from-[var(--color-primary)]/10 to-transparent border-b border-[var(--color-border)] px-6 py-5 flex items-center justify-between z-10 backdrop-blur-sm">
                     <div className="flex items-center gap-3">
                         <div className="p-2 bg-[var(--color-primary)]/20 rounded-lg">
@@ -163,7 +158,6 @@ export default function ProductFilters({
                     </button>
                 </div>
 
-                {/* Content */}
                 <div className="p-6 space-y-8">
                     {loading ? (
                         <div className="flex flex-col items-center justify-center py-12">
@@ -174,7 +168,7 @@ export default function ProductFilters({
                         </div>
                     ) : (
                         <>
-                            {/* Product Type */}
+
                             <div className="space-y-4">
                                 <div className="flex items-center gap-2">
                                     <div className="w-1.5 h-6 bg-gradient-to-b from-[var(--color-primary)] to-[var(--color-accent)] rounded-full"></div>
@@ -222,7 +216,6 @@ export default function ProductFilters({
 
                             <div className="h-px bg-gradient-to-r from-transparent via-[var(--color-border)] to-transparent"></div>
 
-                            {/* Category */}
                             <div className="space-y-4">
                                 <div className="flex items-center gap-2">
                                     <div className="w-1.5 h-6 bg-gradient-to-b from-[var(--color-primary)] to-[var(--color-accent)] rounded-full"></div>
@@ -272,7 +265,6 @@ export default function ProductFilters({
 
                             <div className="h-px bg-gradient-to-r from-transparent via-[var(--color-border)] to-transparent"></div>
 
-                            {/* Material */}
                             <div className="space-y-4">
                                 <div className="flex items-center gap-2">
                                     <div className="w-1.5 h-6 bg-gradient-to-b from-[var(--color-primary)] to-[var(--color-accent)] rounded-full"></div>
@@ -340,7 +332,6 @@ export default function ProductFilters({
 
                             <div className="h-px bg-gradient-to-r from-transparent via-[var(--color-border)] to-transparent"></div>
 
-                            {/* Colors */}
                             <div className="space-y-4">
                                 <div className="flex items-center gap-2">
                                     <div className="w-1.5 h-6 bg-gradient-to-b from-[var(--color-primary)] to-[var(--color-accent)] rounded-full"></div>
@@ -404,7 +395,6 @@ export default function ProductFilters({
 
                             <div className="h-px bg-gradient-to-r from-transparent via-[var(--color-border)] to-transparent"></div>
 
-                            {/* Price Range */}
                             <div className="space-y-4">
                                 <div className="flex items-center gap-2">
                                     <div className="w-1.5 h-6 bg-gradient-to-b from-[var(--color-primary)] to-[var(--color-accent)] rounded-full"></div>
@@ -461,7 +451,7 @@ export default function ProductFilters({
                                             </div>
                                         </div>
                                     </div>
-                                    {/* Price Range Slider */}
+
                                     <div className="pt-2">
                                         <div className="flex items-center justify-between text-sm text-[var(--color-text)]/60 mb-1">
                                             <span>
@@ -498,7 +488,6 @@ export default function ProductFilters({
                     )}
                 </div>
 
-                {/* Footer */}
                 <div className="sticky bottom-0 bg-gradient-to-t from-[var(--color-card-bg)] via-[var(--color-card-bg)] to-transparent border-t border-[var(--color-border)] px-6 py-5 space-y-3 backdrop-blur-sm">
                     <div className="flex gap-3">
                         {hasActiveFilters && (

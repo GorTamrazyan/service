@@ -1,4 +1,3 @@
-// app/client/dashboard/about/page.tsx
 "use client";
 
 import React, { useState, useEffect } from "react";
@@ -21,11 +20,9 @@ import {
 } from "react-icons/fa";
 import { T } from "../../components/T";
 
-// Импортируем Swiper React компоненты
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Pagination, Autoplay, EffectFade } from "swiper/modules";
 
-// Импортируем стили Swiper
 import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
@@ -33,11 +30,10 @@ import "swiper/css/autoplay";
 import "swiper/css/effect-fade";
 
 export default function AboutUsPage() {
-    // Состояния для Before/After проектов
+    
     const [carouselImages, setCarouselImages] = useState<any[]>([]);
     const [isLoadingProjects, setIsLoadingProjects] = useState(true);
 
-    // Загрузка проектов из Firebase
     useEffect(() => {
         async function loadProjects() {
             try {
@@ -47,7 +43,7 @@ export default function AboutUsPage() {
                 );
                 if (response.ok) {
                     const data = await response.json();
-                    // Преобразуем данные в нужный формат
+                    
                     const formattedProjects = data.map((project: any) => ({
                         before: project.beforeImage,
                         after: project.afterImage,
@@ -58,7 +54,7 @@ export default function AboutUsPage() {
                     if (formattedProjects.length > 0) {
                         setCarouselImages(formattedProjects);
                     } else {
-                        // Если нет проектов в Firebase, используем дефолтные
+                        
                         setCarouselImages(getDefaultProjects());
                     }
                 } else {
@@ -76,7 +72,6 @@ export default function AboutUsPage() {
         loadProjects();
     }, []);
 
-    // Дефолтные проекты (fallback)
     const getDefaultProjects = () => [
         {
             before: "/images/projects/before1.jpg",
@@ -198,7 +193,7 @@ export default function AboutUsPage() {
 
     return (
         <div className="bg-[var(--color-background)] text-[var(--color-text)]">
-            {/* Hero Section */}
+
             <section className="relative min-h-[70vh] flex items-center overflow-hidden bg-gradient-to-br from-[var(--color-primary)] via-[var(--color-primary)]/90 to-[var(--color-accent)]/30">
                 <div className="absolute inset-0 z-0">
                     <div className="absolute inset-0 bg-black/40 z-10" />
@@ -257,7 +252,6 @@ export default function AboutUsPage() {
                 </div>
             </section>
 
-            {/* Modern Mission Section */}
             <section className="py-24 bg-gradient-to-b from-[var(--color-background)] to-[var(--color-card-bg)]">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="text-center mb-20">
@@ -280,7 +274,6 @@ export default function AboutUsPage() {
                         </div>
                     </div>
 
-                    {/* Company Stats */}
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
                         {stats.map((stat, index) => (
                             <div
@@ -302,7 +295,6 @@ export default function AboutUsPage() {
                 </div>
             </section>
 
-            {/* Before & After Carousel */}
             <section id="projects" className="py-24 bg-[var(--color-card-bg)]">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="text-center mb-16">
@@ -356,7 +348,7 @@ export default function AboutUsPage() {
                                 <SwiperSlide key={index}>
                                     <div className="relative w-full min-h-[600px] md:min-h-[700px] bg-gradient-to-br from-[var(--color-primary)]/10 to-[var(--color-accent)]/10">
                                         <div className="absolute inset-0 flex flex-col md:flex-row">
-                                            {/* Before Image */}
+
                                             <div className="relative w-full md:w-1/2 h-1/2 md:h-full">
                                                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent z-10" />
                                                 <Image
@@ -372,7 +364,6 @@ export default function AboutUsPage() {
                                                 </div>
                                             </div>
 
-                                            {/* After Image */}
                                             <div className="relative w-full md:w-1/2 h-1/2 md:h-full">
                                                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent z-10" />
                                                 <Image
@@ -389,7 +380,6 @@ export default function AboutUsPage() {
                                             </div>
                                         </div>
 
-                                        {/* Project Description */}
                                         <div className="absolute bottom-0 left-0 right-0 z-20 p-8 md:p-12 bg-gradient-to-t from-black via-black/80 to-transparent">
                                             <div className="max-w-4xl mx-auto text-center">
                                                 <h3 className="text-2xl md:text-3xl font-bold text-[var(--color-background)] mb-3">
@@ -416,7 +406,6 @@ export default function AboutUsPage() {
                 </div>
             </section>
 
-            {/* Timeline Section */}
             <section className="py-24 bg-gradient-to-b from-[var(--color-background)] to-[var(--color-card-bg)]">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="text-center mb-20">
@@ -432,10 +421,9 @@ export default function AboutUsPage() {
                     </div>
 
                     <div className="relative">
-                        {/* Timeline line */}
+
                         <div className="absolute left-1/2 transform -translate-x-1/2 h-full w-1 bg-gradient-to-b from-[var(--color-accent)] to-[var(--color-primary)]" />
 
-                        {/* Timeline items */}
                         <div className="space-y-20">
                             {milestones.map((milestone, index) => (
                                 <div
@@ -446,7 +434,7 @@ export default function AboutUsPage() {
                                             : "flex-row-reverse"
                                     }`}
                                 >
-                                    {/* Content */}
+
                                     <div
                                         className={`w-1/2 ${
                                             index % 2 === 0
@@ -481,7 +469,6 @@ export default function AboutUsPage() {
                                         </div>
                                     </div>
 
-                                    {/* Dot */}
                                     <div className="absolute left-1/2 transform -translate-x-1/2 w-6 h-6 rounded-full bg-[var(--color-accent)] border-4 border-[var(--color-background)] shadow-xl z-10" />
                                 </div>
                             ))}
@@ -490,7 +477,6 @@ export default function AboutUsPage() {
                 </div>
             </section>
 
-            {/* Modern Values Grid */}
             <section className="py-24 bg-[var(--color-card-bg)]">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="text-center mb-20">
@@ -531,7 +517,6 @@ export default function AboutUsPage() {
                 </div>
             </section>
 
-            {/* Why Choose Us - Modern Stats */}
             <section className="py-24 bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-primary)]/90">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="text-center mb-20">
@@ -589,7 +574,6 @@ export default function AboutUsPage() {
                 </div>
             </section>
 
-            {/* CTA Section */}
             <section className="py-24 bg-gradient-to-b from-[var(--color-background)] to-[var(--color-card-bg)]">
                 <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
                     <div className="bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-accent)] rounded-3xl p-12 md:p-16 shadow-2xl">

@@ -13,5 +13,3 @@ export * from './images';
 export * from './typeOfProducts';
 
 export * from './storage';
-
-//export * from './service';

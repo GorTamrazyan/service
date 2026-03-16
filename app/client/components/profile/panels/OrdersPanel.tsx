@@ -110,7 +110,7 @@ export default function OrdersPanel() {
 
     return (
         <div className="space-y-8">
-            {/* Header */}
+
             <div className="space-y-1 flex items-center justify-between">
                 <div>
                     <h1 className="text-3xl font-bold text-[var(--color-primary)]">
@@ -134,7 +134,6 @@ export default function OrdersPanel() {
                 </button>
             </div>
 
-            {/* Stats Cards */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div className="bg-gradient-to-br from-[var(--color-secondary)]/30 to-[var(--color-secondary)]/50 rounded-2xl p-6 border border-[var(--color-text)]/10">
                     <div className="flex items-center gap-4">
@@ -185,7 +184,6 @@ export default function OrdersPanel() {
                 </div>
             </div>
 
-            {/* Orders List */}
             <div className="bg-[var(--color-background)] rounded-2xl shadow-xl border border-[var(--color-text)]/10 overflow-hidden">
                 <div className="bg-gradient-to-r from-[var(--color-secondary)] to-[var(--color-secondary)]/80 px-8 py-6 border-b border-[var(--color-text)]/10">
                     <h3 className="text-xl font-semibold text-[var(--color-primary)]">

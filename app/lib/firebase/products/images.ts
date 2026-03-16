@@ -16,7 +16,6 @@ import {
 import { db } from "../firebase";
 import { Image } from "./types";
 
-// Преобразование Firestore документа в Image объект
 export const firestoreToImage = (doc: DocumentSnapshot<DocumentData>): Image | null => {
   if (!doc.exists()) return null;
 
@@ -32,7 +31,6 @@ export const firestoreToImage = (doc: DocumentSnapshot<DocumentData>): Image | n
   };
 };
 
-// Преобразование Image объекта для Firestore
 export const imageToFirestore = (image: Omit<Image, 'id'>): DocumentData => {
   return {
     url: image.url,
@@ -44,7 +42,6 @@ export const imageToFirestore = (image: Omit<Image, 'id'>): DocumentData => {
   };
 };
 
-// Получить все изображения продукта
 export const getImagesByProductId = async (productId: string): Promise<Image[]> => {
   try {
     const imagesRef = collection(db, 'images');
@@ -58,7 +55,6 @@ export const getImagesByProductId = async (productId: string): Promise<Image[]> 
       .map(doc => firestoreToImage(doc))
       .filter((image): image is Image => image !== null);
 
-    // Сортируем на клиенте вместо Firestore (не требует индекса)
     return images.sort((a, b) => (a.order || 0) - (b.order || 0));
   } catch (error) {
     console.error('Ошибка при получении изображений продукта:', error);
@@ -66,10 +62,9 @@ export const getImagesByProductId = async (productId: string): Promise<Image[]> 
   }
 };
 
-// Получить основное изображение продукта
 export const getPrimaryImageByProductId = async (productId: string): Promise<Image | null> => {
   try {
-    // Получаем все изображения продукта и фильтруем на клиенте
+    
     const images = await getImagesByProductId(productId);
     return images.find(img => img.isPrimary) || images[0] || null;
   } catch (error) {
@@ -78,7 +73,6 @@ export const getPrimaryImageByProductId = async (productId: string): Promise<Ima
   }
 };
 
-// Получить изображение по ID
 export const getImageById = async (id: string): Promise<Image | null> => {
   try {
     const imageRef = doc(db, 'images', id);
@@ -90,7 +84,6 @@ export const getImageById = async (id: string): Promise<Image | null> => {
   }
 };
 
-// Создать новое изображение
 export const createImage = async (
   image: Omit<Image, 'id' | 'createdAt'>
 ): Promise<string> => {
@@ -110,7 +103,6 @@ export const createImage = async (
   }
 };
 
-// Обновить изображение
 export const updateImage = async (
   id: string,
   image: Partial<Omit<Image, 'id' | 'createdAt'>>
@@ -124,7 +116,6 @@ export const updateImage = async (
   }
 };
 
-// Удалить изображение
 export const deleteImage = async (id: string): Promise<void> => {
   try {
     const imageRef = doc(db, 'images', id);
@@ -135,7 +126,6 @@ export const deleteImage = async (id: string): Promise<void> => {
   }
 };
 
-// Удалить все изображения продукта
 export const deleteImagesByProductId = async (productId: string): Promise<void> => {
   try {
     const images = await getImagesByProductId(productId);
@@ -147,17 +137,15 @@ export const deleteImagesByProductId = async (productId: string): Promise<void> 
   }
 };
 
-// Установить основное изображение (сбросить другие isPrimary)
 export const setPrimaryImage = async (imageId: string, productId: string): Promise<void> => {
   try {
-    // Сбросить isPrimary у всех изображений продукта
+    
     const images = await getImagesByProductId(productId);
     const resetPromises = images.map(image =>
       updateImage(image.id!, { isPrimary: false })
     );
     await Promise.all(resetPromises);
 
-    // Установить isPrimary для выбранного изображения
     await updateImage(imageId, { isPrimary: true });
   } catch (error) {
     console.error('Ошибка при установке основного изображения:', error);

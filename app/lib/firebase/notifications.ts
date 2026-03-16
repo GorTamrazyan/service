@@ -1,4 +1,3 @@
-// lib/firebase/notifications.ts
 import {
     collection,
     doc,
@@ -27,7 +26,6 @@ export interface Notification {
     created_at: Timestamp;
 }
 
-// Преобразование Firestore документа в Notification объект
 export const firestoreToNotification = (
     doc: DocumentSnapshot<DocumentData>
 ): Notification | null => {
@@ -44,7 +42,6 @@ export const firestoreToNotification = (
     };
 };
 
-// Создать уведомление о новом заказе
 export const createOrderNotification = async (
     orderId: string,
     customerName: string
@@ -67,7 +64,6 @@ export const createOrderNotification = async (
     }
 };
 
-// Получить все уведомления
 export const getAllNotifications = async (): Promise<Notification[]> => {
     try {
         const notificationsRef = collection(db, "notifications");
@@ -89,7 +85,6 @@ export const getAllNotifications = async (): Promise<Notification[]> => {
     }
 };
 
-// Получить непрочитанные уведомления
 export const getUnreadNotifications = async (): Promise<Notification[]> => {
     try {
         const notificationsRef = collection(db, "notifications");
@@ -112,7 +107,6 @@ export const getUnreadNotifications = async (): Promise<Notification[]> => {
     }
 };
 
-// Пометить уведомление как прочитанное
 export const markNotificationAsRead = async (
     notificationId: string
 ): Promise<void> => {
@@ -132,12 +126,10 @@ export const markNotificationAsRead = async (
     }
 };
 
-// Пометить все уведомления как прочитанные (ОПТИМИЗИРОВАННАЯ ВЕРСИЯ)
 export const markAllNotificationsAsRead = async (): Promise<void> => {
     try {
         console.log("🔄 Starting to mark all notifications as read");
 
-        // Получаем все непрочитанные уведомления
         const notificationsRef = collection(db, "notifications");
         const q = query(notificationsRef, where("read", "==", false));
         const querySnapshot = await getDocs(q);
@@ -149,7 +141,6 @@ export const markAllNotificationsAsRead = async (): Promise<void> => {
 
         console.log(`📝 Found ${querySnapshot.size} unread notifications`);
 
-        // Используем batch для оптимизации (до 500 операций за раз)
         const batch = writeBatch(db);
 
         querySnapshot.docs.forEach((document) => {
@@ -158,7 +149,6 @@ export const markAllNotificationsAsRead = async (): Promise<void> => {
             console.log(`  ✓ Added to batch: ${document.id}`);
         });
 
-        // Выполняем все обновления одной транзакцией
         await batch.commit();
         console.log("✅ All notifications marked as read successfully");
     } catch (error) {
@@ -167,7 +157,6 @@ export const markAllNotificationsAsRead = async (): Promise<void> => {
     }
 };
 
-// Удалить уведомление
 export const deleteNotification = async (
     notificationId: string
 ): Promise<void> => {

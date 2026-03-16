@@ -1,4 +1,3 @@
-// components/EmailVerificationChecker.tsx
 "use client";
 
 import React, { useEffect, useState } from "react";
@@ -34,10 +33,8 @@ export default function EmailVerificationChecker({
             }
         };
 
-        // Проверяем сразу
         checkVerification();
 
-        // Проверяем каждые 5 секунд
         const interval = setInterval(checkVerification, 5000);
 
         return () => clearInterval(interval);

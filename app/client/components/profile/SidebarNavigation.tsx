@@ -1,4 +1,3 @@
-// components/profile/SidebarNavigation.tsx
 import React from "react";
 import {
     FaSignOutAlt,
@@ -48,7 +47,7 @@ export default function SidebarNavigation({
 
     return (
         <div className="sticky top-8 space-y-6">
-            {/* User Info Card */}
+
             <div className="bg-[var(--color-secondary)] rounded-2xl shadow-xl p-6 border border-[var(--color-text)]/10">
                 <div className="flex flex-col items-center text-center mb-6">
                     <div className="w-24 h-24 rounded-full bg-gradient-to-r from-[var(--color-accent)] to-[var(--color-primary)] p-1 mb-4">
@@ -64,7 +63,6 @@ export default function SidebarNavigation({
                     </p>
                 </div>
 
-                {/* Navigation */}
                 <nav className="space-y-2">
                     {menuItems.map((item) => (
                         <button
@@ -85,7 +83,6 @@ export default function SidebarNavigation({
                 </nav>
             </div>
 
-            {/* Stats Card */}
             <div className="bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-primary)]/90 rounded-2xl p-6 text-white">
                 <h3 className="text-lg font-bold mb-4">
                     <T>Account Overview</T>
@@ -112,7 +109,6 @@ export default function SidebarNavigation({
                 </div>
             </div>
 
-            {/* Logout Button */}
             <button
                 onClick={onLogout}
                 className="w-full group inline-flex items-center justify-center gap-2 border-2 border-red-300 hover:border-red-500 text-red-600 hover:bg-red-50 font-bold py-3 px-6 rounded-xl transition-all duration-200"

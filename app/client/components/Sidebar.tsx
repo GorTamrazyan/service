@@ -1,4 +1,3 @@
-// app/client/components/Sidebar.tsx
 "use client";
 
 import React, { useEffect, useState } from "react";
@@ -22,7 +21,6 @@ export default function Sidebar() {
     const router = useRouter();
     const [user, setUser] = useState<User | null>(null);
 
-    // Слушаем изменения состояния аутентификации
     useEffect(() => {
         const unsubscribe = auth.onAuthStateChanged((currentUser) => {
             setUser(currentUser);
@@ -36,8 +34,8 @@ export default function Sidebar() {
             await auth.signOut();
             router.push("/client/dashboard/login");
         } catch (err: any) {
-            console.error("Ошибка при выходе:", err.message);
-            // Можно добавить уведомление пользователю
+            console.error("Logout error:", err.message);
+            
         }
     };
 
@@ -59,62 +57,58 @@ export default function Sidebar() {
             href: "/client/dashboard/profile",
             icon: FaCog,
             label: "Account",
-        }, // Изменил на profile
+        },
     ];
 
     return (
         <nav className="text-white flex flex-col h-full">
-            {/* Аватар и имя пользователя (верхняя часть) */}
+
             <div className="flex items-center mb-10 pt-4">
-                <FaUserCircle className="text-[var(--color-accent)] text-6xl mr-4" />{" "}
-                {/* Золотистая иконка пользователя */}
+                <FaUserCircle className="text-[var(--color-accent)] text-6xl mr-4" />
                 <div>
-                    <h2 className="text-2xl font-semibold">
-                        {user?.displayName || user?.email?.split("@")[0] || (
-                            <T>User</T>
-                        )}
+                    <h2 className="text-xl font-bold">
+                        {user?.displayName || <T>User</T>}
                     </h2>
-                    <p className="text-sm text-gray-300">
-                        {user?.email || <T>No email</T>}
+                    <p className="text-sm text-gray-400">
+                        {user?.email || <T>Guest</T>}
                     </p>
                 </div>
             </div>
 
-            {/* Разделитель */}
-            <div className="border-b border-gray-700 mb-6"></div>
+            <ul className="flex-1 space-y-2">
+                {navItems.map((item) => {
+                    const Icon = item.icon;
+                    const isActive = pathname === item.href;
 
-            {/* Навигационные ссылки */}
-            <ul className="flex-grow space-y-2">
-                {navItems.map((item) => (
-                    <li key={item.name}>
-                        <Link href={item.href} legacyBehavior>
-                            <a
-                                className={`
-                                    flex items-center p-3 rounded-lg text-lg
-                                    ${
-                                        pathname === item.href
-                                            ? "bg-white text-[var(--color-primary)] font-bold shadow-md"
-                                            : "text-white hover:bg-gray-700 transition-colors duration-200"
-                                    }
-                                `}
+                    return (
+                        <li key={item.name}>
+                            <Link
+                                href={item.href}
+                                className={`flex items-center gap-4 px-4 py-3 rounded-lg transition-all duration-300 ${
+                                    isActive
+                                        ? "bg-[var(--color-accent)] text-white shadow-lg"
+                                        : "hover:bg-white/10 text-gray-300 hover:text-white"
+                                }`}
                             >
-                                <item.icon className="mr-3 text-2xl" />
-                                <T>{item.label}</T>
-                            </a>
-                        </Link>
-                    </li>
-                ))}
+                                <Icon className="text-xl" />
+                                <span className="font-medium">
+                                    <T>{item.label}</T>
+                                </span>
+                            </Link>
+                        </li>
+                    );
+                })}
             </ul>
 
-            {/* Кнопка "Выйти" (в конце сайдбара) */}
-            <div className="mt-auto pt-6">
+            <div className="mt-auto pt-4 border-t border-white/10">
                 <button
                     onClick={handleLogout}
-                    className="flex items-center p-3 rounded-lg text-lg text-white w-full
-                               bg-red-600 hover:bg-red-700 transition-colors duration-200"
+                    className="flex items-center gap-4 px-4 py-3 rounded-lg w-full text-left hover:bg-red-500/20 text-red-400 hover:text-red-300 transition-all duration-300"
                 >
-                    <FaSignOutAlt className="mr-3 text-2xl" />
-                    <T>Sign Out</T>
+                    <FaSignOutAlt className="text-xl" />
+                    <span className="font-medium">
+                        <T>Sign Out</T>
+                    </span>
                 </button>
             </div>
         </nav>

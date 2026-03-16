@@ -1,4 +1,3 @@
-// app/client/components/ConsultationCard.tsx
 "use client";
 
 import React from "react";
@@ -13,12 +12,11 @@ interface ConsultationCardProps {
 export default function ConsultationCard({ consultation, onBook }: ConsultationCardProps) {
     return (
         <div className="bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-200 hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
-            {/* Верхняя часть с цветным акцентом */}
+
             <div className="h-2 bg-gradient-to-r from-blue-500 to-blue-600"></div>
-            
-            {/* Содержимое карточки */}
+
             <div className="p-6">
-                {/* Заголовок и иконка */}
+
                 <div className="flex items-start justify-between mb-4">
                     <div className="flex items-center">
                         <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mr-4">
@@ -38,12 +36,10 @@ export default function ConsultationCard({ consultation, onBook }: ConsultationC
                     </div>
                 </div>
 
-                {/* Описание */}
                 <p className="text-gray-600 mb-6 line-clamp-3">
                     {consultation.description}
                 </p>
 
-                {/* Детали */}
                 <div className="space-y-3 mb-6">
                     <div className="flex items-center text-gray-700">
                         <FaVideo className="w-4 h-4 mr-3 text-blue-500" />
@@ -55,7 +51,6 @@ export default function ConsultationCard({ consultation, onBook }: ConsultationC
                     </div>
                 </div>
 
-                {/* Цена и кнопка */}
                 <div className="flex items-center justify-between pt-4 border-t border-gray-100">
                     <div>
                         <span className="text-3xl font-bold text-blue-600">
@@ -73,7 +68,6 @@ export default function ConsultationCard({ consultation, onBook }: ConsultationC
                 </div>
             </div>
 
-            {/* Нижний информационный бар */}
             <div className="bg-gray-50 px-6 py-3 border-t border-gray-200">
                 <div className="flex items-center justify-between text-xs text-gray-500">
                     <span>Flexible scheduling</span>

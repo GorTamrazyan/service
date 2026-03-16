@@ -1,5 +1,3 @@
-// app/lib/firebase/service.ts
-
 import { db } from "./firebase";
 import {
     collection,
@@ -17,10 +15,6 @@ import {
 
 import { Service, Consultation } from "./products/types";
 
-/**
- * @param {QuerySnapshot<DocumentData>} snapshot Firestore query snapshot.
- * @returns {T[]} Array of objects cast to type T.
- */
 const querySnapshotToItems = <
     T extends { createdAt: Date; updatedAt: Date; id: string }
 >(
@@ -32,7 +26,7 @@ const querySnapshotToItems = <
         const item = {
             id: doc.id,
             ...data,
-            // Convert Timestamp to Date
+            
             createdAt: data.createdAt?.toDate() || new Date(),
             updatedAt: data.updatedAt?.toDate() || new Date(),
         };
@@ -41,9 +35,6 @@ const querySnapshotToItems = <
     });
 };
 
-// --- CRUD FUNCTIONS FOR SERVICE ---
-
-// Convert Service object for Firestore
 const serviceToFirestore = (service: Omit<Service, "id">): DocumentData => {
     return {
         icon: service.icon,
@@ -56,9 +47,6 @@ const serviceToFirestore = (service: Omit<Service, "id">): DocumentData => {
     };
 };
 
-/**
- * Get all services.
- */
 export const getAllServices = async (): Promise<Service[]> => {
     try {
         const servicesRef = collection(db, "services");
@@ -72,9 +60,6 @@ export const getAllServices = async (): Promise<Service[]> => {
     }
 };
 
-/**
- * Create a new service.
- */
 export const createService = async (
     service: Omit<Service, "id" | "createdAt" | "updatedAt">
 ): Promise<string> => {
@@ -98,9 +83,6 @@ export const createService = async (
     }
 };
 
-/**
- * Update an existing service.
- */
 export const updateService = async (
     serviceId: string,
     serviceData: Partial<Omit<Service, "id" | "createdAt">>
@@ -120,9 +102,6 @@ export const updateService = async (
     }
 };
 
-/**
- * Delete a service.
- */
 export const deleteService = async (serviceId: string): Promise<void> => {
     try {
         const serviceRef = doc(db, "services", serviceId);
@@ -133,9 +112,6 @@ export const deleteService = async (serviceId: string): Promise<void> => {
     }
 };
 
-// --- CRUD FUNCTIONS FOR CONSULTATION ---
-
-// Convert Consultation object for Firestore
 const consultationToFirestore = (
     consultation: Omit<Consultation, "id">
 ): DocumentData => {
@@ -150,9 +126,6 @@ const consultationToFirestore = (
     };
 };
 
-/**
- * Get all consultations.
- */
 export const getAllConsultations = async (): Promise<Consultation[]> => {
     try {
         const consultationsRef = collection(db, "consultations");
@@ -166,9 +139,6 @@ export const getAllConsultations = async (): Promise<Consultation[]> => {
     }
 };
 
-/**
- * Create a new consultation.
- */
 export const createConsultation = async (
     consultation: Omit<Consultation, "id" | "createdAt" | "updatedAt">
 ): Promise<string> => {
@@ -192,9 +162,6 @@ export const createConsultation = async (
     }
 };
 
-/**
- * Update an existing consultation.
- */
 export const updateConsultation = async (
     consultationId: string,
     consultationData: Partial<Omit<Consultation, "id" | "createdAt">>
@@ -214,9 +181,6 @@ export const updateConsultation = async (
     }
 };
 
-/**
- * Delete a consultation.
- */
 export const deleteConsultation = async (
     consultationId: string
 ): Promise<void> => {
@@ -229,9 +193,6 @@ export const deleteConsultation = async (
     }
 };
 
-/**
- * Get service by ID
- */
 export const getServiceById = async (
     serviceId: string
 ): Promise<Service | null> => {
@@ -244,9 +205,6 @@ export const getServiceById = async (
     }
 };
 
-/**
- * Get consultation by ID
- */
 export const getConsultationById = async (
     consultationId: string
 ): Promise<Consultation | null> => {

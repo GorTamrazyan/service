@@ -1,4 +1,3 @@
-// app/api/materials/route.ts
 import { NextResponse } from "next/server";
 import { getAllMaterials } from "../../lib/firebase/products";
 

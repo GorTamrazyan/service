@@ -1,4 +1,3 @@
-// client/register/page.tsx
 "use client";
 import { useState } from "react";
 import React from "react";
@@ -36,10 +35,10 @@ export default function RegisterPage() {
     const [error, setError] = useState("");
     const [verificationSent, setVerificationSent] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
+    const [agreedToTerms, setAgreedToTerms] = useState(false);
 
     const router = useRouter();
 
-    // Check if email exists in database
     const checkEmailExists = async (email: string) => {
         try {
             const usersRef = collection(db, "users");
@@ -52,7 +51,6 @@ export default function RegisterPage() {
         }
     };
 
-    // Create user profile in Firestore (if it doesn't exist)
     const createUserProfile = async (userId: string, email: string) => {
         try {
             const userDocRef = doc(db, "users", userId);
@@ -105,7 +103,7 @@ export default function RegisterPage() {
         setIsLoading(true);
 
         try {
-            // Check if email already exists in database
+            
             const emailExists = await checkEmailExists(email);
             if (emailExists) {
                 setError("An account with this email already exists.");
@@ -121,10 +119,8 @@ export default function RegisterPage() {
             const user = userCredential.user;
             console.log("Successful registration via Email/Password:", user);
 
-            // Create user profile in Firestore
             await createUserProfile(user.uid, email);
 
-            // Send email verification
             try {
                 await sendEmailVerification(user, {
                     url: `${window.location.origin}/client/dashboard/home`,
@@ -138,7 +134,6 @@ export default function RegisterPage() {
                 );
                 console.log("📧 Check your inbox and spam folder");
 
-                // Send welcome email
                 try {
                     await sendWelcomeEmailHelper(email, email.split("@")[0]);
                     console.log("✅ Welcome email sent");
@@ -185,11 +180,9 @@ export default function RegisterPage() {
             const user = result.user;
             console.log("Successful registration via Google:", user);
 
-            // Create user profile in Firestore if it doesn't exist
             if (user.email) {
                 await createUserProfile(user.uid, user.email);
 
-                // Send welcome email
                 try {
                     await sendWelcomeEmailHelper(
                         user.email,
@@ -222,11 +215,9 @@ export default function RegisterPage() {
             const user = result.user;
             console.log("Successful registration via Apple/iCloud:", user);
 
-            // Create user profile in Firestore if it doesn't exist
             if (user.email) {
                 await createUserProfile(user.uid, user.email);
 
-                // Send welcome email
                 try {
                     await sendWelcomeEmailHelper(
                         user.email,
@@ -253,13 +244,12 @@ export default function RegisterPage() {
 
     return (
         <div className="min-h-screen bg-[var(--color-background)] flex flex-col relative overflow-hidden">
-            {/* Background decorative elements */}
+
             <div className="absolute inset-0 overflow-hidden pointer-events-none">
                 <div className="absolute top-0 right-0 w-96 h-96 bg-[var(--color-primary)]/5 rounded-full blur-3xl"></div>
                 <div className="absolute bottom-0 left-0 w-96 h-96 bg-[var(--color-accent)]/5 rounded-full blur-3xl"></div>
             </div>
 
-            {/* Modern Header */}
             <div className="relative w-full py-6 bg-[var(--color-secondary)] shadow-sm border-b border-[var(--color-border)]">
                 <div className="max-w-7xl mx-auto px-4">
                     <Link
@@ -267,7 +257,7 @@ export default function RegisterPage() {
                         className="flex items-center justify-center group"
                     >
                         <div className="flex items-center space-x-4 transition-transform duration-300 group-hover:scale-105">
-                            {/* Enhanced Fence icon */}
+
                             <div className="text-[var(--color-accent)] transform transition-all duration-300 group-hover:rotate-6">
                                 <svg
                                     width="60"
@@ -296,12 +286,11 @@ export default function RegisterPage() {
                 </div>
             </div>
 
-            {/* Main content */}
             <div className="relative flex-1 flex items-center justify-center px-4 py-12">
                 <div className="w-full max-w-md">
-                    {/* Modern card container */}
+
                     <div className="bg-[var(--color-card-bg)] rounded-2xl shadow-2xl border border-[var(--color-border)] p-8 md:p-10 transition-all duration-300 hover:shadow-3xl">
-                        {/* Header section */}
+
                         <div className="text-center mb-8">
                             <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-accent)] rounded-2xl mb-4 shadow-lg">
                                 <svg
@@ -327,12 +316,11 @@ export default function RegisterPage() {
                             </p>
                         </div>
 
-                        {/* Form */}
                         <form
                             onSubmit={handleEmailPasswordSubmit}
                             className="space-y-5"
                         >
-                            {/* Email field with icon */}
+
                             <div className="space-y-2">
                                 <label
                                     htmlFor="email"
@@ -361,7 +349,6 @@ export default function RegisterPage() {
                                 </div>
                             </div>
 
-                            {/* Password field with icon */}
                             <div className="space-y-2">
                                 <label
                                     htmlFor="password"
@@ -393,7 +380,6 @@ export default function RegisterPage() {
                                 </p>
                             </div>
 
-                            {/* Confirm Password field with icon */}
                             <div className="space-y-2">
                                 <label
                                     htmlFor="confirmPassword"
@@ -422,7 +408,6 @@ export default function RegisterPage() {
                                 </div>
                             </div>
 
-                            {/* Error message with modern styling */}
                             {error && (
                                 <div className="bg-[var(--color-error)]/10 border-2 border-[var(--color-error)]/30 text-[var(--color-error)] px-4 py-3 rounded-xl text-sm flex items-start space-x-2 animate-shake">
                                     <MdInfo className="h-5 w-5 flex-shrink-0 mt-0.5" />
@@ -430,7 +415,6 @@ export default function RegisterPage() {
                                 </div>
                             )}
 
-                            {/* Verification sent message with modern styling */}
                             {verificationSent && (
                                 <div className="space-y-4 animate-fadeIn">
                                     <div className="bg-[var(--color-success)]/10 border-2 border-[var(--color-success)]/30 text-[var(--color-success)] px-4 py-4 rounded-xl">
@@ -455,7 +439,6 @@ export default function RegisterPage() {
                                         </div>
                                     </div>
 
-                                    {/* Email help section */}
                                     <details className="group">
                                         <summary className="cursor-pointer text-[var(--color-info)] hover:text-[var(--color-info)]/80 font-medium text-sm flex items-center space-x-2 transition-colors">
                                             <span>
@@ -502,11 +485,30 @@ export default function RegisterPage() {
                                 </div>
                             )}
 
-                            {/* Register button with loading state */}
+                            <div className="flex items-start space-x-3">
+                                <input
+                                    id="agreedToTerms"
+                                    type="checkbox"
+                                    checked={agreedToTerms}
+                                    onChange={(e) => setAgreedToTerms(e.target.checked)}
+                                    className="mt-1 w-4 h-4 accent-[var(--color-primary)] cursor-pointer flex-shrink-0"
+                                />
+                                <label htmlFor="agreedToTerms" className="text-sm text-[var(--color-text)]/70 cursor-pointer">
+                                    I agree to the{" "}
+                                    <Link href="/terms" target="_blank" className="text-[var(--color-primary)] hover:text-[var(--color-accent)] font-semibold underline">
+                                        Terms of Service
+                                    </Link>{" "}
+                                    and{" "}
+                                    <Link href="/privacy" target="_blank" className="text-[var(--color-primary)] hover:text-[var(--color-accent)] font-semibold underline">
+                                        Privacy Policy
+                                    </Link>
+                                </label>
+                            </div>
+
                             <div className="pt-2">
                                 <button
                                     type="submit"
-                                    disabled={isLoading || verificationSent}
+                                    disabled={isLoading || verificationSent || !agreedToTerms}
                                     className="w-full bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-accent)] hover:from-[var(--color-primary)]/90 hover:to-[var(--color-accent)]/90 text-white font-bold py-4 px-6 rounded-xl text-lg transition-all duration-300 transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none shadow-lg hover:shadow-xl"
                                 >
                                     {isLoading ? (
@@ -538,7 +540,6 @@ export default function RegisterPage() {
                                 </button>
                             </div>
 
-                            {/* Divider */}
                             <div className="relative py-4">
                                 <div className="absolute inset-0 flex items-center">
                                     <div className="w-full border-t border-[var(--color-border)]"></div>
@@ -550,12 +551,11 @@ export default function RegisterPage() {
                                 </div>
                             </div>
 
-                            {/* Social login buttons with modern design */}
                             <div className="grid grid-cols-2 gap-3">
                                 <button
                                     type="button"
                                     onClick={handleGoogleSignIn}
-                                    disabled={isLoading}
+                                    disabled={isLoading || !agreedToTerms}
                                     className="flex items-center justify-center py-3 px-4 bg-[var(--color-input-bg)] border-2 border-[var(--color-input-border)] rounded-xl hover:border-[var(--color-primary)] hover:bg-[var(--color-primary)]/5 transition-all duration-200 transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none group"
                                 >
                                     <FcGoogle className="h-5 w-5 mr-2 group-hover:scale-110 transition-transform" />
@@ -567,7 +567,7 @@ export default function RegisterPage() {
                                 <button
                                     type="button"
                                     onClick={handleAppleSignIn}
-                                    disabled={isLoading}
+                                    disabled={isLoading || !agreedToTerms}
                                     className="flex items-center justify-center py-3 px-4 bg-[var(--color-input-bg)] border-2 border-[var(--color-input-border)] rounded-xl hover:border-[var(--color-primary)] hover:bg-[var(--color-primary)]/5 transition-all duration-200 transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none group"
                                 >
                                     <FaApple className="h-5 w-5 mr-2 text-[var(--color-text)] group-hover:scale-110 transition-transform" />
@@ -578,7 +578,6 @@ export default function RegisterPage() {
                             </div>
                         </form>
 
-                        {/* Sign in link */}
                         <div className="text-center mt-8 pt-6 border-t border-[var(--color-border)]">
                             <p className="text-[var(--color-text)]/70 text-sm">
                                 Already have an account?{" "}
@@ -592,11 +591,6 @@ export default function RegisterPage() {
                         </div>
                     </div>
 
-                    {/* Footer note */}
-                    <p className="text-center text-[var(--color-text)]/50 text-xs mt-6">
-                        By creating an account, you agree to our Terms of
-                        Service and Privacy Policy
-                    </p>
                 </div>
             </div>
 

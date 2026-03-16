@@ -1,4 +1,3 @@
-// components/admin/AdminProtection.tsx
 "use client";
 
 import React, { useEffect, useState } from "react";
@@ -37,13 +36,12 @@ export default function AdminProtection({ children }: AdminProtectionProps) {
                         
                         console.log("Hours since login:", hoursSinceLogin);
                         
-                        // Session expires after 8 hours
                         if (hoursSinceLogin < 8) {
                             console.log("User is authenticated");
                             setIsAuthenticated(true);
                         } else {
                             console.log("Session expired");
-                            // Clear expired session
+                            
                             localStorage.removeItem("adminSessionToken");
                             localStorage.removeItem("adminUser");
                             setIsAuthenticated(false);
@@ -74,7 +72,6 @@ export default function AdminProtection({ children }: AdminProtectionProps) {
         }
     }, [isAuthenticated, router, isMounted]);
 
-    // Don't render anything until mounted (prevents hydration mismatch)
     if (!isMounted) {
         return (
             <div className="min-h-screen bg-[var(--color-background)] flex items-center justify-center">
@@ -87,7 +84,7 @@ export default function AdminProtection({ children }: AdminProtectionProps) {
     }
 
     if (isAuthenticated === null) {
-        // Loading state
+        
         return (
             <div className="min-h-screen bg-[var(--color-background)] flex items-center justify-center">
                 <div className="text-center">
@@ -99,7 +96,7 @@ export default function AdminProtection({ children }: AdminProtectionProps) {
     }
 
     if (isAuthenticated === false) {
-        // Redirecting to login
+        
         return (
             <div className="min-h-screen bg-[var(--color-background)] flex items-center justify-center">
                 <div className="text-center">
@@ -110,6 +107,5 @@ export default function AdminProtection({ children }: AdminProtectionProps) {
         );
     }
 
-    // User is authenticated
     return <>{children}</>;
 }

@@ -1,4 +1,3 @@
-// app/api/products/[id]/route.ts
 import { NextResponse } from "next/server";
 import {
     getProductById,
@@ -6,9 +5,6 @@ import {
     deleteProduct,
 } from "../../../lib/firebase/products";
 
-/**
- * GET-запрос для получения продукта по ID
- */
 export async function GET(
     request: Request,
     { params }: { params: Promise<{ id: string }> }
@@ -34,9 +30,6 @@ export async function GET(
     }
 }
 
-/**
- * PUT-запрос для обновления продукта
- */
 export async function PUT(
     request: Request,
     { params }: { params: Promise<{ id: string }> }
@@ -46,7 +39,6 @@ export async function PUT(
         const body = await request.json();
         const { name, description, colorPrices, categoryId, typeOfProductId, materialId, colorIds, featured, discount } = body;
 
-        // Базовая валидация
         if (name !== undefined && !name) {
             return NextResponse.json(
                 { message: "Имя продукта не может быть пустым" },
@@ -67,7 +59,6 @@ export async function PUT(
             );
         }
 
-        // Проверяем, существует ли продукт
         const existingProduct = await getProductById(id);
         if (!existingProduct) {
             return NextResponse.json(
@@ -76,7 +67,6 @@ export async function PUT(
             );
         }
 
-        // Обновляем продукт
         await updateProduct(id, {
             ...(name !== undefined && { name }),
             ...(description !== undefined && { description }),
@@ -89,7 +79,6 @@ export async function PUT(
             ...(discount !== undefined && { discount }),
         });
 
-        // Получаем обновленный продукт
         const updatedProduct = await getProductById(id);
 
         return NextResponse.json(updatedProduct, { status: 200 });
@@ -102,9 +91,6 @@ export async function PUT(
     }
 }
 
-/**
- * DELETE-запрос для удаления продукта
- */
 export async function DELETE(
     request: Request,
     { params }: { params: Promise<{ id: string }> }
@@ -112,7 +98,6 @@ export async function DELETE(
     try {
         const { id } = await params;
 
-        // Проверяем, существует ли продукт
         const existingProduct = await getProductById(id);
         if (!existingProduct) {
             return NextResponse.json(
@@ -121,7 +106,6 @@ export async function DELETE(
             );
         }
 
-        // Удаляем продукт
         await deleteProduct(id);
 
         return NextResponse.json(

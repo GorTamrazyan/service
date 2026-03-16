@@ -16,7 +16,6 @@ import {
 import { db } from "../firebase";
 import { Material } from "./types";
 
-// Преобразование Firestore документа в Material объект
 export const firestoreToMaterial = (doc: DocumentSnapshot<DocumentData>): Material | null => {
   if (!doc.exists()) return null;
 
@@ -30,7 +29,6 @@ export const firestoreToMaterial = (doc: DocumentSnapshot<DocumentData>): Materi
   };
 };
 
-// Преобразование Material объекта для Firestore
 export const materialToFirestore = (material: Omit<Material, 'id'>): DocumentData => {
   return {
     name: material.name,
@@ -40,7 +38,6 @@ export const materialToFirestore = (material: Omit<Material, 'id'>): DocumentDat
   };
 };
 
-// Получить все материалы
 export const getAllMaterials = async (): Promise<Material[]> => {
   try {
     const materialsRef = collection(db, 'materials');
@@ -56,7 +53,6 @@ export const getAllMaterials = async (): Promise<Material[]> => {
   }
 };
 
-// Получить материал по ID
 export const getMaterialById = async (id: string): Promise<Material | null> => {
   try {
     const materialRef = doc(db, 'materials', id);
@@ -68,7 +64,6 @@ export const getMaterialById = async (id: string): Promise<Material | null> => {
   }
 };
 
-// Создать новый материал
 export const createMaterial = async (
   material: Omit<Material, 'id' | 'createdAt' | 'updatedAt'>
 ): Promise<string> => {
@@ -89,7 +84,6 @@ export const createMaterial = async (
   }
 };
 
-// Обновить материал
 export const updateMaterial = async (
   id: string,
   material: Partial<Omit<Material, 'id' | 'createdAt'>>
@@ -108,7 +102,6 @@ export const updateMaterial = async (
   }
 };
 
-// Удалить материал
 export const deleteMaterial = async (id: string): Promise<void> => {
   try {
     const materialRef = doc(db, 'materials', id);

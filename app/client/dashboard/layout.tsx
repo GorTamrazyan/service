@@ -1,4 +1,3 @@
-// app/layout.tsx
 import { Inter } from "next/font/google";
 import FirebaseAnalyticsInitializer from "../components/FirebaseAnalyticsInitializer";
 import { CartProvider } from "../context/CartContext";

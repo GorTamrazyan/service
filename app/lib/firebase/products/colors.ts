@@ -16,7 +16,6 @@ import {
 import { db } from "../firebase";
 import { Color } from "./types";
 
-// Преобразование Firestore документа в Color объект
 export const firestoreToColor = (
     doc: DocumentSnapshot<DocumentData>
 ): Color | null => {
@@ -24,10 +23,9 @@ export const firestoreToColor = (
 
     const data = doc.data();
 
-    // Обеспечиваем, что name всегда строка
     const name = Array.isArray(data.name)
-        ? data.name[0] // Если массив, берем первый элемент
-        : data.name || ""; // Если undefined, используем пустую строку
+        ? data.name[0] 
+        : data.name || ""; 
 
     return {
         id: doc.id,
@@ -38,10 +36,9 @@ export const firestoreToColor = (
     };
 };
 
-// Преобразование Color объекта для Firestore
 export const colorToFirestore = (color: Omit<Color, "id">): DocumentData => {
     return {
-        name: color.name, // Теперь это строка
+        name: color.name, 
         hexCode: color.hexCode,
         createdAt: color.createdAt
             ? Timestamp.fromDate(color.createdAt)
@@ -52,7 +49,6 @@ export const colorToFirestore = (color: Omit<Color, "id">): DocumentData => {
     };
 };
 
-// Получить все цвета
 export const getAllColors = async (): Promise<Color[]> => {
     try {
         const colorsRef = collection(db, "colors");
@@ -68,7 +64,6 @@ export const getAllColors = async (): Promise<Color[]> => {
     }
 };
 
-// Получить цвет по ID
 export const getColorById = async (id: string): Promise<Color | null> => {
     try {
         const colorRef = doc(db, "colors", id);
@@ -80,7 +75,6 @@ export const getColorById = async (id: string): Promise<Color | null> => {
     }
 };
 
-// Создать новый цвет
 export const createColor = async (
     color: Omit<Color, "id" | "createdAt" | "updatedAt">
 ): Promise<string> => {
@@ -101,7 +95,6 @@ export const createColor = async (
     }
 };
 
-// Обновить цвет
 export const updateColor = async (
     id: string,
     color: Partial<Omit<Color, "id" | "createdAt">>
@@ -120,7 +113,6 @@ export const updateColor = async (
     }
 };
 
-// Удалить цвет
 export const deleteColor = async (id: string): Promise<void> => {
     try {
         const colorRef = doc(db, "colors", id);

@@ -1,4 +1,3 @@
-// app/admin/orders/page.tsx
 "use client";
 
 import React, { useState, useEffect } from "react";
@@ -176,7 +175,6 @@ export default function OrdersPage() {
                 )}
             </div>
 
-            {/* Order Details Modal */}
             {showModal && selectedOrder && (
                 <div className="fixed inset-0 bg-[var(--color-modal-overlay)] flex items-center justify-center z-50 p-4">
                     <div className="bg-[var(--color-card-bg)] rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
@@ -194,7 +192,7 @@ export default function OrdersPage() {
                             </div>
 
                             <div className="space-y-6">
-                                {/* Customer Info */}
+
                                 <div className="bg-[var(--color-gray-50)] rounded-lg p-4">
                                     <h3 className="font-semibold text-[var(--color-text)] mb-3">
                                         Customer Information
@@ -232,7 +230,6 @@ export default function OrdersPage() {
                                     </div>
                                 </div>
 
-                                {/* Order Items - Products */}
                                 {selectedOrder.products &&
                                     selectedOrder.products.length > 0 && (
                                         <div>
@@ -278,7 +275,6 @@ export default function OrdersPage() {
                                         </div>
                                     )}
 
-                                {/* Order Items - Services */}
                                 {selectedOrder.services &&
                                     selectedOrder.services.length > 0 && (
                                         <div>
@@ -326,7 +322,6 @@ export default function OrdersPage() {
                                         </div>
                                     )}
 
-                                {/* Total */}
                                 <div className="border-t pt-4">
                                     <div className="flex justify-between items-center font-bold text-lg">
                                         <span>Total:</span>
@@ -336,7 +331,6 @@ export default function OrdersPage() {
                                     </div>
                                 </div>
 
-                                {/* Order Info */}
                                 <div className="bg-[var(--color-gray-50)] rounded-lg p-4">
                                     <h3 className="font-semibold text-[var(--color-text)] mb-3">
                                         Order Information

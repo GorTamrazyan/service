@@ -1,4 +1,3 @@
-// admin/users/page.tsx
 "use client";
 
 import React, { useState, useEffect } from "react";
@@ -73,7 +72,6 @@ export default function AdminUsersPage() {
     const filterUsers = () => {
         let filtered = users;
 
-        // Filter by search query
         if (searchQuery) {
             filtered = filtered.filter((user) => {
                 const searchLower = searchQuery.toLowerCase();
@@ -88,7 +86,6 @@ export default function AdminUsersPage() {
             });
         }
 
-        // Filter by status
         if (statusFilter !== "all") {
             filtered = filtered.filter((user) => {
                 switch (statusFilter) {
@@ -159,7 +156,7 @@ export default function AdminUsersPage() {
 
     return (
         <div className="space-y-8">
-            {/* Header */}
+
             <div className="flex items-center justify-between">
                 <div>
                     <h1 className="text-3xl font-bold text-[var(--color-primary)]">
@@ -171,14 +168,12 @@ export default function AdminUsersPage() {
                 </div>
             </div>
 
-            {/* Error Display */}
             {error && (
                 <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-xl">
                     {error}
                 </div>
             )}
 
-            {/* Stats Cards */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 <div className="bg-[var(--color-background)] border border-[var(--color-text)]/10 rounded-2xl p-6">
                     <div className="flex items-center justify-between">
@@ -237,10 +232,9 @@ export default function AdminUsersPage() {
                 </div>
             </div>
 
-            {/* Filters */}
             <div className="bg-[var(--color-background)] rounded-2xl shadow-xl border border-[var(--color-text)]/10 p-6">
                 <div className="flex flex-col lg:flex-row gap-4">
-                    {/* Search */}
+
                     <div className="relative flex-1">
                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--color-text)]/50" />
                         <input
@@ -252,7 +246,6 @@ export default function AdminUsersPage() {
                         />
                     </div>
 
-                    {/* Status Filter */}
                     <div className="relative">
                         <Filter className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--color-text)]/50" />
                         <select
@@ -270,7 +263,6 @@ export default function AdminUsersPage() {
                 </div>
             </div>
 
-            {/* Users Table */}
             <div className="bg-[var(--color-background)] rounded-2xl shadow-xl border border-[var(--color-text)]/10 overflow-hidden">
                 <div className="overflow-x-auto">
                     <table className="w-full">
@@ -415,7 +407,6 @@ export default function AdminUsersPage() {
                 </div>
             </div>
 
-            {/* Empty State */}
             {filteredUsers.length === 0 && (
                 <div className="text-center py-12">
                     <Users className="w-16 h-16 text-[var(--color-text)]/30 mx-auto mb-4" />

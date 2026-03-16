@@ -1,4 +1,3 @@
-// components/admin/AdminHeader.tsx
 "use client";
 
 import React, { useState } from "react";
@@ -14,7 +13,7 @@ export default function AdminHeader() {
     return (
         <header className="bg-[var(--color-background)] border-b border-[var(--color-text)]/10 px-8 py-4">
             <div className="flex items-center justify-between">
-                {/* Search */}
+
                 <div className="flex items-center gap-6 flex-1 max-w-2xl">
                     <div className="relative flex-1">
                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--color-text)]/50" />
@@ -28,9 +27,8 @@ export default function AdminHeader() {
                     </div>
                 </div>
 
-                {/* Actions */}
                 <div className="flex items-center gap-4">
-                    {/* Theme Toggle */}
+
                     <button
                         onClick={toggleTheme}
                         className="p-2 rounded-lg hover:bg-[var(--color-secondary)]/50 transition-colors"
@@ -42,10 +40,8 @@ export default function AdminHeader() {
                         )}
                     </button>
 
-                    {/* Notifications */}
                     <NotificationsDropdown />
 
-                    {/* Admin Profile */}
                     <div className="relative">
                         <button className="flex items-center gap-3 p-2 rounded-lg hover:bg-[var(--color-secondary)]/50 transition-colors">
                             <div className="bg-[var(--color-accent)] rounded-full p-2">
@@ -64,7 +60,6 @@ export default function AdminHeader() {
                 </div>
             </div>
 
-            {/* Breadcrumb or Page Info */}
             <div className="mt-4 flex items-center justify-between">
                 <div>
                     <p className="text-sm text-[var(--color-text)]/60">

@@ -1,4 +1,3 @@
-// lib/firebase/beforeAfter.ts
 import {
     collection,
     doc,
@@ -17,27 +16,24 @@ import {
 import { db } from "./firebase";
 import { v2 as cloudinary } from "cloudinary";
 
-// Конфигурация Cloudinary
 cloudinary.config({
     cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
     api_key: process.env.CLOUDINARY_API_KEY,
     api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-// Интерфейс для Before/After проекта
 export interface BeforeAfterProject {
     id?: string;
-    beforeImage: string; // URL изображения "До"
-    afterImage: string; // URL изображения "После"
-    description: string; // Описание проекта
-    location: string; // Локация проекта
-    order: number; // Порядок отображения
-    isActive: boolean; // Активен ли проект
+    beforeImage: string; 
+    afterImage: string; 
+    description: string; 
+    location: string; 
+    order: number; 
+    isActive: boolean; 
     createdAt: Date;
     updatedAt: Date;
 }
 
-// Преобразование Firestore документа в BeforeAfterProject
 const firestoreToProject = (
     doc: DocumentSnapshot<DocumentData>
 ): BeforeAfterProject | null => {
@@ -57,7 +53,6 @@ const firestoreToProject = (
     };
 };
 
-// Преобразование BeforeAfterProject в формат для Firestore
 const projectToFirestore = (
     project: Omit<BeforeAfterProject, "id">
 ): DocumentData => {
@@ -73,9 +68,6 @@ const projectToFirestore = (
     };
 };
 
-/**
- * Загрузить изображение в Cloudinary
- */
 export const uploadProjectImage = async (
     file: File,
     type: "before" | "after"
@@ -110,18 +102,15 @@ export const uploadProjectImage = async (
     }
 };
 
-/**
- * Удалить изображение из Cloudinary
- */
 export const deleteProjectImage = async (imageUrl: string): Promise<void> => {
     try {
-        // Извлекаем public_id из URL Cloudinary
+        
         const urlParts = imageUrl.split("/");
         const uploadIndex = urlParts.indexOf("upload");
         if (uploadIndex === -1) return;
 
         let parts = urlParts.slice(uploadIndex + 1);
-        // Пропускаем версию (v1234567890)
+        
         if (parts[0] && /^v\d+$/.test(parts[0])) {
             parts = parts.slice(1);
         }
@@ -131,13 +120,10 @@ export const deleteProjectImage = async (imageUrl: string): Promise<void> => {
         console.log("Cloudinary delete result:", publicId, result);
     } catch (error) {
         console.error("Error deleting image:", error);
-        // Не бросаем ошибку, так как файл может уже не существовать
+        
     }
 };
 
-/**
- * Получить все Before/After проекты
- */
 export const getAllProjects = async (): Promise<BeforeAfterProject[]> => {
     try {
         const projectsRef = collection(db, "beforeAfterProjects");
@@ -155,9 +141,6 @@ export const getAllProjects = async (): Promise<BeforeAfterProject[]> => {
     }
 };
 
-/**
- * Получить только активные проекты
- */
 export const getActiveProjects = async (): Promise<BeforeAfterProject[]> => {
     try {
         const allProjects = await getAllProjects();
@@ -168,9 +151,6 @@ export const getActiveProjects = async (): Promise<BeforeAfterProject[]> => {
     }
 };
 
-/**
- * Получить проект по ID
- */
 export const getProjectById = async (
     id: string
 ): Promise<BeforeAfterProject | null> => {
@@ -186,9 +166,6 @@ export const getProjectById = async (
     }
 };
 
-/**
- * Создать новый Before/After проект
- */
 export const createProject = async (
     project: Omit<BeforeAfterProject, "id" | "createdAt" | "updatedAt">
 ): Promise<string> => {
@@ -213,9 +190,6 @@ export const createProject = async (
     }
 };
 
-/**
- * Обновить существующий проект
- */
 export const updateProject = async (
     id: string,
     updates: Partial<Omit<BeforeAfterProject, "id" | "createdAt" | "updatedAt">>
@@ -234,16 +208,13 @@ export const updateProject = async (
     }
 };
 
-/**
- * Удалить проект
- */
 export const deleteProject = async (id: string): Promise<void> => {
     try {
-        // Получаем проект чтобы удалить изображения
+        
         const project = await getProjectById(id);
 
         if (project) {
-            // Удаляем изображения из Storage
+            
             if (project.beforeImage) {
                 await deleteProjectImage(project.beforeImage);
             }
@@ -252,7 +223,6 @@ export const deleteProject = async (id: string): Promise<void> => {
             }
         }
 
-        // Удаляем документ из Firestore
         const projectRef = doc(db, "beforeAfterProjects", id);
         await deleteDoc(projectRef);
     } catch (error) {
@@ -261,9 +231,6 @@ export const deleteProject = async (id: string): Promise<void> => {
     }
 };
 
-/**
- * Изменить порядок проектов
- */
 export const reorderProjects = async (projectIds: string[]): Promise<void> => {
     try {
         const updates = projectIds.map((id, index) =>

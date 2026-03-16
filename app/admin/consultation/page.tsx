@@ -1,4 +1,3 @@
-// app/admin/consultation/page.tsx
 "use client";
 
 import React, { useState, useEffect } from "react";
@@ -34,10 +33,8 @@ export default function AdminCalendarView() {
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
-    // ID календаря из переменных окружения
     const CALENDAR_ID = "gor.tamrazyan2002@gmail.com";
 
-    // Функция для отмены бронирования
     const handleCancelAppointment = async (appointmentId: string, clientName: string) => {
         if (!confirm(`Вы уверены, что хотите отменить бронирование для ${clientName}?`)) {
             return;
@@ -53,22 +50,19 @@ export default function AdminCalendarView() {
                 throw new Error(errorData.error || "Failed to cancel appointment");
             }
 
-            // Успешная отмена - обновляем список
             alert(`Бронирование для ${clientName} успешно отменено`);
-            fetchCalendarEvents(); // Перезагружаем список
+            fetchCalendarEvents(); 
         } catch (error) {
             console.error("Error cancelling appointment:", error);
             alert(`Ошибка при отмене бронирования: ${error instanceof Error ? error.message : 'Unknown error'}`);
         }
     };
 
-    // Функция для получения событий из API
     const fetchCalendarEvents = async () => {
         try {
             setIsLoading(true);
             setError(null);
 
-            // Получаем события за следующие 30 дней
             const timeMin = new Date().toISOString();
             const timeMax = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
 
@@ -82,12 +76,10 @@ export default function AdminCalendarView() {
 
             const data = await response.json();
 
-            // Фильтруем только клиентские бронирования (с маркером CLIENT_BOOKING:)
             const clientBookings = data.events.filter((event: { description?: string }) => {
                 return event.description?.includes("CLIENT_BOOKING:");
             });
 
-            // Преобразуем события в формат appointments
             const formattedAppointments = clientBookings.map((event: {
                 id: string;
                 description?: string;
@@ -96,7 +88,7 @@ export default function AdminCalendarView() {
                 status: string;
                 htmlLink?: string;
             }) => {
-                // Извлекаем информацию из description
+                
                 const description = event.description || "";
                 const clientMatch = description.match(/Клиент:\s*(.+)/);
                 const emailMatch = description.match(/Email:\s*(.+)/);
@@ -128,7 +120,6 @@ export default function AdminCalendarView() {
         }
     };
 
-    // Функция для получения embed URL
     const getCalendarEmbedUrl = () => {
         const baseUrl = "https://calendar.google.com/calendar/embed";
         const params = new URLSearchParams({
@@ -151,15 +142,14 @@ export default function AdminCalendarView() {
         return `${baseUrl}?${params.toString()}`;
     };
 
-    // Загружаем события при монтировании компонента
     useEffect(() => {
         fetchCalendarEvents();
     }, []);
 
     useEffect(() => {
-        // При изменении режима просмотра обновляем iframe
+        
         setIsLoading(true);
-        // Имитация загрузки
+        
         const timer = setTimeout(() => setIsLoading(false), 500);
         return () => clearTimeout(timer);
     }, [viewMode]);
@@ -169,7 +159,7 @@ export default function AdminCalendarView() {
     };
 
     const exportAppointments = () => {
-        // Логика экспорта в CSV
+        
         const csvContent =
             "data:text/csv;charset=utf-8," +
             "Client Name,Email,Phone,Type,Date,Status,Notes\n" +
@@ -191,7 +181,7 @@ export default function AdminCalendarView() {
 
     return (
         <div className="w-full space-y-6">
-            {/* Панель управления админа */}
+
             <div className="bg-[var(--color-card-bg)] rounded-xl shadow-lg p-6">
                 <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-6">
                     <div>
@@ -229,7 +219,6 @@ export default function AdminCalendarView() {
                     </div>
                 </div>
 
-                {/* Переключатель вида календаря */}
                 <div className="flex flex-wrap gap-4 mb-6">
                     <div className="flex items-center space-x-2">
                         <span className="text-[var(--color-text)]/70 font-medium">View:</span>
@@ -273,7 +262,6 @@ export default function AdminCalendarView() {
                     </div>
                 </div>
 
-                {/* Основной календарь */}
                 <div className="mb-8">
                     <div className="flex items-center justify-between mb-4">
                         <h2 className="text-lg font-semibold text-[var(--color-text)]">
@@ -370,7 +358,6 @@ export default function AdminCalendarView() {
                     </div>
                 </div>
 
-                {/* Список предстоящих консультаций */}
                 {showDetails && (
                     <div>
                         <h3 className="text-lg font-semibold text-[var(--color-text)] mb-4 flex items-center">
@@ -472,7 +459,6 @@ export default function AdminCalendarView() {
                 )}
             </div>
 
-            {/* Ошибка загрузки */}
             {error && (
                 <div className="bg-red-500/10 border border-red-500/30 rounded-xl p-4 mb-6">
                     <div className="flex items-center">
@@ -485,7 +471,6 @@ export default function AdminCalendarView() {
                 </div>
             )}
 
-            {/* Статистика */}
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <div className="bg-[var(--color-card-bg)] rounded-xl p-4 shadow">
                     <div className="text-2xl font-bold text-[var(--color-accent)]">
@@ -502,6 +487,7 @@ export default function AdminCalendarView() {
                     <div className="text-sm text-[var(--color-text)]/60">Confirmed</div>
                 </div>
                 <div className="bg-[var(--color-card-bg)] rounded-xl p-4 shadow">
+                    
                     <div className="text-2xl font-bold text-yellow-500">
                         {appointments.filter(a => a.status === "pending").length}
                     </div>

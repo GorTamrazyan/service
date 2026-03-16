@@ -1,4 +1,3 @@
-// scripts/create-admin.js (БЕЗ Firebase Auth)
 const { initializeApp } = require('firebase/app');
 const { getFirestore, collection, addDoc } = require('firebase/firestore');
 
@@ -22,10 +21,9 @@ async function createAdmin() {
         const email = "gor.tamrazyan5@mail.ru";
         const password = "123321";
 
-        // Создаем админа только в Firestore (БЕЗ Firebase Auth)
         const adminData = {
             email,
-            password, // В продакшене используйте bcrypt!
+            password, 
             username: "admin",
             role: "super_admin",
             permissions: [

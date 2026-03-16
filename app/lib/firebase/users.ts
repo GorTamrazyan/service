@@ -1,4 +1,3 @@
-// lib/firebase/users.ts
 import {
     collection,
     doc,
@@ -39,7 +38,6 @@ export interface User {
 
 const USERS_COLLECTION = "users";
 
-// Convert Firestore document to User object
 export const firestoreToUser = (doc: DocumentSnapshot<DocumentData>): User | null => {
     if (!doc.exists()) return null;
     
@@ -53,14 +51,13 @@ export const firestoreToUser = (doc: DocumentSnapshot<DocumentData>): User | nul
         address: data.address || {},
         createdAt: data.createdAt?.toDate() || new Date(),
         lastLoginAt: data.lastLoginAt?.toDate(),
-        isActive: data.isActive !== false, // Default to true if not specified
+        isActive: data.isActive !== false, 
         emailVerified: data.emailVerified || false,
         orderCount: data.orderCount || 0,
         totalSpent: data.totalSpent || 0
     };
 };
 
-// Get all users
 export const getAllUsers = async (): Promise<User[]> => {
     try {
         const usersRef = collection(db, USERS_COLLECTION);
@@ -76,7 +73,6 @@ export const getAllUsers = async (): Promise<User[]> => {
     }
 };
 
-// Get user by ID
 export const getUserById = async (id: string): Promise<User | null> => {
     try {
         const userRef = doc(db, USERS_COLLECTION, id);
@@ -88,7 +84,6 @@ export const getUserById = async (id: string): Promise<User | null> => {
     }
 };
 
-// Update user status (activate/deactivate)
 export const updateUserStatus = async (userId: string, isActive: boolean): Promise<void> => {
     try {
         const userRef = doc(db, USERS_COLLECTION, userId);
@@ -102,7 +97,6 @@ export const updateUserStatus = async (userId: string, isActive: boolean): Promi
     }
 };
 
-// Delete user
 export const deleteUser = async (userId: string): Promise<void> => {
     try {
         const userRef = doc(db, USERS_COLLECTION, userId);
@@ -113,7 +107,6 @@ export const deleteUser = async (userId: string): Promise<void> => {
     }
 };
 
-// Search users by email or name
 export const searchUsers = async (searchTerm: string): Promise<User[]> => {
     try {
         const usersRef = collection(db, USERS_COLLECTION);
@@ -123,7 +116,6 @@ export const searchUsers = async (searchTerm: string): Promise<User[]> => {
             .map(doc => firestoreToUser(doc))
             .filter((user): user is User => user !== null);
         
-        // Filter users based on search term
         const filteredUsers = users.filter(user => {
             const searchLower = searchTerm.toLowerCase();
             return (
@@ -141,7 +133,6 @@ export const searchUsers = async (searchTerm: string): Promise<User[]> => {
     }
 };
 
-// Get users statistics
 export const getUsersStats = async () => {
     try {
         const users = await getAllUsers();

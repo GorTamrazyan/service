@@ -1,6 +1,3 @@
-// hooks/useProfile.ts
-// ОПЦИОНАЛЬНО - Custom hook для переиспользования логики профиля
-
 import { useState, useEffect } from "react";
 import { auth, db } from "../lib/firebase/firebase";
 import { doc, getDoc, setDoc } from "firebase/firestore";
@@ -13,7 +10,6 @@ export const useProfile = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
-    // Загрузка профиля из Firebase
     const fetchUserProfile = async (uid: string) => {
         setLoading(true);
         setError(null);
@@ -26,7 +22,7 @@ export const useProfile = () => {
                 const data = docSnap.data() as UserProfile;
                 setProfile(data);
             } else {
-                // Создаем пустой профиль для нового пользователя
+                
                 const newProfile: UserProfile = {
                     firstName: "",
                     lastName: "",
@@ -43,23 +39,21 @@ export const useProfile = () => {
 
                 setProfile(newProfile);
 
-                // Сохраняем базовый профиль в БД
                 if (user) {
                     await setDoc(userDocRef, newProfile, { merge: true });
                 }
             }
         } catch (err: any) {
-            setError("Ошибка при загрузке профиля: " + err.message);
+            setError("Error loading profile: " + err.message);
             console.error("Profile fetch error:", err);
         } finally {
             setLoading(false);
         }
     };
 
-    // Сохранение профиля
     const saveProfile = async (updatedProfile: UserProfile) => {
         if (!user || !updatedProfile) {
-            throw new Error("Нет данных пользователя или профиля");
+            throw new Error("No user data or profile");
         }
 
         setLoading(true);
@@ -71,40 +65,18 @@ export const useProfile = () => {
             setProfile(updatedProfile);
             return true;
         } catch (err: any) {
-            setError("Ошибка при сохранении профиля: " + err.message);
+            setError("Error saving profile: " + err.message);
             console.error("Profile save error:", err);
-            throw err;
-        } finally {
-            setLoading(false);
+            return false;
         }
     };
 
-    // Обновление профиля локально
-    const updateProfile = (updates: Partial<UserProfile>) => {
-        if (profile) {
-            setProfile({ ...profile, ...updates });
-        }
-    };
-
-    // Обновление адреса
-    const updateAddress = (addressUpdates: Partial<UserProfile["address"]>) => {
-        if (profile) {
-            setProfile({
-                ...profile,
-                address: { ...profile.address, ...addressUpdates },
-            });
-        }
-    };
-
-    // Слушатель изменений аутентификации
     useEffect(() => {
         const unsubscribe = auth.onAuthStateChanged(async (currentUser) => {
             setUser(currentUser);
-
             if (currentUser) {
                 await fetchUserProfile(currentUser.uid);
             } else {
-                setProfile(null);
                 setLoading(false);
             }
         });
@@ -119,12 +91,5 @@ export const useProfile = () => {
         error,
         fetchUserProfile,
         saveProfile,
-        updateProfile,
-        updateAddress,
-        setProfile,
-        setError,
     };
 };
-
-// Пример использования в компоненте:
-// const { profile, loading, saveProfile, updateProfile } = useProfile();

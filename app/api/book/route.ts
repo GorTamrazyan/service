@@ -7,7 +7,6 @@ export async function POST(request: NextRequest) {
         const { name, email, phone, startTime, duration, consultationType } =
             body;
 
-        // 1. Валидация входных данных
         if (!name || !email || !startTime) {
             return NextResponse.json(
                 { error: "Missing required fields" },
@@ -37,19 +36,15 @@ export async function POST(request: NextRequest) {
         const calendar = google.calendar({ version: "v3", auth });
         const calendarId = process.env.GOOGLE_CALENDAR_ID || "primary";
 
-        // 2. Получаем часовой пояс календаря
         const calendarResponse = await calendar.calendars.get({ calendarId });
         const calendarTimezone =
             calendarResponse.data.timeZone || "Europe/Moscow";
 
-        // 3. Работа с датами
-        // Используем ISO строку напрямую для создания объектов Date
         const startDate = new Date(startTime);
         const endDate = new Date(
             startDate.getTime() + (duration || 60) * 60 * 1000
         );
 
-        // 4. Проверка доступности (Double Booking Protection)
         const freeBusyResponse = await calendar.freebusy.query({
             requestBody: {
                 timeMin: startDate.toISOString(),
@@ -62,7 +57,6 @@ export async function POST(request: NextRequest) {
         const busySlots =
             freeBusyResponse.data.calendars?.[calendarId]?.busy || [];
 
-        // Простая и надежная проверка на любое пересечение
         const isSlotBusy = busySlots.some((busy) => {
             const bStart = new Date(busy.start!);
             const bEnd = new Date(busy.end!);
@@ -76,8 +70,6 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        // 5. Создание события
-        // Добавляем специальный маркер CLIENT_BOOKING: для фильтрации в админ-панели
         const description = `CLIENT_BOOKING:
 Консультация: ${consultationType || "Общая"}
 Клиент: ${name}

@@ -1,4 +1,3 @@
-// app/client/components/ProductModal.tsx
 "use client";
 
 import React, { useState, useEffect } from "react";
@@ -138,7 +137,7 @@ export default function ProductModal({
 
     return (
         <>
-            {/* Notification */}
+
             {showNotification && (
                 <div className="fixed top-6 right-6 z-[60] animate-slideIn">
                     <div className="bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-primary)]/90 text-white px-6 py-4 rounded-xl shadow-2xl flex items-center gap-4 max-w-md border border-white/20 backdrop-blur-sm">
@@ -164,10 +163,9 @@ export default function ProductModal({
                 </div>
             )}
 
-            {/* Modal */}
             <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
                 <div className="bg-[var(--color-card-bg)] rounded-2xl w-full max-w-6xl max-h-[90vh] overflow-y-auto shadow-2xl border border-[var(--color-border)]">
-                    {/* Header */}
+
                     <div className="sticky top-0 bg-[var(--color-card-bg)] border-b border-[var(--color-border)] px-8 py-5 flex items-center justify-between z-10 rounded-t-2xl">
                         <div className="flex items-center gap-3">
                             <div className="w-3 h-8 bg-gradient-to-b from-[var(--color-primary)] to-[var(--color-accent)] rounded-full"></div>
@@ -183,12 +181,11 @@ export default function ProductModal({
                         </button>
                     </div>
 
-                    {/* Content */}
                     <div className="p-6 md:p-8">
                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                            {/* Left Column - Images */}
+
                             <div className="space-y-6">
-                                {/* Main Image */}
+
                                 <div className="relative w-full h-96 bg-gradient-to-br from-[var(--color-gray-100)] to-[var(--color-gray-200)] rounded-xl overflow-hidden group">
                                     {allImages.length > 0 ? (
                                         <>
@@ -226,7 +223,6 @@ export default function ProductModal({
                                         </div>
                                     )}
 
-                                    {/* Image Counter */}
                                     {allImages.length > 1 && (
                                         <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-black/70 text-white px-4 py-2 rounded-full text-sm font-medium backdrop-blur-sm">
                                             {currentImageIndex + 1} /{" "}
@@ -235,7 +231,6 @@ export default function ProductModal({
                                     )}
                                 </div>
 
-                                {/* Thumbnails */}
                                 {allImages.length > 1 && (
                                     <div className="grid grid-cols-4 gap-3">
                                         {allImages.map((img, index) => (
@@ -265,9 +260,8 @@ export default function ProductModal({
                                 )}
                             </div>
 
-                            {/* Right Column - Details */}
                             <div className="space-y-6">
-                                {/* Title and Price */}
+
                                 <div className="pb-6 border-b border-[var(--color-border)]">
                                     <h1 className="text-3xl font-bold text-[var(--color-primary)] mb-3">
                                         {product.name}
@@ -282,7 +276,6 @@ export default function ProductModal({
                                     </div>
                                 </div>
 
-                                {/* Description */}
                                 {product.description && (
                                     <div className="bg-[var(--color-gray-50)] p-5 rounded-xl">
                                         <h3 className="text-lg font-semibold text-[var(--color-primary)] mb-3">
@@ -294,13 +287,11 @@ export default function ProductModal({
                                     </div>
                                 )}
 
-                                {/* Dimensions */}
                                 <div className="space-y-5">
                                     <h3 className="text-xl font-semibold text-[var(--color-primary)]">
                                         <T>Fence Dimensions</T>
                                     </h3>
 
-                                    {/* Height Input */}
                                     <div className="space-y-3">
                                         <label className="block text-sm font-medium text-[var(--color-text)]">
                                             <T>Height</T>{" "}
@@ -335,7 +326,6 @@ export default function ProductModal({
                                         </div>
                                     </div>
 
-                                    {/* Length Input */}
                                     <div className="space-y-3">
                                         <label className="block text-sm font-medium text-[var(--color-text)]">
                                             <T>Length</T>{" "}
@@ -370,7 +360,6 @@ export default function ProductModal({
                                         </div>
                                     </div>
 
-                                    {/* Total Price */}
                                     <div className="p-4 bg-gradient-to-r from-[var(--color-primary)]/5 to-[var(--color-accent)]/5 rounded-xl border border-[var(--color-accent)]/30">
                                         <div className="flex justify-between items-center">
                                             <span className="font-semibold text-[var(--color-text)]">
@@ -386,7 +375,6 @@ export default function ProductModal({
                                     </div>
                                 </div>
 
-                                {/* Material */}
                                 {material && (
                                     <div className="p-4 border border-[var(--color-border)] rounded-xl">
                                         <h3 className="text-lg font-semibold text-[var(--color-primary)] mb-2">
@@ -422,7 +410,6 @@ export default function ProductModal({
                                     </div>
                                 )}
 
-                                {/* Colors */}
                                 {colors.length > 0 && (
                                     <div>
                                         <h3 className="text-lg font-semibold text-[var(--color-primary)] mb-3">
@@ -463,7 +450,6 @@ export default function ProductModal({
                                     </div>
                                 )}
 
-                                {/* Tags */}
                                 {product.tags && product.tags.length > 0 && (
                                     <div>
                                         <h3 className="text-lg font-semibold text-[var(--color-primary)] mb-2">
@@ -482,7 +468,6 @@ export default function ProductModal({
                                     </div>
                                 )}
 
-                                {/* Add to Cart Button */}
                                 <button
                                     onClick={handleAddToCart}
                                     disabled={
@@ -506,7 +491,6 @@ export default function ProductModal({
                 </div>
             </div>
 
-            {/* CSS animations */}
             <style jsx global>{`
                 @keyframes slideIn {
                     from {

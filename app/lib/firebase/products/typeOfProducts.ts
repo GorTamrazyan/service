@@ -16,7 +16,6 @@ import {
 import { db } from "../firebase";
 import { TypeOfProduct } from "./types";
 
-// Преобразование Firestore документа в TypeOfProduct объект
 export const firestoreToTypeOfProduct = (doc: DocumentSnapshot<DocumentData>): TypeOfProduct | null => {
   if (!doc.exists()) return null;
 
@@ -30,7 +29,6 @@ export const firestoreToTypeOfProduct = (doc: DocumentSnapshot<DocumentData>): T
   };
 };
 
-// Преобразование TypeOfProduct объекта для Firestore
 export const typeOfProductToFirestore = (typeOfProduct: Omit<TypeOfProduct, 'id'>): DocumentData => {
   return {
     name: typeOfProduct.name,
@@ -40,7 +38,6 @@ export const typeOfProductToFirestore = (typeOfProduct: Omit<TypeOfProduct, 'id'
   };
 };
 
-// Получить все типы продуктов
 export const getAllTypeOfProducts = async (): Promise<TypeOfProduct[]> => {
   try {
     const typeOfProductsRef = collection(db, 'typeOfProducts');
@@ -56,7 +53,6 @@ export const getAllTypeOfProducts = async (): Promise<TypeOfProduct[]> => {
   }
 };
 
-// Получить тип продукта по ID
 export const getTypeOfProductById = async (id: string): Promise<TypeOfProduct | null> => {
   try {
     const typeOfProductRef = doc(db, 'typeOfProducts', id);
@@ -68,7 +64,6 @@ export const getTypeOfProductById = async (id: string): Promise<TypeOfProduct | 
   }
 };
 
-// Создать новый тип продукта
 export const createTypeOfProduct = async (
   typeOfProduct: Omit<TypeOfProduct, 'id' | 'createdAt' | 'updatedAt'>
 ): Promise<string> => {
@@ -89,7 +84,6 @@ export const createTypeOfProduct = async (
   }
 };
 
-// Обновить тип продукта
 export const updateTypeOfProduct = async (
   id: string,
   typeOfProduct: Partial<Omit<TypeOfProduct, 'id' | 'createdAt'>>
@@ -108,7 +102,6 @@ export const updateTypeOfProduct = async (
   }
 };
 
-// Удалить тип продукта
 export const deleteTypeOfProduct = async (id: string): Promise<void> => {
   try {
     const typeOfProductRef = doc(db, 'typeOfProducts', id);

@@ -1,4 +1,3 @@
-// app/api/products/route.ts
 import { NextResponse } from "next/server";
 import {
     getAllProducts,
@@ -10,13 +9,6 @@ import {
     getProductByIdEnriched,
 } from "../../lib/firebase/products";
 
-/**
- * Обработчик GET-запроса для получения всех продуктов с возможностью фильтрации.
- * Принимает параметры запроса:
- * - category: string (например, ?category=vinyl)
- * - minPrice: string (например, ?minPrice=30)
- * - maxPrice: string (например, ?maxPrice=70)
- */
 export async function GET(request: Request) {
     try {
         const { searchParams } = new URL(request.url);
@@ -28,13 +20,12 @@ export async function GET(request: Request) {
         const minPrice = searchParams.get("minPrice");
         const maxPrice = searchParams.get("maxPrice");
 
-        // Используем Firestore helper функции для получения продуктов с полными данными
         let products;
 
         const hasFilters = categoryId || typeOfProductId || materialId || minPrice || maxPrice;
 
         if (hasFilters) {
-            // Получаем продукты с фильтрацией и полными данными материалов/цветов
+            
             products = await getFilteredProductsEnriched({
                 categoryId: categoryId || undefined,
                 typeOfProductId: typeOfProductId || undefined,
@@ -43,18 +34,16 @@ export async function GET(request: Request) {
                 maxPrice: maxPrice ? parseFloat(maxPrice) : undefined,
             });
         } else {
-            // Получаем все продукты с полными данными материалов/цветов
+            
             products = await getAllProductsEnriched();
         }
 
-        // Фильтруем по colorIds на сервере (после получения)
         if (colorIds && colorIds.length > 0) {
             products = products.filter((product) =>
                 colorIds.some((colorId) => product.colorIds?.includes(colorId))
             );
         }
 
-        // Форматируем продукты для клиента с массивом URL изображений
         const formattedProducts = products.map((product) => ({
             ...product,
             images: product.images?.map((img) => img.url) || [],
@@ -69,15 +58,12 @@ export async function GET(request: Request) {
         );
     }
 }
-/*
- * POST-запрос для создания новых продуктов через API
- */
+
 export async function POST(request: Request) {
     try {
         const body = await request.json();
         const { name, description, colorPrices, categoryId, typeOfProductId, materialId, colorIds, featured, discount } = body;
 
-        // Базовая валидация входных данных
         if (!name || !colorPrices) {
             return NextResponse.json(
                 { message: "Имя и цены продукта обязательны" },
@@ -98,7 +84,6 @@ export async function POST(request: Request) {
             );
         }
 
-        // Используем Firestore helper функцию для создания продукта
         const newProductId = await createProduct({
             name,
             description: description || undefined,
@@ -111,7 +96,6 @@ export async function POST(request: Request) {
             discount: discount || 0,
         });
 
-        // Получаем созданный продукт для возврата
         const newProduct = await getProductById(newProductId);
 
         return NextResponse.json(newProduct, { status: 201 });

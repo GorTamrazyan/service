@@ -1,10 +1,9 @@
-// app/api/email/test/route.ts
 import { NextRequest, NextResponse } from 'next/server';
 import { verifyEmailConnection, transporter, defaultSender } from '../../../lib/email/config';
 
 export async function GET() {
     try {
-        // Проверяем наличие environment variables
+        
         const emailUser = process.env.EMAIL_USER;
         const emailPassword = process.env.EMAIL_PASSWORD;
 
@@ -14,7 +13,6 @@ export async function GET() {
             NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL || 'Not set (using default)',
         };
 
-        // Если конфигурация неполная, возвращаем информацию об ошибке
         if (!emailUser || !emailPassword) {
             return NextResponse.json({
                 success: false,
@@ -33,7 +31,6 @@ export async function GET() {
             });
         }
 
-        // Проверяем подключение к SMTP серверу
         const isConnected = await verifyEmailConnection();
 
         if (isConnected) {
@@ -65,7 +62,6 @@ export async function GET() {
     }
 }
 
-// POST endpoint для отправки тестового письма
 export async function POST(request: NextRequest) {
     try {
         const body = await request.json();
@@ -78,7 +74,6 @@ export async function POST(request: NextRequest) {
             }, { status: 400 });
         }
 
-        // Отправляем тестовое письмо
         const info = await transporter.sendMail({
             from: `"${defaultSender.name}" <${defaultSender.email}>`,
             to: testEmail,

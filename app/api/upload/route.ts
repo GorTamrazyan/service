@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { v2 as cloudinary } from "cloudinary";
 
-// Конфигурация Cloudinary
 cloudinary.config({
     cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
     api_key: process.env.CLOUDINARY_API_KEY,
@@ -10,7 +9,7 @@ cloudinary.config({
 
 export async function POST(request: NextRequest) {
     try {
-        // Проверяем конфигурацию Cloudinary
+        
         if (!process.env.CLOUDINARY_CLOUD_NAME || !process.env.CLOUDINARY_API_KEY || !process.env.CLOUDINARY_API_SECRET) {
             console.error("Cloudinary configuration missing");
             return NextResponse.json(

@@ -1,7 +1,6 @@
 const fs = require('fs');
 const path = require('path');
 
-// Умный переводчик - сохраняет существующие переводы
 async function translateText(text, targetLang) {
     try {
         const response = await fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=${targetLang}&dt=t&q=${encodeURIComponent(text)}`);
@@ -13,11 +12,9 @@ async function translateText(text, targetLang) {
     }
 }
 
-// Извлекает переводы из существующего файла
 function extractExistingTranslations(content) {
     const translations = { en: {}, ru: {}, hy: {} };
     
-    // Извлекаем каждый язык отдельно
     const languages = ['en', 'ru', 'hy'];
     
     languages.forEach(lang => {
@@ -42,7 +39,6 @@ function extractExistingTranslations(content) {
     return translations;
 }
 
-// Умный перевод - переводит только отсутствующие ключи
 async function smartTranslate() {
     const contextPath = path.join(__dirname, '../app/contexts/LanguageContext.tsx');
     const content = fs.readFileSync(contextPath, 'utf8');
@@ -50,7 +46,6 @@ async function smartTranslate() {
     console.log('🧠 Анализирую существующие переводы...');
     const existingTranslations = extractExistingTranslations(content);
     
-    // Находим все английские ключи
     const allEnglishKeys = Object.keys(existingTranslations.en);
     console.log(`📝 Найдено ${allEnglishKeys.length} английских ключей`);
     
@@ -61,7 +56,6 @@ async function smartTranslate() {
     
     let translated = false;
     
-    // Переводим только отсутствующие ключи
     for (const [langCode, googleLangCode] of Object.entries(languages)) {
         console.log(`\n🔍 Проверяю переводы для ${langCode.toUpperCase()}:`);
         
@@ -85,11 +79,10 @@ async function smartTranslate() {
                 console.log(`  ✅ -> "${translatedText}"`);
                 translated = true;
                 
-                // Задержка чтобы не перегрузить API
                 await new Promise(resolve => setTimeout(resolve, 200));
             } catch (error) {
                 console.error(`  ❌ Ошибка перевода: ${error.message}`);
-                existingTranslations[langCode][key] = englishText; // fallback
+                existingTranslations[langCode][key] = englishText; 
             }
         }
     }
@@ -99,11 +92,9 @@ async function smartTranslate() {
         return;
     }
     
-    // Создаем резервную копию
     fs.copyFileSync(contextPath, contextPath + '.backup');
     console.log('\n💾 Создана резервная копия: LanguageContext.tsx.backup');
     
-    // Генерируем обновленный файл
     const newContent = generateUpdatedLanguageContext(content, existingTranslations);
     fs.writeFileSync(contextPath, newContent, 'utf8');
     
@@ -111,16 +102,14 @@ async function smartTranslate() {
     console.log('🔧 Существующие переводы сохранены без изменений');
 }
 
-// Генерирует обновленный контент, сохраняя структуру файла
 function generateUpdatedLanguageContext(originalContent, translations) {
     const formatTranslations = (obj) => {
         return Object.entries(obj)
-            .sort(([a], [b]) => a.localeCompare(b)) // сортируем ключи
+            .sort(([a], [b]) => a.localeCompare(b)) 
             .map(([key, value]) => `        "${key}": "${value.replace(/"/g, '\\"')}"`)
             .join(',\n');
     };
     
-    // Заменяем только секции переводов, оставляя остальной код без изменений
     let updatedContent = originalContent;
     
     ['en', 'ru', 'hy'].forEach(lang => {
@@ -132,30 +121,25 @@ function generateUpdatedLanguageContext(originalContent, translations) {
     return updatedContent;
 }
 
-// Функция для добавления новых ключей (для использования в разработке)
 function addNewKey(key, englishText) {
     const contextPath = path.join(__dirname, '../app/contexts/LanguageContext.tsx');
     const content = fs.readFileSync(contextPath, 'utf8');
     
     const existingTranslations = extractExistingTranslations(content);
     
-    // Добавляем новый ключ
     existingTranslations.en[key] = englishText;
     
     console.log(`➕ Добавлен новый ключ: ${key} = "${englishText}"`);
     console.log('🚀 Запустите npm run translate для автоперевода');
     
-    // Обновляем файл
     const newContent = generateUpdatedLanguageContext(content, existingTranslations);
     fs.writeFileSync(contextPath, newContent, 'utf8');
 }
 
-// Экспортируем функции
 module.exports = { smartTranslate, addNewKey, translateText };
 
-// Запускаем если файл вызван напрямую
 if (require.main === module) {
-    // Проверяем аргументы командной строки
+    
     const args = process.argv.slice(2);
     
     if (args[0] === 'add' && args[1] && args[2]) {

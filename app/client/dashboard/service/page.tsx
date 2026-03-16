@@ -1,4 +1,3 @@
-// app/client/dashboard/service/page.tsx
 "use client";
 
 import React, { useState, useEffect } from "react";
@@ -46,8 +45,6 @@ const getIconComponent = (iconName: string): IconType => {
     return IconMap[iconName] || (FaTools as IconType);
 };
 
-// Удалено - больше не нужен
-
 export default function ServicePage() {
     const searchParams = useSearchParams();
     const [services, setServices] = useState<Service[]>([]);
@@ -66,7 +63,6 @@ export default function ServicePage() {
     const [searchQuery, setSearchQuery] = useState("");
     const { addServiceToCart } = useCart();
 
-    // Получаем параметр поиска из URL
     useEffect(() => {
         const search = searchParams?.get("search");
         if (search) {
@@ -107,7 +103,6 @@ export default function ServicePage() {
         fetchServiceData();
     }, []);
 
-    // Функция фильтрации услуг и консультаций
     useEffect(() => {
         if (!searchQuery.trim()) {
             setFilteredServices(services);
@@ -117,7 +112,6 @@ export default function ServicePage() {
 
         const searchLower = searchQuery.toLowerCase().trim();
 
-        // Фильтруем услуги
         const filteredSvcs = services.filter((service) => {
             const titleMatch = service.title
                 .toLowerCase()
@@ -128,7 +122,6 @@ export default function ServicePage() {
             return titleMatch || descriptionMatch;
         });
 
-        // Фильтруем консультации
         const filteredCons = consultations.filter((consultation) => {
             const titleMatch = consultation.title
                 .toLowerCase()
@@ -228,7 +221,7 @@ export default function ServicePage() {
 
     return (
         <div className="min-h-screen bg-[var(--color-background)]">
-            {/* Hero Banner */}
+
             <div className="relative overflow-hidden bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-primary)]/90 py-16 md:py-24">
                 <div className="absolute inset-0 bg-[url('/pattern.svg')] opacity-5"></div>
                 <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-white/10 to-transparent rounded-full -translate-y-32 translate-x-32"></div>
@@ -259,7 +252,6 @@ export default function ServicePage() {
                             </T>
                         </p>
 
-                        {/* Search Bar */}
                         <div className="max-w-2xl mx-auto">
                             <div className="relative">
                                 <FaSearch className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-white/50" />
@@ -283,7 +275,6 @@ export default function ServicePage() {
                             </div>
                         </div>
 
-                        {/* Search Results Info */}
                         {searchQuery && (
                             <div className="mt-6 text-white/90">
                                 <p>
@@ -298,7 +289,6 @@ export default function ServicePage() {
                 </div>
             </div>
 
-            {/* Services Section */}
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
                 <div className="mb-16">
                     <div className="text-center mb-12">
@@ -350,7 +340,6 @@ export default function ServicePage() {
                     )}
                 </div>
 
-                {/* Consultations Section */}
                 <div>
                     <div className="text-center mb-12">
                         <h2 className="text-3xl md:text-4xl font-black text-[var(--color-primary)] mb-4">
@@ -402,7 +391,6 @@ export default function ServicePage() {
                 </div>
             </div>
 
-            {/* Success Notification */}
             {showNotification && (
                 <div className="fixed top-24 right-4 bg-green-500 text-white px-6 py-4 rounded-xl shadow-2xl z-50 animate-slide-in-right">
                     <div className="flex items-center gap-3">
@@ -417,7 +405,6 @@ export default function ServicePage() {
                 </div>
             )}
 
-            {/* Booking Modal */}
             {showBookingModal && selectedConsultation && (
                 <AppointmentBooking
                     isOpen={showBookingModal}

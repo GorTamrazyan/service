@@ -1,4 +1,3 @@
-// app/client/dashboard/products/page.tsx
 "use client";
 
 import React, { useEffect, useState, useCallback } from "react";
@@ -50,7 +49,6 @@ export default function ProductPage() {
         maxPrice: "",
     });
 
-    // Получаем параметр поиска из URL при загрузке страницы
     useEffect(() => {
         const search = searchParams?.get("search");
         if (search) {
@@ -106,7 +104,7 @@ export default function ProductPage() {
 
             const response = await fetch(url);
             if (!response.ok) {
-                throw new Error(`Ошибка HTTP! Статус: ${response.status}`);
+                throw new Error(`HTTP Error! Status: ${response.status}`);
             }
             const data = await response.json();
             setProducts(data);
@@ -117,7 +115,6 @@ export default function ProductPage() {
         }
     }, []);
 
-    // Функция поиска товаров по запросу
     const filterProductsBySearch = useCallback(
         (productsToFilter: Product[], query: string) => {
             if (!query.trim()) {
@@ -127,29 +124,25 @@ export default function ProductPage() {
             const searchLower = query.toLowerCase().trim();
 
             return productsToFilter.filter((product) => {
-                // Поиск по названию
+                
                 const nameMatch = product.name
                     .toLowerCase()
                     .includes(searchLower);
 
-                // Поиск по описанию
                 const descriptionMatch =
                     product.description?.toLowerCase().includes(searchLower) ||
                     false;
 
-                // Поиск по материалу
                 const materialMatch =
                     product.material?.name
                         .toLowerCase()
                         .includes(searchLower) || false;
 
-                // Поиск по цветам
                 const colorMatch =
                     product.colors?.some((color) =>
                         color.name.toLowerCase().includes(searchLower)
                     ) || false;
 
-                // Поиск по тегам
                 const tagMatch =
                     product.tags?.some((tag) =>
                         tag.toLowerCase().includes(searchLower)
@@ -167,7 +160,6 @@ export default function ProductPage() {
         []
     );
 
-    // Применение поиска при изменении товаров или запроса
     useEffect(() => {
         const filtered = filterProductsBySearch(products, searchQuery);
         setFilteredProducts(filtered);
@@ -196,7 +188,6 @@ export default function ProductPage() {
         !hasActiveFilters && !hasActiveSearch
     );
 
-    // Обновляем shouldGroup при изменении фильтров или поиска
     useEffect(() => {
         setShouldGroup(!hasActiveFilters && !hasActiveSearch);
     }, [hasActiveFilters, hasActiveSearch]);
@@ -215,7 +206,6 @@ export default function ProductPage() {
     let fenceProducts: Product[] = [];
     let gateProducts: Product[] = [];
 
-    // Используем filteredProducts вместо products
     if (shouldGroup) {
         filteredProducts.forEach((p) => {
             if (gateTypeId && p.typeOfProductId === gateTypeId) {
@@ -300,7 +290,7 @@ export default function ProductPage() {
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-[var(--color-background)] via-[var(--color-secondary)]/20 to-[var(--color-background)]">
-            {/* Hero Section */}
+
             <div className="relative bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-primary)]/80 text-white overflow-hidden">
                 <div className="absolute inset-0 bg-[url('/grid-pattern.svg')] opacity-10"></div>
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 relative z-10">
@@ -319,11 +309,10 @@ export default function ProductPage() {
                 <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-[var(--color-background)] to-transparent"></div>
             </div>
 
-            {/* Main Content */}
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-                {/* Search and Filter Bar */}
+
                 <div className="mb-8 flex flex-col sm:flex-row gap-4 items-center justify-between">
-                    {/* Search Input */}
+
                     <div className="relative w-full sm:w-96">
                         <input
                             type="text"
@@ -367,7 +356,6 @@ export default function ProductPage() {
                         )}
                     </div>
 
-                    {/* Filter Button */}
                     <button
                         onClick={() => setIsFilterOpen(true)}
                         className="group flex items-center gap-3 bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-primary)]/90 text-white px-8 py-3 rounded-xl font-bold hover:shadow-2xl hover:scale-105 transition-all duration-300"
@@ -382,7 +370,6 @@ export default function ProductPage() {
                     </button>
                 </div>
 
-                {/* Search Results Info */}
                 {searchQuery && (
                     <div className="mb-6 p-4 bg-[var(--color-primary)]/10 rounded-xl">
                         <p className="text-[var(--color-primary)] font-semibold">
@@ -395,7 +382,6 @@ export default function ProductPage() {
                     </div>
                 )}
 
-                {/* Features Grid */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
                     <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-[var(--color-primary)]/10 hover:shadow-xl transition-shadow">
                         <div className="w-14 h-14 bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-primary)]/80 rounded-xl flex items-center justify-center mb-4">
@@ -434,11 +420,10 @@ export default function ProductPage() {
                     </div>
                 </div>
 
-                {/* Products Display */}
                 <div className="space-y-12">
                     {shouldGroup ? (
                         <>
-                            {/* Fences Section */}
+
                             {fenceProducts.length > 0 && (
                                 <div className="space-y-6">
                                     <div className="flex items-center gap-4">
@@ -454,7 +439,6 @@ export default function ProductPage() {
                                 </div>
                             )}
 
-                            {/* Gates Section */}
                             {gateProducts.length > 0 && (
                                 <div className="space-y-6">
                                     <div className="flex items-center gap-4">
@@ -470,7 +454,6 @@ export default function ProductPage() {
                                 </div>
                             )}
 
-                            {/* No products found */}
                             {fenceProducts.length === 0 &&
                                 gateProducts.length === 0 && (
                                     <div className="text-center py-20">
@@ -531,7 +514,7 @@ export default function ProductPage() {
                         </>
                     ) : (
                         <>
-                            {/* Filtered products - no grouping */}
+
                             {fenceProducts.length > 0 ? (
                                 <ProductList
                                     products={fenceProducts}
@@ -594,7 +577,6 @@ export default function ProductPage() {
                 </div>
             </div>
 
-            {/* Filter Modal */}
             <ProductFilters
                 isOpen={isFilterOpen}
                 onClose={() => setIsFilterOpen(false)}

@@ -100,7 +100,6 @@ export default function MaterialModal({
                     </button>
                 </div>
 
-                {/* Existing Materials List */}
                 {materials.length > 0 && (
                     <div className="mb-6">
                         <h3 className="text-sm font-semibold text-[var(--color-text)] mb-3">
@@ -140,7 +139,6 @@ export default function MaterialModal({
                     </div>
                 )}
 
-                {/* Add New Material Form */}
                 <div className="border-t border-[var(--color-text)]/10 pt-4">
                     <h3 className="text-sm font-semibold text-[var(--color-text)] mb-3">
                         <T>Add New Material</T>

@@ -1,4 +1,3 @@
-// app/lib/email/services.ts
 import { transporter, defaultSender, siteUrl } from './config';
 import {
     welcomeEmailTemplate,
@@ -10,7 +9,6 @@ import {
     OrderItem
 } from './templates';
 
-// Интерфейсы для параметров отправки
 export interface SendEmailOptions {
     to: string;
     subject: string;
@@ -64,7 +62,6 @@ export interface NewsletterEmailParams {
     ctaLink?: string;
 }
 
-// Базовая функция отправки email
 export const sendEmail = async (options: SendEmailOptions): Promise<{ success: boolean; messageId?: string; error?: string }> => {
     try {
         const mailOptions = {
@@ -90,7 +87,6 @@ export const sendEmail = async (options: SendEmailOptions): Promise<{ success: b
     }
 };
 
-// 1. Отправка приветственного письма
 export const sendWelcomeEmail = async (params: WelcomeEmailParams) => {
     const html = welcomeEmailTemplate(params.customerName);
 
@@ -101,7 +97,6 @@ export const sendWelcomeEmail = async (params: WelcomeEmailParams) => {
     });
 };
 
-// 2. Отправка подтверждения заказа
 export const sendOrderConfirmationEmail = async (params: OrderEmailParams) => {
     const html = orderConfirmationTemplate(
         params.orderId,
@@ -118,7 +113,6 @@ export const sendOrderConfirmationEmail = async (params: OrderEmailParams) => {
     });
 };
 
-// 3. Отправка обновления статуса заказа
 export const sendOrderStatusEmail = async (params: OrderStatusEmailParams) => {
     const statusMessages: Record<string, string> = {
         pending: 'Your order has been received and is being processed.',
@@ -142,7 +136,6 @@ export const sendOrderStatusEmail = async (params: OrderStatusEmailParams) => {
     });
 };
 
-// 4. Отправка подтверждения консультации
 export const sendConsultationConfirmationEmail = async (params: ConsultationEmailParams) => {
     const html = consultationBookingTemplate(
         params.customerName,
@@ -160,7 +153,6 @@ export const sendConsultationConfirmationEmail = async (params: ConsultationEmai
     });
 };
 
-// 5. Отправка письма для сброса пароля
 export const sendPasswordResetEmail = async (params: PasswordResetEmailParams) => {
     const html = passwordResetTemplate(
         params.customerName,
@@ -174,7 +166,6 @@ export const sendPasswordResetEmail = async (params: PasswordResetEmailParams) =
     });
 };
 
-// 6. Отправка рассылки/промо
 export const sendNewsletterEmail = async (params: NewsletterEmailParams) => {
     const html = newsletterTemplate(
         params.customerName,
@@ -191,7 +182,6 @@ export const sendNewsletterEmail = async (params: NewsletterEmailParams) => {
     });
 };
 
-// Массовая отправка email (для рассылок)
 export const sendBulkEmails = async (
     recipients: Array<{ email: string; name: string }>,
     subject: string,
@@ -223,7 +213,6 @@ export const sendBulkEmails = async (
                 results.errors.push(`${recipient.email}: ${result.error}`);
             }
 
-            // Небольшая задержка между отправками для избежания rate limiting
             await new Promise(resolve => setTimeout(resolve, 100));
         } catch (error) {
             results.failed++;

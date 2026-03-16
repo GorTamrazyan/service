@@ -1,4 +1,3 @@
-// app/client/dashboard/profile/page.tsx
 "use client";
 
 import React, { useState, useEffect, Suspense } from "react";
@@ -17,7 +16,6 @@ function ProfilePageContent() {
     const { t } = useLanguage();
     const searchParams = useSearchParams();
 
-    // Состояния
     const [user, setUser] = useState<User | null>(null);
     const [profile, setProfile] = useState<UserProfile | null>(null);
     const [loading, setLoading] = useState(true);
@@ -29,7 +27,6 @@ function ProfilePageContent() {
     const [saveSuccess, setSaveSuccess] = useState(false);
     const router = useRouter();
 
-    // Проверка URL параметров для установки активной секции
     useEffect(() => {
         const section = searchParams.get("section");
         if (section) {
@@ -37,7 +34,6 @@ function ProfilePageContent() {
         }
     }, [searchParams]);
 
-    // Проверка аутентификации и загрузка профиля
     useEffect(() => {
         const unsubscribe = auth.onAuthStateChanged(async (currentUser) => {
             if (!currentUser) {
@@ -51,7 +47,6 @@ function ProfilePageContent() {
         return () => unsubscribe();
     }, [router]);
 
-    // Загрузка профиля пользователя из Firebase
     const fetchUserProfile = async (uid: string) => {
         setLoading(true);
         try {
@@ -94,7 +89,6 @@ function ProfilePageContent() {
         }
     };
 
-    // Обработка изменений в форме
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
         if (profile) {
@@ -112,7 +106,6 @@ function ProfilePageContent() {
         }
     };
 
-    // Сохранение профиля
     const handleSaveProfile = async () => {
         if (!user || !profile) return;
 
@@ -131,7 +124,6 @@ function ProfilePageContent() {
             setIsEditing(false);
             setSaveSuccess(true);
 
-            // Скрыть уведомление об успехе через 3 секунды
             setTimeout(() => setSaveSuccess(false), 3000);
         } catch (err: any) {
             setError("Error saving profile: " + err.message);
@@ -141,7 +133,6 @@ function ProfilePageContent() {
         }
     };
 
-    // Выход из системы
     const handleLogout = async () => {
         try {
             await auth.signOut();
@@ -152,10 +143,8 @@ function ProfilePageContent() {
         }
     };
 
-    // Начать редактирование
     const handleEdit = () => setIsEditing(true);
 
-    // Отменить редактирование
     const handleCancel = () => {
         setIsEditing(false);
         if (user) {
@@ -163,13 +152,11 @@ function ProfilePageContent() {
         }
     };
 
-    // Смена активной секции
     const handleSectionChange = (section: string) => {
         setActiveSection(section);
         setIsEditing(false);
     };
 
-    // Loading состояние
     if (loading) {
         return (
             <div className="min-h-screen bg-[var(--color-background)] flex flex-col items-center justify-center p-4">
@@ -191,7 +178,6 @@ function ProfilePageContent() {
         );
     }
 
-    // Ошибка
     if (error) {
         return (
             <div className="min-h-screen bg-[var(--color-background)] flex items-center justify-center p-4">
@@ -218,7 +204,6 @@ function ProfilePageContent() {
         );
     }
 
-    // Профиль не найден
     if (!profile) {
         return (
             <div className="flex justify-center items-center min-h-screen bg-[var(--color-background)]">
@@ -229,10 +214,9 @@ function ProfilePageContent() {
         );
     }
 
-    // Основной интерфейс
     return (
         <div className="min-h-screen bg-[var(--color-background)] text-[var(--color-text)]">
-            {/* Header */}
+
             <header className="bg-gradient-to-r from-[var(--color-primary)] via-[var(--color-primary)]/90 to-[var(--color-accent)]/90 py-6 px-4 sm:px-6 lg:px-8">
                 <div className="max-w-7xl mx-auto">
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -251,7 +235,7 @@ function ProfilePageContent() {
             </header>
 
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                {/* Success Notification */}
+
                 {saveSuccess && (
                     <div className="mb-6 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-xl p-4 shadow-lg animate-fadeIn">
                         <div className="flex items-center gap-3">
@@ -272,7 +256,7 @@ function ProfilePageContent() {
                 )}
 
                 <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-                    {/* Left Navigation */}
+
                     <div className="lg:col-span-1">
                         <SidebarNavigation
                             profile={profile}
@@ -282,7 +266,6 @@ function ProfilePageContent() {
                         />
                     </div>
 
-                    {/* Main Content */}
                     <div className="lg:col-span-3">
                         <ProfileContent
                             profile={profile}
@@ -297,7 +280,6 @@ function ProfilePageContent() {
                 </div>
             </div>
 
-            {/* CSS Animations */}
             <style jsx global>{`
                 @keyframes fadeIn {
                     from {

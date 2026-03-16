@@ -1,4 +1,3 @@
-// app/admin/orders/components/OrderStatusUpdate.tsx
 "use client";
 
 import React, { useState } from "react";
@@ -42,10 +41,9 @@ export default function OrderStatusUpdate({
         setErrorMessage("");
 
         try {
-            // Обновляем статус заказа
+            
             await onStatusUpdate(orderId, selectedStatus);
 
-            // Отправляем email если выбрана опция
             if (sendEmail) {
                 setEmailStatus("sending");
                 try {
@@ -87,7 +85,6 @@ export default function OrderStatusUpdate({
                 Update Order Status
             </h4>
 
-            {/* Status Select */}
             <div className="flex flex-col sm:flex-row gap-3 mb-4">
                 <select
                     value={selectedStatus}
@@ -125,7 +122,6 @@ export default function OrderStatusUpdate({
                 </button>
             </div>
 
-            {/* Email Notification Toggle */}
             <div className="flex items-center gap-2 mb-3">
                 <input
                     type="checkbox"
@@ -144,12 +140,10 @@ export default function OrderStatusUpdate({
                 </label>
             </div>
 
-            {/* Customer Info */}
             <div className="text-xs text-[var(--color-gray-500)] mb-2">
                 Notification will be sent to: <strong>{customerEmail}</strong>
             </div>
 
-            {/* Status Messages */}
             {emailStatus === "sending" && (
                 <div className="flex items-center gap-2 text-sm text-[var(--color-info)]">
                     <Loader2 className="w-4 h-4 animate-spin" />

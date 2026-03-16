@@ -1,5 +1,3 @@
-// lib/firebase/auth-utils.ts
-
 import { User, sendEmailVerification, reload } from "firebase/auth";
 
 export const checkEmailVerification = async (user: User): Promise<boolean> => {
@@ -33,9 +31,8 @@ export const waitForEmailVerification = async (user: User): Promise<boolean> => 
                 clearInterval(checkInterval);
                 resolve(true);
             }
-        }, 3000); // Проверяем каждые 3 секунды
+        }, 3000); 
 
-        // Останавливаем проверку через 5 минут
         setTimeout(() => {
             clearInterval(checkInterval);
             resolve(false);

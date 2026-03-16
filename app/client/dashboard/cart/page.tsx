@@ -1,4 +1,3 @@
-// app/client/dashboard/cart/page.tsx
 "use client";
 
 import React from "react";
@@ -112,7 +111,7 @@ export default function CartPage() {
     return (
         <div className="min-h-screen bg-[var(--color-background)] text-[var(--color-text)] py-8 md:py-12">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                {/* Header */}
+
                 <div className="mb-8 md:mb-12">
                     <div className="flex items-center justify-between mb-6">
                         <h1 className="text-3xl md:text-5xl font-black text-[var(--color-primary)]">
@@ -152,7 +151,7 @@ export default function CartPage() {
                 </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                    {/* Cart Items */}
+
                     <div className="lg:col-span-2 space-y-6">
                         {cartItems.map((item) => (
                             <div
@@ -163,7 +162,7 @@ export default function CartPage() {
                             >
                                 <div className="p-6">
                                     <div className="flex flex-col sm:flex-row gap-6">
-                                        {/* Image/Icon */}
+
                                         <div className="relative">
                                             {item.type === "service" ? (
                                                 <div className="w-24 h-24 rounded-xl bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center shadow-lg">
@@ -211,7 +210,6 @@ export default function CartPage() {
                                                 </div>
                                             )}
 
-                                            {/* Badge */}
                                             <div
                                                 className={`absolute -top-2 -left-2 px-3 py-1 rounded-full text-xs font-bold shadow-lg ${
                                                     item.type === "service"
@@ -227,7 +225,6 @@ export default function CartPage() {
                                             </div>
                                         </div>
 
-                                        {/* Details */}
                                         <div className="flex-grow">
                                             <div className="flex justify-between items-start mb-2">
                                                 <h3
@@ -259,7 +256,6 @@ export default function CartPage() {
                                                     </p>
                                                 )}
 
-                                            {/* Product Details */}
                                             {item.type === "product" && (
                                                 <div className="space-y-2 mb-4">
                                                     <div className="flex flex-wrap gap-4">
@@ -322,7 +318,6 @@ export default function CartPage() {
                                                 </div>
                                             )}
 
-                                            {/* Quantity Controls */}
                                             <div className="flex items-center justify-between">
                                                 <div className="flex items-center gap-4">
                                                     <div className="flex items-center gap-2 bg-[var(--color-background)] rounded-lg p-2">
@@ -390,10 +385,9 @@ export default function CartPage() {
                         ))}
                     </div>
 
-                    {/* Order Summary */}
                     <div className="lg:col-span-1">
                         <div className="sticky top-8 space-y-8">
-                            {/* Summary Card */}
+
                             <div className="bg-[var(--color-card)] rounded-2xl shadow-xl p-6 border border-[var(--color-border)]">
                                 <h2 className="text-2xl font-bold text-[var(--color-primary)] mb-6">
                                     <T>Order Summary</T>
@@ -476,7 +470,6 @@ export default function CartPage() {
                                 </div>
                             </div>
 
-                            {/* Benefits Card */}
                             <div className="bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-primary)]/90 rounded-2xl p-6 text-white">
                                 <h3 className="text-xl font-bold mb-4">
                                     <T>Order Benefits</T>
@@ -534,7 +527,6 @@ export default function CartPage() {
                 </div>
             </div>
 
-            {/* Checkout Modal */}
             <CheckoutModal
                 isOpen={showCheckoutModal}
                 onClose={closeCheckoutModal}

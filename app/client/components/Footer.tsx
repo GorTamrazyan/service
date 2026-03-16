@@ -1,4 +1,3 @@
-// components/Footer.tsx
 "use client";
 
 import React from "react";
@@ -12,14 +11,13 @@ export default function Footer() {
 
     return (
         <footer className="bg-[var(--color-secondary)] text-[var(--color-text)] mt-auto">
-            {/* Main Footer Content */}
+
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-                    
-                    {/* Company Info */}
+
                     <div className="space-y-4">
                         <div className="flex items-center space-x-3">
-                            {/* Fence Logo */}
+
                             <div className="text-[var(--color-accent)]">
                                 <svg width="40" height="28" viewBox="0 0 60 40" fill="currentColor">
                                     <rect x="8" y="8" width="6" height="24" />
@@ -77,7 +75,6 @@ export default function Footer() {
                         </div>
                     </div>
 
-                    {/* Quick Links */}
                     <div className="space-y-4">
                         <h4 className="text-lg font-semibold text-[var(--color-primary)]">
                             <T>Quick Links</T>
@@ -110,9 +107,6 @@ export default function Footer() {
                         </nav>
                     </div>
 
-                    
-
-                    {/* Contact Info */}
                     <div className="space-y-4">
                         <h4 className="text-lg font-semibold text-[var(--color-primary)]">
                             <T>Contact Info</T>
@@ -143,8 +137,7 @@ export default function Footer() {
                                 </a>
                             </div>
                         </div>
-                        
-                        {/* Working Hours */}
+
                         <div className="pt-2">
                             <h5 className="text-sm font-semibold text-[var(--color-primary)] mb-2">
                                 <T>Working Hours</T>
@@ -168,7 +161,6 @@ export default function Footer() {
                 </div>
             </div>
 
-            {/* Bottom Footer */}
             <div className="border-t border-[var(--color-text)]/10">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
                     <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">

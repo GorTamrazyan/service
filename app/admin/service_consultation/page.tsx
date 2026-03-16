@@ -10,7 +10,6 @@ import EditConsultationModal from "../components/modals/EditConsultationModal";
 import { FaPlus, FaWrench, FaMoneyBillWave } from "react-icons/fa";
 import { Edit, Trash2 } from "lucide-react";
 
-// Adapted functions for fetching data from the API
 const fetchApiData = async <T,>(endpoint: string): Promise<T[]> => {
     const response = await fetch(endpoint);
     if (!response.ok) {
@@ -22,7 +21,6 @@ const fetchApiData = async <T,>(endpoint: string): Promise<T[]> => {
     return response.json();
 };
 
-// Function to delete service
 const deleteService = async (serviceId: string): Promise<void> => {
     const response = await fetch(`/api/service?id=${serviceId}`, {
         method: "DELETE",
@@ -45,7 +43,6 @@ const deleteConsultation = async (consultationId: string): Promise<void> => {
     }
 };
 
-// Function to update service
 const updateService = async (
     serviceId: string,
     serviceData: Partial<Service>
@@ -92,7 +89,6 @@ export default function AdminCombinedServicesPage() {
     const [isConsultationModalOpen, setIsConsultationModalOpen] =
         useState(false);
 
-    // States for editing service
     const [editingService, setEditingService] = useState<Service | null>(null);
     const [editingConsultation, setEditingConsultation] = useState<Consultation | null>(null);
     const [showEditServiceForm, setShowEditServiceForm] = useState(false);
@@ -113,7 +109,6 @@ export default function AdminCombinedServicesPage() {
         price: 0,
     });
 
-    // Function to load ALL data
     const fetchAllData = async () => {
         setIsLoading(true);
         setError(null);
@@ -136,7 +131,6 @@ export default function AdminCombinedServicesPage() {
         fetchAllData();
     }, []);
 
-    // Handlers for successful addition (to refresh lists)
     const handleServiceAdded = () => {
         setIsServiceModalOpen(false);
         fetchAllData();
@@ -146,7 +140,7 @@ export default function AdminCombinedServicesPage() {
         if (confirm(`Are you sure you want to delete "${title}"?`)) {
             try {
                 await deleteService(serviceId);
-                fetchAllData(); // Refresh the list
+                fetchAllData(); 
             } catch (error) {
                 console.error("Error deleting service:", error);
                 setError(
@@ -161,7 +155,7 @@ export default function AdminCombinedServicesPage() {
         if (confirm(`Are you sure you want to delete "${title}"?`)) {
             try {
                 await deleteConsultation(consultationId);
-                fetchAllData(); // Refresh the list
+                fetchAllData(); 
             } catch (error) {
                 console.error("Error deleting service:", error);
                 setError(
@@ -173,9 +167,8 @@ export default function AdminCombinedServicesPage() {
         }
     };
 
-
     const handleEditService = (service: Service) => {
-        console.log("Editing service:", service); // Debug log
+        console.log("Editing service:", service); 
         setEditingService(service);
         setEditService({
             icon: service.icon || "",
@@ -191,7 +184,7 @@ export default function AdminCombinedServicesPage() {
     };
 
      const handleEditConsultation = (consultation: Consultation) => {
-         console.log("Editing service:", consultation); // Debug log
+         console.log("Editing service:", consultation); 
          setEditingConsultation(consultation);
          setEditConsultation({
              title: consultation.title || "",
@@ -220,7 +213,7 @@ export default function AdminCombinedServicesPage() {
 
             setShowEditServiceForm(false);
             setEditingService(null);
-            fetchAllData(); // Refresh the list
+            fetchAllData(); 
         } catch (error) {
             console.error("Error updating service:", error);
             setError(
@@ -239,7 +232,6 @@ export default function AdminCombinedServicesPage() {
         }));
     };
 
-
     const handleUpdateConsultation = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!editingConsultation) return;
@@ -254,7 +246,7 @@ export default function AdminCombinedServicesPage() {
 
             setShowEditConsultationForm(false);
             setEditingConsultation(null);
-            fetchAllData(); // Refresh the list
+            fetchAllData(); 
         } catch (error) {
             console.error("Error updating consultation:", error);
             setError(
@@ -289,7 +281,6 @@ export default function AdminCombinedServicesPage() {
         setError("");
     };
 
-    // --- Component for displaying the list of SERVICES ---
     const ServiceTable = () => (
         <div className="mt-8">
             <div className="flex justify-between items-center mb-4">
@@ -382,7 +373,6 @@ export default function AdminCombinedServicesPage() {
         </div>
     );
 
-    // --- Component for displaying the list of CONSULTATIONS ---
     const ConsultationTable = () => (
         <div className="mt-12">
             <div className="flex justify-between items-center mb-4">
@@ -498,7 +488,6 @@ export default function AdminCombinedServicesPage() {
                 )}
             </div>
 
-            {/* Modals */}
             <ServiceModal
                 isOpen={isServiceModalOpen}
                 onClose={() => setIsServiceModalOpen(false)}
@@ -510,7 +499,6 @@ export default function AdminCombinedServicesPage() {
                 onSuccess={handleConsultationAdded}
             />
 
-            {/* Edit Service Modal */}
             <EditServiceModal
                 isOpen={showEditServiceForm}
                 editingService={editingService}

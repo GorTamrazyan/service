@@ -1,4 +1,3 @@
-// components/admin/AdminSidebar.tsx
 "use client";
 
 import React, { useState } from "react";
@@ -70,10 +69,10 @@ export default function AdminSidebar() {
             }`}
         >
             <div className="flex flex-col h-full">
-                {/* Logo */}
+
                 <div className="flex items-center justify-between p-6 border-b border-[var(--color-text)]/10">
                     <div className="flex items-center space-x-3">
-                        {/* Fence Logo */}
+
                         <div className="text-[var(--color-accent)]">
                             <svg
                                 width="32"
@@ -117,7 +116,6 @@ export default function AdminSidebar() {
                     </button>
                 </div>
 
-                {/* Navigation */}
                 <nav className="flex-1 p-4 space-y-2">
                     {menuItems.map((item, index) => {
                         const Icon = item.icon;
@@ -167,7 +165,7 @@ export default function AdminSidebar() {
                                 window.location.href = "/admin/login";
                             } catch (error) {
                                 console.error("Logout error:", error);
-                                // Even if logout fails, clear local storage and redirect
+                                
                                 localStorage.removeItem("adminSessionToken");
                                 localStorage.removeItem("adminUser");
                                 window.location.href = "/admin/login";

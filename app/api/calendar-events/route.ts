@@ -26,7 +26,6 @@ export async function GET(request: NextRequest) {
         const calendar = google.calendar({ version: "v3", auth });
         const calendarId = process.env.GOOGLE_CALENDAR_ID || "primary";
 
-        // Получаем параметры
         const { searchParams } = new URL(request.url);
         const timeMin = searchParams.get("timeMin") || new Date().toISOString();
         const timeMax = searchParams.get("timeMax") || undefined;
@@ -39,15 +38,14 @@ export async function GET(request: NextRequest) {
             maxResults,
             singleEvents: true,
             orderBy: "startTime",
-            // Мы не запрашиваем удаленные события
+            
             showDeleted: false,
         });
 
         const events = response.data.items || [];
 
-        // Форматируем события с защитой от пустых дат
         const formattedEvents = events.map((event) => {
-            // Google возвращает либо dateTime (для встреч), либо date (для событий на весь день)
+            
             const start = event.start?.dateTime || event.start?.date;
             const end = event.end?.dateTime || event.end?.date;
 
@@ -57,7 +55,7 @@ export async function GET(request: NextRequest) {
                 description: event.description || "",
                 start,
                 end,
-                // Добавляем флаг "весь день", это поможет правильно отрисовать в UI
+                
                 isAllDay: !event.start?.dateTime,
                 htmlLink: event.htmlLink,
                 status: event.status,
@@ -68,7 +66,7 @@ export async function GET(request: NextRequest) {
             success: true,
             count: formattedEvents.length,
             events: formattedEvents,
-            // Передаем часовой пояс календаря, чтобы фронтенд знал, в каком контексте данные
+            
             timeZone: response.data.timeZone,
         });
     } catch (error: any) {

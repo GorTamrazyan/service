@@ -11,7 +11,6 @@ interface LanguageContextType {
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
-// Простой кэш для переводов
 const translationCache: Record<string, Record<string, string>> = {
     es: {},
     ru: {},
@@ -22,7 +21,6 @@ const translationCache: Record<string, Record<string, string>> = {
 export function LanguageProvider({ children }: { children: React.ReactNode }) {
     const [language, setLanguage] = useState('en');
 
-    // Загружаем язык из localStorage при монтировании
     useEffect(() => {
         const savedLanguage = localStorage.getItem('preferred-language');
         if (savedLanguage && ['en','es', 'ru', 'hy'].includes(savedLanguage)) {
@@ -30,12 +28,10 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
         }
     }, []);
 
-    // Сохраняем язык в localStorage при изменении
     useEffect(() => {
         localStorage.setItem('preferred-language', language);
     }, [language]);
 
-    // Добавляем функцию setLanguage в глобальную область для DevTools
     useEffect(() => {
         (window as any).setLanguage = (lang: string) => {
             if (['en','es', 'ru', 'hy'].includes(lang)) {
@@ -47,19 +43,16 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
         };
     }, []);
 
-    // Функция t() теперь просто возвращает исходный ключ (для обратной совместимости)
     const t = (key: string): string => {
         return key;
     };
 
-    // Функция автоматического перевода
     const autoTranslate = async (text: string): Promise<string> => {
-        // Если язык английский, возвращаем оригинальный текст
+        
         if (language === 'en') {
             return text;
         }
 
-        // Проверяем кэш
         if (translationCache[language][text]) {
             return translationCache[language][text];
         }
@@ -74,7 +67,6 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
                 targetLanguage = 'es';
             }
 
-            // Делаем запрос к Google Translate API
             const response = await fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=${targetLanguage}&dt=t&q=${encodeURIComponent(text)}`);
             
             if (!response.ok) {
@@ -83,19 +75,17 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
 
             const data = await response.json();
             
-            // Извлекаем переведённый текст
-            let translatedText = text; // fallback
+            let translatedText = text; 
             if (data && data[0] && data[0][0] && data[0][0][0]) {
                 translatedText = data[0][0][0];
             }
 
-            // Кэшируем результат
             translationCache[language][text] = translatedText;
             
             return translatedText;
         } catch (error) {
             console.warn('Auto-translation failed:', error);
-            // В случае ошибки возвращаем оригинальный текст
+            
             return text;
         }
     };

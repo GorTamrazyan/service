@@ -1,4 +1,3 @@
-// components/Header.tsx
 "use client";
 import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
@@ -33,6 +32,20 @@ export default function Header() {
     const [isLanguageOpen, setIsLanguageOpen] = useState(false);
     const { getTotalItems, isAuthenticated } = useCart();
     const { language, setLanguage } = useLanguage();
+    const searchRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        const handleClickOutside = (e: MouseEvent) => {
+            if (searchRef.current && !searchRef.current.contains(e.target as Node)) {
+                setIsSearchOpen(false);
+                setSearchQuery("");
+            }
+        };
+        if (isSearchOpen) {
+            document.addEventListener("mousedown", handleClickOutside);
+        }
+        return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, [isSearchOpen]);
 
     const languages = [
         { code: "en", label: "English", flag: "🇺🇸" },
@@ -43,7 +56,6 @@ export default function Header() {
 
     const languageRef = useRef<HTMLDivElement>(null);
 
-    // Close language dropdown when clicking outside
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
             if (languageRef.current && !languageRef.current.contains(event.target as Node)) {
@@ -102,7 +114,7 @@ export default function Header() {
     const handleSearchSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         if (searchQuery.trim()) {
-            // Перенаправляем в зависимости от выбранного типа поиска
+            
             if (searchType === "products") {
                 router.push(
                     `/client/dashboard/products?search=${encodeURIComponent(
@@ -159,10 +171,10 @@ export default function Header() {
 
     return (
         <header className="fixed top-0 left-0 w-full py-4 px-4 sm:px-6 lg:px-8 bg-gradient-to-r from-[var(--color-primary)] via-[var(--color-primary)]/95 to-[var(--color-primary)]/90 backdrop-blur-lg border-b border-white/10 z-50 shadow-2xl">
-            {/* Main Header */}
+
             <div className="max-w-7xl mx-auto">
                 <div className="flex justify-between items-center">
-                    {/* Mobile Menu Button */}
+
                     <button
                         onClick={toggleMobileMenu}
                         aria-label="Menu"
@@ -175,7 +187,6 @@ export default function Header() {
                         )}
                     </button>
 
-                    {/* Logo */}
                     <Link
                         href="/client/dashboard/home"
                         className="flex items-center gap-3 group"
@@ -200,7 +211,6 @@ export default function Header() {
                         </div>
                     </Link>
 
-                    {/* Desktop Navigation */}
                     <nav className="hidden lg:flex items-center gap-1">
                         {navItems.map((item) => {
                             const isActive = getLinkClassName(
@@ -225,9 +235,8 @@ export default function Header() {
                         })}
                     </nav>
 
-                    {/* Right Side Actions */}
                     <div className="flex items-center gap-3">
-                        {/* Search */}
+
                         <button
                             onClick={toggleSearch}
                             className="p-3 rounded-full bg-white/10 hover:bg-white/20 transition-all duration-300 group relative"
@@ -236,7 +245,6 @@ export default function Header() {
                             <FaSearch className="w-5 h-5 text-white group-hover:scale-110 transition-transform" />
                         </button>
 
-                        {/* Cart or Language Selector */}
                         {isAuthenticated ? (
                             <Link
                                 href="/client/dashboard/cart"
@@ -286,7 +294,6 @@ export default function Header() {
                             </div>
                         )}
 
-                        {/* User/Auth */}
                         {isAuthenticated ? (
                             <Link
                                 href="/client/dashboard/profile"
@@ -311,8 +318,7 @@ export default function Header() {
                 </div>
             </div>
 
-            {/* Search Bar - Desktop and Mobile */}
-            <div className="max-w-7xl mx-auto">
+            <div className="max-w-7xl mx-auto" ref={searchRef}>
                 <div
                     className={`
                         transition-all duration-500 ease-in-out overflow-hidden
@@ -325,7 +331,7 @@ export default function Header() {
                 >
                     <form onSubmit={handleSearchSubmit} className="relative">
                         <div className="flex flex-col sm:flex-row gap-3">
-                            {/* Search Type Selector */}
+
                             <div className="flex rounded-2xl bg-white/10 backdrop-blur-sm border border-white/20 overflow-hidden">
                                 <button
                                     type="button"
@@ -357,7 +363,6 @@ export default function Header() {
                                 </button>
                             </div>
 
-                            {/* Search Input */}
                             <div className="relative flex-1">
                                 <div className="absolute left-4 top-1/2 transform -translate-y-1/2">
                                     <FaSearch className="w-5 h-5 text-gray-400" />
@@ -386,7 +391,6 @@ export default function Header() {
                 </div>
             </div>
 
-            {/* Mobile Navigation Menu */}
             <div
                 className={`
                     lg:hidden absolute top-full left-0 w-full bg-gradient-to-b from-[var(--color-primary)] to-[var(--color-primary)]/95 backdrop-blur-lg border-t border-white/10 transition-all duration-500 ease-in-out overflow-hidden
@@ -422,7 +426,6 @@ export default function Header() {
                             );
                         })}
 
-                        {/* Mobile Language Selector for non-authenticated users */}
                         {!isAuthenticated && (
                             <div className="border-t border-white/10 pt-4 mt-2">
                                 <p className="text-white/60 text-sm px-6 mb-2">
@@ -449,7 +452,6 @@ export default function Header() {
                             </div>
                         )}
 
-                        {/* Mobile Login Button */}
                         {!isAuthenticated && (
                             <div className="space-y-2 mt-4">
                                 <Link

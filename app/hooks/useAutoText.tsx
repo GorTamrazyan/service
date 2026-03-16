@@ -4,7 +4,6 @@ import React from "react";
 import { useLanguage } from "../contexts/LanguageContext";
 import { useEffect, useState } from "react";
 
-// Хук для автоматического перевода текста
 export function useAutoText(text: string, fallback?: string): string {
     const { t, language, autoTranslate } = useLanguage();
     const [translatedText, setTranslatedText] = useState<string>(text);
@@ -16,14 +15,12 @@ export function useAutoText(text: string, fallback?: string): string {
                 return;
             }
 
-            // Сначала пытаемся найти перевод по ключу
             const keyTranslation = t(text);
             if (keyTranslation !== text) {
                 setTranslatedText(keyTranslation);
                 return;
             }
 
-            // Если ключ не найден и язык не английский - переводим автоматически
             if (language !== 'en') {
                 try {
                     const translated = await autoTranslate(text);
@@ -43,7 +40,6 @@ export function useAutoText(text: string, fallback?: string): string {
     return translatedText;
 }
 
-// Компонент для автоматического перевода текста
 interface AutoTextProps {
     children: string;
     fallback?: string;

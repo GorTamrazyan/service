@@ -1,4 +1,3 @@
-// admin/layout.tsx
 "use client";
 
 import React, { useEffect, useState } from "react";
@@ -20,7 +19,7 @@ export default function AdminLayout({
     const pathname = usePathname();
 
     useEffect(() => {
-        // Skip authentication check for login page
+        
         if (pathname === "/admin/login") {
             setIsAuthenticated(true);
             return;
@@ -29,8 +28,7 @@ export default function AdminLayout({
         const checkAuth = async () => {
             const sessionToken = localStorage.getItem("adminSessionToken");
             if (sessionToken) {
-                // In a real app, verify session with server
-                // For now, just check if token exists
+                
                 const adminUser = localStorage.getItem("adminUser");
                 if (adminUser) {
                     try {
@@ -41,7 +39,6 @@ export default function AdminLayout({
                             (now.getTime() - loginTime.getTime()) /
                             (1000 * 60 * 60);
 
-                        // Session valid for 8 hours
                         if (hoursSinceLogin < 8) {
                             setIsAuthenticated(true);
                             return;
@@ -52,18 +49,15 @@ export default function AdminLayout({
                 }
             }
 
-            // Clear invalid session and redirect
             localStorage.removeItem("adminSessionToken");
             localStorage.removeItem("adminUser");
             setIsAuthenticated(false);
             router.push("/admin/login");
         };
 
-        // Small delay to ensure client-side rendering
         setTimeout(checkAuth, 100);
     }, [pathname, router]);
 
-    // Loading state
     if (isAuthenticated === null) {
         return (
             <div className="min-h-screen bg-[var(--color-background)] flex items-center justify-center">
@@ -75,7 +69,6 @@ export default function AdminLayout({
         );
     }
 
-    // Not authenticated and not on login page
     if (isAuthenticated === false && pathname !== "/admin/login") {
         return (
             <div className="min-h-screen bg-[var(--color-background)] flex items-center justify-center">
@@ -89,19 +82,16 @@ export default function AdminLayout({
         );
     }
 
-    // Login page - render without sidebar/header
     if (pathname === "/admin/login") {
         return <ThemeProvider scope="admin">{children}</ThemeProvider>;
     }
 
-    // Authenticated - render full admin layout
     return (
         <ThemeProvider scope="admin">
             <div className="min-h-screen bg-[var(--color-background)] flex">
-                {/* Sidebar */}
+
                 <AdminSidebar />
 
-                {/* Main Content */}
                 <div className="flex-1 flex flex-col">
                     <AdminHeader />
                     <main className="flex-1 p-8 overflow-y-auto">{children}</main>

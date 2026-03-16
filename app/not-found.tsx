@@ -1,4 +1,3 @@
-// app/not-found.tsx
 "use client";
 
 import Link from "next/link";
@@ -7,14 +6,13 @@ import { FaHome, FaSearch, FaTools } from "react-icons/fa";
 export default function NotFound() {
     return (
         <div className="min-h-screen bg-[var(--color-background)] flex flex-col relative overflow-hidden">
-            {/* Background decorative elements */}
+
             <div className="absolute inset-0 overflow-hidden pointer-events-none">
                 <div className="absolute top-0 right-0 w-96 h-96 bg-[var(--color-primary)]/5 rounded-full blur-3xl"></div>
                 <div className="absolute bottom-0 left-0 w-96 h-96 bg-[var(--color-accent)]/5 rounded-full blur-3xl"></div>
                 <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-[var(--color-accent)]/3 rounded-full blur-3xl"></div>
             </div>
 
-            {/* Header */}
             <div className="relative w-full py-6 bg-[var(--color-secondary)] shadow-sm border-b border-[var(--color-border)]">
                 <div className="max-w-7xl mx-auto px-4">
                     <Link
@@ -22,7 +20,7 @@ export default function NotFound() {
                         className="flex items-center justify-center group"
                     >
                         <div className="flex items-center space-x-4 transition-transform duration-300 group-hover:scale-105">
-                            {/* Enhanced Fence icon */}
+
                             <div className="text-[var(--color-accent)] transform transition-all duration-300 group-hover:rotate-6">
                                 <svg
                                     width="60"
@@ -51,17 +49,16 @@ export default function NotFound() {
                 </div>
             </div>
 
-            {/* Main Content */}
             <div className="relative flex-1 flex items-center justify-center px-4 py-12">
                 <div className="max-w-2xl w-full text-center">
-                    {/* 404 Number with animation */}
+
                     <div className="mb-8 relative">
                         <div className="text-[200px] md:text-[280px] font-black text-[var(--color-primary)]/10 leading-none select-none">
                             404
                         </div>
                         <div className="absolute inset-0 flex items-center justify-center">
                             <div className="relative">
-                                {/* Animated fence icon */}
+
                                 <div className="animate-bounce">
                                     <svg
                                         width="120"
@@ -116,7 +113,6 @@ export default function NotFound() {
                         </div>
                     </div>
 
-                    {/* Error Message */}
                     <div className="mb-12">
                         <h2 className="text-4xl md:text-5xl font-bold text-[var(--color-primary)] mb-4">
                             Page Not Found
@@ -128,7 +124,6 @@ export default function NotFound() {
                         </p>
                     </div>
 
-                    {/* Action Buttons */}
                     <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
                         <Link
                             href="/"
@@ -147,7 +142,6 @@ export default function NotFound() {
                         </Link>
                     </div>
 
-                    {/* Additional Links */}
                     <div className="mt-12 pt-8 border-t border-[var(--color-border)]">
                         <p className="text-[var(--color-text)]/60 mb-4">
                             Need help? Here are some useful links:
@@ -183,7 +177,6 @@ export default function NotFound() {
                 </div>
             </div>
 
-            {/* Footer Note */}
             <div className="relative py-6 text-center">
                 <p className="text-[var(--color-text)]/50 text-sm">
                     © 2024 ONIK&apos;S VINYL - Premium Fencing Solutions

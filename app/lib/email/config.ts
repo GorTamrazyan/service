@@ -1,17 +1,13 @@
-// app/lib/email/config.ts
 import nodemailer from 'nodemailer';
 
-// Конфигурация транспорта для отправки писем
-// Использует Gmail SMTP с App Password
 export const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
         user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASSWORD, // Используйте App Password для Gmail
+        pass: process.env.EMAIL_PASSWORD, 
     },
 });
 
-// Альтернативная конфигурация для других SMTP серверов
 export const createCustomTransporter = (config: {
     host: string;
     port: number;
@@ -30,7 +26,6 @@ export const createCustomTransporter = (config: {
     });
 };
 
-// Проверка подключения к SMTP серверу
 export const verifyEmailConnection = async (): Promise<boolean> => {
     try {
         await transporter.verify();
@@ -42,11 +37,9 @@ export const verifyEmailConnection = async (): Promise<boolean> => {
     }
 };
 
-// Настройки отправителя по умолчанию
 export const defaultSender = {
     name: "ONIK'S VINYL",
     email: process.env.EMAIL_USER || 'noreply@oniks-vinyl.com',
 };
 
-// Базовый URL сайта
 export const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';

@@ -1,4 +1,3 @@
-// app/api/colors/route.ts
 import { NextResponse } from "next/server";
 import { getAllColors } from "../../lib/firebase/products";
 

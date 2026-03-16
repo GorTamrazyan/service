@@ -31,7 +31,7 @@ export default function CheckoutModal({
         <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4 animate-fadeIn">
             <div className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto animate-slideUp shadow-2xl">
                 <div className="p-6 md:p-8">
-                    {/* Header */}
+
                     <div className="flex items-center justify-between mb-6">
                         <div>
                             <h2 className="text-3xl font-black text-[var(--color-primary)]">
@@ -51,7 +51,7 @@ export default function CheckoutModal({
 
                     <form onSubmit={onSubmit}>
                         <div className="space-y-6">
-                            {/* Contact Information */}
+
                             <div>
                                 <h3 className="text-lg font-bold text-gray-900 mb-4">
                                     <T>Contact Information</T>
@@ -112,13 +112,12 @@ export default function CheckoutModal({
                                 </div>
                             </div>
 
-                            {/* Delivery Address */}
                             <div>
                                 <h3 className="text-lg font-bold text-gray-900 mb-4">
                                     <T>Delivery Address</T>
                                 </h3>
                                 <div className="space-y-4">
-                                    {/* Street and House Number */}
+
                                     <div className="grid grid-cols-2 gap-4">
                                         <div>
                                             <label className="block text-sm font-semibold text-gray-700 mb-2">
@@ -174,7 +173,6 @@ export default function CheckoutModal({
                                         </div>
                                     </div>
 
-                                    {/* Apartment Number */}
                                     <div>
                                         <label className="block text-sm font-semibold text-gray-700 mb-2">
                                             <T>Apartment/Unit</T>
@@ -196,7 +194,6 @@ export default function CheckoutModal({
                                         />
                                     </div>
 
-                                    {/* City, State, ZIP Code */}
                                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                                         <div>
                                             <label className="block text-sm font-semibold text-gray-700 mb-2">
@@ -215,8 +212,6 @@ export default function CheckoutModal({
                                                 placeholder="Seattle"
                                             />
                                         </div>
-
-                                      
 
                                         <div>
                                             <label className="block text-sm font-semibold text-gray-700 mb-2">
@@ -242,7 +237,6 @@ export default function CheckoutModal({
                                 </div>
                             </div>
 
-                            {/* Order Summary in Modal */}
                             <div className="bg-gray-50 rounded-xl p-6 border border-gray-200">
                                 <h3 className="text-lg font-bold text-gray-900 mb-4">
                                     <T>Order Summary</T>
@@ -294,7 +288,6 @@ export default function CheckoutModal({
                                 </div>
                             </div>
 
-                            {/* Submit Buttons */}
                             <div className="flex flex-col sm:flex-row gap-4 pt-6 border-t border-gray-200">
                                 <button
                                     type="button"

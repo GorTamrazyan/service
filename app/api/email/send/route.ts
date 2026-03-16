@@ -1,4 +1,3 @@
-// app/api/email/send/route.ts
 import { NextRequest, NextResponse } from 'next/server';
 import {
     sendWelcomeEmail,

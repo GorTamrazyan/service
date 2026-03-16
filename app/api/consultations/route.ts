@@ -1,4 +1,3 @@
-// app/api/consultations/route.ts
 import { NextResponse } from "next/server";
 import {
     getAllConsultations,
@@ -7,9 +6,6 @@ import {
     deleteConsultation,
 } from "../../lib/firebase/service";
 
-/**
- * GET handler for retrieving all consultations
- */
 export async function GET(request: Request) {
     try {
         const consultations = await getAllConsultations();
@@ -23,15 +19,11 @@ export async function GET(request: Request) {
     }
 }
 
-/**
- * POST handler for creating a new consultation
- */
 export async function POST(request: Request) {
     try {
         const body = await request.json();
         const { title, description, features, price, duration } = body;
 
-        // Validation
         if (!title || !description || !Array.isArray(features)) {
             return NextResponse.json(
                 {
@@ -42,7 +34,6 @@ export async function POST(request: Request) {
             );
         }
 
-        // Create consultation
         const newConsultationId = await createConsultation({
             title,
             description,
@@ -67,9 +58,6 @@ export async function POST(request: Request) {
     }
 }
 
-/**
- * PUT handler for updating a consultation
- */
 export async function PUT(request: Request) {
     try {
         const { searchParams } = new URL(request.url);
@@ -85,7 +73,6 @@ export async function PUT(request: Request) {
         const body = await request.json();
         const { title, description, features, price, duration } = body;
 
-        // Validation
         if (!title || !description || !Array.isArray(features)) {
             return NextResponse.json(
                 {
@@ -96,7 +83,6 @@ export async function PUT(request: Request) {
             );
         }
 
-        // Update consultation
         await updateConsultation(id, {
             title,
             description,
@@ -118,9 +104,6 @@ export async function PUT(request: Request) {
     }
 }
 
-/**
- * DELETE handler for deleting a consultation
- */
 export async function DELETE(request: Request) {
     try {
         const { searchParams } = new URL(request.url);
@@ -133,7 +116,6 @@ export async function DELETE(request: Request) {
             );
         }
 
-        // Delete consultation
         await deleteConsultation(id);
 
         return NextResponse.json(

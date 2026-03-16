@@ -1,6 +1,3 @@
-// app/lib/email/templates.ts
-
-// Базовые стили для всех писем
 const baseStyles = `
     <style>
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 0; background-color: #f5f5f5; }
@@ -23,7 +20,6 @@ const baseStyles = `
     </style>
 `;
 
-// 1. Welcome Email - приветственное письмо после регистрации
 export const welcomeEmailTemplate = (customerName: string) => `
 <!DOCTYPE html>
 <html>
@@ -75,7 +71,6 @@ export const welcomeEmailTemplate = (customerName: string) => `
 </html>
 `;
 
-// 2. Order Confirmation Email - подтверждение заказа
 export interface OrderItem {
     name: string;
     quantity: number;
@@ -163,7 +158,6 @@ export const orderConfirmationTemplate = (
 `;
 };
 
-// 3. Order Status Update Email - обновление статуса заказа
 export const orderStatusUpdateTemplate = (
     orderId: string,
     customerName: string,
@@ -226,7 +220,6 @@ export const orderStatusUpdateTemplate = (
 `;
 };
 
-// 4. Consultation Booking Email - подтверждение бронирования консультации
 export const consultationBookingTemplate = (
     customerName: string,
     consultationType: string,
@@ -300,7 +293,6 @@ export const consultationBookingTemplate = (
 </html>
 `;
 
-// 5. Password Reset Email - сброс пароля
 export const passwordResetTemplate = (
     customerName: string,
     resetLink: string
@@ -351,7 +343,6 @@ export const passwordResetTemplate = (
 </html>
 `;
 
-// 6. Newsletter/Promotional Email - рассылка
 export const newsletterTemplate = (
     customerName: string,
     subject: string,
@@ -401,7 +392,6 @@ export const newsletterTemplate = (
 </html>
 `;
 
-// Экспорт типов для использования в других файлах
 export type EmailTemplateType =
     | 'welcome'
     | 'order_confirmation'

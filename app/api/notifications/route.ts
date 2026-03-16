@@ -1,11 +1,9 @@
-// app/api/admin/notifications/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import {
     getAllNotifications,
     markAllNotificationsAsRead,
 } from "../../lib/firebase/notifications";
 
-// GET: Получить все уведомления
 export async function GET() {
     try {
         console.log("🔔 API: Fetching all notifications...");
@@ -18,7 +16,6 @@ export async function GET() {
         );
         console.log("📋 API: Notifications data:", notifications);
 
-        // Преобразуем Timestamp в строку для JSON
         const serializedNotifications = notifications.map((notif) => ({
             ...notif,
             created_at:
@@ -44,7 +41,6 @@ export async function GET() {
     }
 }
 
-// PUT: Пометить все уведомления как прочитанные
 export async function PUT() {
     try {
         console.log("👁 API: Marking all notifications as read...");

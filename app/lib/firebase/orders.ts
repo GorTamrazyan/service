@@ -1,4 +1,3 @@
-// lib/firebase/orders.ts
 import {
     collection,
     doc,
@@ -43,15 +42,15 @@ export interface ServiceInfo {
 export interface Order {
     id?: string;
     userId: string;
-    type: "product" | "consultation" | "service"; // Новое поле для типа заказа
+    type: "product" | "consultation" | "service"; 
     products: {
         id: string;
         name: string;
         price: string;
         quantity: number;
     }[];
-    consultation?: ConsultationInfo; // Информация о консультации
-    services?: ServiceInfo[]; // Информация об услугах
+    consultation?: ConsultationInfo; 
+    services?: ServiceInfo[]; 
     totalPrice: string;
     status:
         | "pending"
@@ -71,7 +70,6 @@ export interface Order {
     updatedAt: Date;
 }
 
-// Преобразование Firestore документа в Order объект
 export const firestoreToOrder = (
     doc: DocumentSnapshot<DocumentData>,
 ): Order | null => {
@@ -81,7 +79,7 @@ export const firestoreToOrder = (
     return {
         id: doc.id,
         userId: data.userId,
-        type: data.type || "product", // По умолчанию 'product' для обратной совместимости
+        type: data.type || "product", 
         products: data.products || [],
         consultation: data.consultation
             ? {
@@ -108,7 +106,6 @@ export const firestoreToOrder = (
     };
 };
 
-// Преобразование Order объекта для Firestore
 export const orderToFirestore = (order: Omit<Order, "id">): DocumentData => {
     const data: DocumentData = {
         userId: order.userId,
@@ -121,7 +118,6 @@ export const orderToFirestore = (order: Omit<Order, "id">): DocumentData => {
         updatedAt: Timestamp.fromDate(order.updatedAt),
     };
 
-    // Добавляем consultation если это консультация
     if (order.consultation) {
         data.consultation = {
             consultationType: order.consultation.consultationType,
@@ -137,7 +133,6 @@ export const orderToFirestore = (order: Omit<Order, "id">): DocumentData => {
         }
     }
 
-    // Добавляем services если они есть
     if (order.services && order.services.length > 0) {
         data.services = order.services.map((service) => ({
             serviceType: service.serviceType,
@@ -150,7 +145,6 @@ export const orderToFirestore = (order: Omit<Order, "id">): DocumentData => {
     return data;
 };
 
-// Создать новый заказ
 export const createOrder = async (
     order: Omit<Order, "id" | "createdAt" | "updatedAt">,
 ): Promise<string> => {
@@ -167,7 +161,6 @@ export const createOrder = async (
 
         const orderId = docRef.id;
 
-        // Создаем уведомление только для заказов продуктов или услуг (НЕ для консультаций)
         if (order.type === "product" || order.type === "service") {
             console.log(`✅ Creating notification for ${order.type} order`);
             await createOrderNotification(orderId, order.customerInfo.name);
@@ -182,7 +175,6 @@ export const createOrder = async (
     }
 };
 
-// Получить все заказы (только продукты и услуги, БЕЗ консультаций)
 export const getAllOrders = async (): Promise<Order[]> => {
     try {
         const ordersRef = collection(db, "orders");
@@ -192,14 +184,13 @@ export const getAllOrders = async (): Promise<Order[]> => {
         return querySnapshot.docs
             .map((doc) => firestoreToOrder(doc))
             .filter((order): order is Order => order !== null)
-            .filter((order) => order.type !== "consultation"); // Исключаем консультации
+            .filter((order) => order.type !== "consultation"); 
     } catch (error) {
         console.error("Ошибка при получении заказов:", error);
         throw error;
     }
 };
 
-// Получить заказы пользователя
 export const getUserOrders = async (userId: string): Promise<Order[]> => {
     try {
         console.log("getUserOrders: Fetching orders for user:", userId);
@@ -222,7 +213,6 @@ export const getUserOrders = async (userId: string): Promise<Order[]> => {
     }
 };
 
-// Получить заказ по ID
 export const getOrderById = async (id: string): Promise<Order | null> => {
     try {
         const orderRef = doc(db, "orders", id);
@@ -234,7 +224,6 @@ export const getOrderById = async (id: string): Promise<Order | null> => {
     }
 };
 
-// Обновить статус заказа
 export const updateOrderStatus = async (
     id: string,
     status: Order["status"],
@@ -251,7 +240,6 @@ export const updateOrderStatus = async (
     }
 };
 
-// Обновить заказ
 export const updateOrder = async (
     id: string,
     order: Partial<Omit<Order, "id" | "createdAt">>,
@@ -270,7 +258,6 @@ export const updateOrder = async (
     }
 };
 
-// Удалить заказ
 export const deleteOrder = async (id: string): Promise<void> => {
     try {
         const orderRef = doc(db, "orders", id);
@@ -281,7 +268,6 @@ export const deleteOrder = async (id: string): Promise<void> => {
     }
 };
 
-// Создать заказ консультации
 export const createConsultationOrder = async (
     userId: string,
     consultation: ConsultationInfo,

@@ -1,4 +1,3 @@
-// app/client/dashboard/home/page.tsx
 "use client";
 
 import React, { useEffect, useState } from "react";
@@ -16,7 +15,6 @@ import {
     FaQuoteLeft,
 } from "react-icons/fa";
 
-// ПРАВИЛЬНЫЙ импорт ProductCard из компонента ProductList
 import { ProductCard } from "../../components/ProductList";
 import { T } from "../../components/T";
 import type { Material, Color } from "../../../lib/firebase/products/types";
@@ -51,7 +49,7 @@ export default function HomePage() {
                     "/api/products?featured=true&_limit=4"
                 );
                 if (!response.ok) {
-                    throw new Error(`Ошибка HTTP! Статус: ${response.status}`);
+                    throw new Error(`HTTP Error! Status: ${response.status}`);
                 }
                 const data: Product[] = await response.json();
                 setProducts(data);
@@ -67,7 +65,7 @@ export default function HomePage() {
 
     return (
         <div className="bg-[var(--color-background)] text-[var(--color-text)]">
-            {/* Modern Hero Section */}
+
             <section className="relative min-h-[90vh] flex items-center overflow-hidden">
                 <div className="absolute inset-0 z-0">
                     <div className="absolute inset-0 bg-gradient-to-r from-[var(--color-primary)] via-[var(--color-primary)/80] to-transparent z-10" />
@@ -145,7 +143,6 @@ export default function HomePage() {
                 </div>
             </section>
 
-            {/* Featured Products - Modern Grid */}
             <section className="py-24 bg-gradient-to-b from-[var(--color-background)] to-[var(--color-card-bg)]">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="text-center mb-16">
@@ -234,7 +231,6 @@ export default function HomePage() {
                 </div>
             </section>
 
-            {/* Modern Benefits Section */}
             <section className="py-24 bg-[var(--color-card-bg)]">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="text-center mb-20">
@@ -322,7 +318,6 @@ export default function HomePage() {
                 </div>
             </section>
 
-            {/* Modern Testimonials Preview */}
             <section className="py-24 bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-primary)]/80">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="text-center mb-16">
@@ -387,7 +382,6 @@ export default function HomePage() {
                 </div>
             </section>
 
-            {/* Modern CTA Section */}
             <section className="py-24 bg-gradient-to-r from-[var(--color-accent)] to-[var(--color-accent)]/90">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="text-center">

@@ -1,4 +1,3 @@
-// app/admin/before-after/page.tsx
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
@@ -38,7 +37,6 @@ export default function AdminBeforeAfterPage() {
     const [editingProject, setEditingProject] =
         useState<BeforeAfterProject | null>(null);
 
-    // Form states
     const [beforeImageFile, setBeforeImageFile] = useState<File | null>(null);
     const [afterImageFile, setAfterImageFile] = useState<File | null>(null);
     const [beforeImagePreview, setBeforeImagePreview] = useState<string>("");
@@ -47,7 +45,6 @@ export default function AdminBeforeAfterPage() {
     const [location, setLocation] = useState("");
     const [isActive, setIsActive] = useState(true);
 
-    // Refs for file inputs
     const beforeImageInputRef = useRef<HTMLInputElement>(null);
     const afterImageInputRef = useRef<HTMLInputElement>(null);
 
@@ -240,7 +237,7 @@ export default function AdminBeforeAfterPage() {
 
     return (
         <div className="space-y-8">
-            {/* Header */}
+
             <div className="flex items-center justify-between">
                 <div>
                     <h1 className="text-3xl font-bold text-[var(--color-primary)]">
@@ -260,21 +257,19 @@ export default function AdminBeforeAfterPage() {
                 </button>
             </div>
 
-            {/* Error Display */}
             {error && (
                 <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-xl">
                     {error}
                 </div>
             )}
 
-            {/* Projects Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {projects.map((project) => (
                     <div
                         key={project.id}
                         className="bg-[var(--color-background)] rounded-2xl shadow-xl border border-[var(--color-text)]/10 overflow-hidden"
                     >
-                        {/* Before & After Images */}
+
                         <div className="grid grid-cols-2 gap-2 p-4">
                             <div className="relative aspect-square rounded-lg overflow-hidden">
                                 <Image
@@ -300,7 +295,6 @@ export default function AdminBeforeAfterPage() {
                             </div>
                         </div>
 
-                        {/* Project Info */}
                         <div className="p-4 border-t border-[var(--color-text)]/10">
                             <p className="text-[var(--color-text)] font-medium mb-2 line-clamp-2">
                                 {project.description}
@@ -309,7 +303,6 @@ export default function AdminBeforeAfterPage() {
                                 📍 {project.location}
                             </p>
 
-                            {/* Status Badge */}
                             <div className="flex items-center gap-2 mb-4">
                                 {project.isActive ? (
                                     <span className="inline-flex items-center gap-1 text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full">
@@ -324,7 +317,6 @@ export default function AdminBeforeAfterPage() {
                                 )}
                             </div>
 
-                            {/* Actions */}
                             <div className="flex items-center gap-2">
                                 <button
                                     onClick={() => handleToggleActive(project)}
@@ -364,7 +356,6 @@ export default function AdminBeforeAfterPage() {
                 ))}
             </div>
 
-            {/* Add/Edit Form Modal */}
             {(showAddForm || showEditForm) && (
                 <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
                     <div className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
@@ -399,7 +390,7 @@ export default function AdminBeforeAfterPage() {
                             }
                             className="p-6 space-y-6"
                         >
-                            {/* Before Image */}
+
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-2">
                                     Before Image *
@@ -460,7 +451,6 @@ export default function AdminBeforeAfterPage() {
                                 </div>
                             </div>
 
-                            {/* After Image */}
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-2">
                                     After Image *
@@ -521,7 +511,6 @@ export default function AdminBeforeAfterPage() {
                                 </div>
                             </div>
 
-                            {/* Description */}
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-2">
                                     Description *
@@ -538,7 +527,6 @@ export default function AdminBeforeAfterPage() {
                                 />
                             </div>
 
-                            {/* Location */}
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-2">
                                     Location *
@@ -555,7 +543,6 @@ export default function AdminBeforeAfterPage() {
                                 />
                             </div>
 
-                            {/* Active Status */}
                             <div className="flex items-center gap-3">
                                 <input
                                     type="checkbox"
@@ -574,7 +561,6 @@ export default function AdminBeforeAfterPage() {
                                 </label>
                             </div>
 
-                            {/* Submit Buttons */}
                             <div className="flex items-center gap-3 pt-4">
                                 <button
                                     type="submit"

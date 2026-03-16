@@ -1,4 +1,3 @@
-// components/profile/ProfileContent.tsx
 import React from "react";
 import { ProfileContentProps } from "../../../types/profile";
 import PersonalInfoPanel from "./panels/PersonalInfoPanel";
@@ -33,7 +32,7 @@ export default function ProfileContent({
 
     return (
         <div className="max-w-4xl mx-auto w-full">
-            {/* Content Header */}
+
             <div className="bg-[var(--color-secondary)] rounded-2xl shadow-xl p-6 border border-[var(--color-text)]/10 mb-6">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <div>
@@ -87,7 +86,6 @@ export default function ProfileContent({
                 </div>
             </div>
 
-            {/* Content Area */}
             <div className="bg-[var(--color-secondary)] rounded-2xl shadow-xl p-6 border border-[var(--color-text)]/10">
                 {activeSection === "personalInfo" && (
                     <PersonalInfoPanel

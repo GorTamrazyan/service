@@ -22,7 +22,6 @@ import { getColorById } from "./colors";
 import { getImagesByProductId, getPrimaryImageByProductId } from "./images";
 import type { Image } from "./types";
 
-// Преобразование Firestore документа в Product объект
 export const firestoreToProduct = (doc: DocumentSnapshot<DocumentData>): Product | null => {
   if (!doc.exists()) return null;
 
@@ -53,7 +52,6 @@ export const firestoreToProduct = (doc: DocumentSnapshot<DocumentData>): Product
   };
 };
 
-// Преобразование Product объекта для Firestore
 export const productToFirestore = (product: Omit<Product, 'id'>): DocumentData => {
   return {
     name: product.name,
@@ -75,7 +73,6 @@ export const productToFirestore = (product: Omit<Product, 'id'>): DocumentData =
   };
 };
 
-// Получить все продукты
 export const getAllProducts = async (): Promise<Product[]> => {
   try {
     const productsRef = collection(db, 'products');
@@ -91,7 +88,6 @@ export const getAllProducts = async (): Promise<Product[]> => {
   }
 };
 
-// Получить продукты с фильтрацией
 export const getFilteredProducts = async (filters: {
   categoryId?: string;
   typeOfProductId?: string;
@@ -106,7 +102,6 @@ export const getFilteredProducts = async (filters: {
     const productsRef = collection(db, 'products');
     let q = query(productsRef);
 
-    // Применяем фильтры
     if (filters.categoryId) {
       q = query(q, where('categoryId', '==', filters.categoryId));
     }
@@ -125,7 +120,6 @@ export const getFilteredProducts = async (filters: {
       .map(doc => firestoreToProduct(doc))
       .filter((product): product is Product => product !== null);
 
-    // Фильтрация по цене (на клиенте)
     if (filters.minPrice !== undefined || filters.maxPrice !== undefined) {
       products = products.filter(product => {
         const prices = Object.values(product.colorPrices);
@@ -138,14 +132,12 @@ export const getFilteredProducts = async (filters: {
       });
     }
 
-    // Фильтрация по цвету (на клиенте)
     if (filters.colorId) {
       products = products.filter(product =>
         product.colorIds?.includes(filters.colorId!)
       );
     }
 
-    // Фильтрация по тегам (на клиенте)
     if (filters.tags && filters.tags.length > 0) {
       products = products.filter(product =>
         filters.tags!.some(tag => product.tags?.includes(tag))
@@ -159,7 +151,6 @@ export const getFilteredProducts = async (filters: {
   }
 };
 
-// Получить продукт по ID
 export const getProductById = async (id: string): Promise<Product | null> => {
   try {
     const productRef = doc(db, 'products', id);
@@ -171,7 +162,6 @@ export const getProductById = async (id: string): Promise<Product | null> => {
   }
 };
 
-// Создать новый продукт
 export const createProduct = async (
   product: Omit<Product, 'id' | 'createdAt' | 'updatedAt'>
 ): Promise<string> => {
@@ -192,7 +182,6 @@ export const createProduct = async (
   }
 };
 
-// Обновить продукт
 export const updateProduct = async (
   id: string,
   product: Partial<Omit<Product, 'id' | 'createdAt'>>
@@ -211,7 +200,6 @@ export const updateProduct = async (
   }
 };
 
-// Удалить продукт
 export const deleteProduct = async (id: string): Promise<void> => {
   try {
     const productRef = doc(db, 'products', id);
@@ -222,7 +210,6 @@ export const deleteProduct = async (id: string): Promise<void> => {
   }
 };
 
-// Получить избранные продукты
 export const getFeaturedProducts = async (): Promise<Product[]> => {
   try {
     const productsRef = collection(db, 'products');
@@ -238,7 +225,6 @@ export const getFeaturedProducts = async (): Promise<Product[]> => {
   }
 };
 
-// Пакетное создание продуктов
 export const batchCreateProducts = async (products: Omit<Product, 'id'>[]): Promise<void> => {
   try {
     const batch = writeBatch(db);
@@ -256,11 +242,6 @@ export const batchCreateProducts = async (products: Omit<Product, 'id'>[]): Prom
   }
 };
 
-// ============================================
-// ФУНКЦИИ ДЛЯ ОБОГАЩЕНИЯ ПРОДУКТОВ
-// ============================================
-
-// Расширенный интерфейс продукта с полными данными
 export interface EnrichedProduct extends Omit<Product, 'materialId' | 'colorIds'> {
   materialId?: string;
   material?: Material;
@@ -270,12 +251,10 @@ export interface EnrichedProduct extends Omit<Product, 'materialId' | 'colorIds'
   imageUrl?: string | null;
 }
 
-// Обогащение одного продукта данными материала, цветов и изображений
 export const enrichProduct = async (product: Product): Promise<EnrichedProduct> => {
   try {
     const enriched: EnrichedProduct = { ...product, imageUrl: null };
 
-    // Загружаем материал, если есть materialId
     if (product.materialId) {
       const material = await getMaterialById(product.materialId);
       if (material) {
@@ -283,19 +262,16 @@ export const enrichProduct = async (product: Product): Promise<EnrichedProduct> 
       }
     }
 
-    // Загружаем цвета, если есть colorIds
     if (product.colorIds && product.colorIds.length > 0) {
       const colorsPromises = product.colorIds.map(colorId => getColorById(colorId));
       const colorsResults = await Promise.all(colorsPromises);
       enriched.colors = colorsResults.filter((color): color is Color => color !== null);
     }
 
-    // Загружаем изображения продукта
     if (product.id) {
       const images = await getImagesByProductId(product.id);
       enriched.images = images;
 
-      // Устанавливаем основное изображение
       const primaryImage = images.find(img => img.isPrimary);
       enriched.imageUrl = primaryImage?.url || images[0]?.url || null;
     }
@@ -307,7 +283,6 @@ export const enrichProduct = async (product: Product): Promise<EnrichedProduct> 
   }
 };
 
-// Обогащение массива продуктов
 export const enrichProducts = async (products: Product[]): Promise<EnrichedProduct[]> => {
   try {
     const enrichedPromises = products.map(product => enrichProduct(product));
@@ -318,20 +293,17 @@ export const enrichProducts = async (products: Product[]): Promise<EnrichedProdu
   }
 };
 
-// Получить все продукты с полными данными
 export const getAllProductsEnriched = async (): Promise<EnrichedProduct[]> => {
   const products = await getAllProducts();
   return enrichProducts(products);
 };
 
-// Получить продукт по ID с полными данными
 export const getProductByIdEnriched = async (id: string): Promise<EnrichedProduct | null> => {
   const product = await getProductById(id);
   if (!product) return null;
   return enrichProduct(product);
 };
 
-// Получить отфильтрованные продукты с полными данными
 export const getFilteredProductsEnriched = async (filters: {
   categoryId?: string;
   typeOfProductId?: string;

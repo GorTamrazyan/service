@@ -96,7 +96,6 @@ export default function TypeModal({
                     </button>
                 </div>
 
-                {/* Existing Types List */}
                 {types.length > 0 && (
                     <div className="mb-6">
                         <h3 className="text-sm font-semibold text-[var(--color-text)] mb-3">
@@ -133,7 +132,6 @@ export default function TypeModal({
                     </div>
                 )}
 
-                {/* Add New Type Form */}
                 <div className="border-t border-[var(--color-text)]/10 pt-4">
                     <h3 className="text-sm font-semibold text-[var(--color-text)] mb-3">
                         <T>Add New Type</T>

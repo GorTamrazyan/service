@@ -1,8 +1,3 @@
-// app/lib/email/helpers.ts
-// Helper функции для отправки email из клиентских компонентов
-// ВАЖНО: Этот файл НЕ импортирует nodemailer напрямую - используется только fetch к API
-
-// Базовый URL для API (используется на клиенте)
 const getApiUrl = () => {
     if (typeof window !== 'undefined') {
         return window.location.origin;
@@ -10,7 +5,6 @@ const getApiUrl = () => {
     return process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
 };
 
-// Типы для параметров
 export interface SendWelcomeEmailParams {
     email: string;
     name: string;
@@ -46,7 +40,6 @@ export interface SendOrderStatusEmailParams {
     newStatus: string;
 }
 
-// Helper для отправки приветственного письма
 export const sendWelcomeEmailHelper = async (email: string, name: string): Promise<boolean> => {
     try {
         const response = await fetch(`${getApiUrl()}/api/email/send`, {
@@ -78,7 +71,6 @@ export const sendWelcomeEmailHelper = async (email: string, name: string): Promi
     }
 };
 
-// Helper для отправки подтверждения заказа
 export const sendOrderEmail = async (params: SendOrderEmailParams): Promise<boolean> => {
     try {
         const response = await fetch(`${getApiUrl()}/api/email/send`, {
@@ -114,7 +106,6 @@ export const sendOrderEmail = async (params: SendOrderEmailParams): Promise<bool
     }
 };
 
-// Helper для отправки подтверждения консультации
 export const sendConsultationEmail = async (params: SendConsultationEmailParams): Promise<boolean> => {
     try {
         const response = await fetch(`${getApiUrl()}/api/email/send`, {
@@ -151,7 +142,6 @@ export const sendConsultationEmail = async (params: SendConsultationEmailParams)
     }
 };
 
-// Helper для отправки обновления статуса заказа
 export const sendOrderStatusEmail = async (params: SendOrderStatusEmailParams): Promise<boolean> => {
     try {
         const response = await fetch(`${getApiUrl()}/api/email/send`, {
@@ -185,7 +175,6 @@ export const sendOrderStatusEmail = async (params: SendOrderStatusEmailParams): 
     }
 };
 
-// Helper для отправки письма сброса пароля
 export const sendPasswordResetEmailHelper = async (
     email: string,
     name: string,

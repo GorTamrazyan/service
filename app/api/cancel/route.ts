@@ -36,7 +36,6 @@ export async function DELETE(request: NextRequest) {
         const calendar = google.calendar({ version: "v3", auth });
         const calendarId = process.env.GOOGLE_CALENDAR_ID || "primary";
 
-        // Удаляем событие из календаря
         await calendar.events.delete({
             calendarId: calendarId,
             eventId: eventId,
@@ -49,7 +48,6 @@ export async function DELETE(request: NextRequest) {
     } catch (error: any) {
         console.error("❌ Cancel Error:", error);
 
-        // Если событие не найдено
         if (error.code === 404 || error.message?.includes("Not Found")) {
             return NextResponse.json(
                 { error: "Event not found" },

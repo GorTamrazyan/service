@@ -1,4 +1,3 @@
-// app/api/type-of-products/route.ts
 import { NextResponse } from "next/server";
 import { getAllTypeOfProducts } from "../../lib/firebase/products";
 
@@ -14,5 +13,3 @@ export async function GET() {
         );
     }
 }
-
-

@@ -32,7 +32,7 @@ export default function PersonalInfoPanel({
     return (
         <div className="animate-fadeIn">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {/* Personal Information */}
+
                 <div className="space-y-6">
                     <div>
                         <h3 className="text-lg font-bold text-[var(--color-text)] mb-4 flex items-center gap-2">
@@ -77,7 +77,6 @@ export default function PersonalInfoPanel({
                         </div>
                     </div>
 
-                    {/* Contact Information */}
                     <div>
                         <h3 className="text-lg font-bold text-[var(--color-text)] mb-4 flex items-center gap-2">
                             <FaEnvelope className="w-5 h-5 text-[var(--color-accent)]" />
@@ -120,7 +119,6 @@ export default function PersonalInfoPanel({
                     </div>
                 </div>
 
-                {/* Address Information */}
                 <div>
                     <div className="flex items-center justify-between mb-4">
                         <h3 className="text-lg font-bold text-[var(--color-text)] flex items-center gap-2">

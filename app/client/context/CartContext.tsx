@@ -1,4 +1,3 @@
-// app/client/context/CartContext.tsx
 "use client";
 
 import React, {
@@ -15,24 +14,22 @@ import { createOrder } from "../../lib/firebase/orders";
 import type { Color } from "../../lib/firebase/products/types";
 import { sendOrderEmail } from "../../lib/email/helpers";
 
-// Интерфейс для продукта в корзине
 export interface CartItem {
     id: string;
     name: string;
     price: string;
     imageUrl: string | null;
     quantity: number;
-    type: "product" | "consultation" | "service"; // Тип элемента
+    type: "product" | "consultation" | "service"; 
     color?: Color | null;
     height?: number;
     length?: number;
-    duration?: number; // Продолжительность в минутах
-    features?: string[]; // Что включено в консультацию
-    description?: string; // Описание услуги
-    serviceType?: "delivery" | "installation" | "assembly" | "other"; // Тип услуги
+    duration?: number; 
+    features?: string[]; 
+    description?: string; 
+    serviceType?: "delivery" | "installation" | "assembly" | "other"; 
 }
 
-// Интерфейс для информации о клиенте
 export interface CustomerInfo {
     name: string;
     email: string;
@@ -44,7 +41,6 @@ export interface CustomerInfo {
     zipCode: string; 
 }
 
-// Интерфейс для значений контекста корзины
 interface CartContextType {
     cartItems: CartItem[];
     addToCart: (product: {
@@ -87,7 +83,7 @@ interface CartContextType {
     getTotalPrice: () => number;
     isAuthenticated: boolean;
     requiresAuth: (action: string) => boolean;
-    // Checkout functionality
+    
     showCheckoutModal: boolean;
     customerInfo: CustomerInfo;
     isSubmitting: boolean;
@@ -99,7 +95,6 @@ interface CartContextType {
     resetOrderSuccess: () => void;
 }
 
-// Создаем контекст с значениями по умолчанию
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
 interface CartProviderProps {
@@ -107,14 +102,12 @@ interface CartProviderProps {
 }
 
 export const CartProvider = ({ children }: CartProviderProps) => {
-    // Инициализируем состояние корзины как пустой массив на сервере.
-    // Фактические данные из localStorage будут загружены только на клиенте.
+    
     const [cartItems, setCartItems] = useState<CartItem[]>([]);
     const [isClient, setIsClient] = useState(false);
     const [user, loading] = useAuthState();
     const { profile } = useProfile();
 
-    // Checkout states
     const [showCheckoutModal, setShowCheckoutModal] = useState(false);
     const [customerInfo, setCustomerInfo] = useState<CustomerInfo>({
         name: "",
@@ -129,14 +122,13 @@ export const CartProvider = ({ children }: CartProviderProps) => {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [orderSuccess, setOrderSuccess] = useState(false);
 
-    // Этот useEffect выполняется только на клиенте после монтирования
     useEffect(() => {
         if (typeof window !== "undefined") {
             const savedCart = localStorage.getItem("cart");
             if (savedCart) {
                 try {
                     const parsedCart = JSON.parse(savedCart);
-                    // Преобразуем даты обратно в объекты Date при загрузке
+                    
                     const cartWithDates = parsedCart.map((item: any) => ({
                         ...item,
                         color: item.color
@@ -164,7 +156,6 @@ export const CartProvider = ({ children }: CartProviderProps) => {
         }
     }, []);
 
-    // Эффект для сохранения корзины в localStorage при каждом изменении
     useEffect(() => {
         if (isClient) {
             try {
@@ -175,10 +166,8 @@ export const CartProvider = ({ children }: CartProviderProps) => {
         }
     }, [cartItems, isClient]);
 
-    // Проверка авторизации
     const isAuthenticated = !loading && !!user;
 
-    // Функция для определения, требует ли действие авторизации
     const requiresAuth = (action: string) => {
         const actionsRequiringAuth = [
             "addToCart",
@@ -189,7 +178,6 @@ export const CartProvider = ({ children }: CartProviderProps) => {
         return actionsRequiringAuth.includes(action);
     };
 
-    // Функция для показа предупреждения о необходимости авторизации
     const showAuthRequired = () => {
         alert(
             "Для добавления товаров в корзину необходимо войти в аккаунт или зарегистрироваться",
@@ -197,7 +185,6 @@ export const CartProvider = ({ children }: CartProviderProps) => {
         window.location.href = "/client/sign-in";
     };
 
-    // Добавление продукта в корзину
     const addToCart = useCallback(
         (product: {
             id: string;
@@ -243,7 +230,6 @@ export const CartProvider = ({ children }: CartProviderProps) => {
         [isAuthenticated],
     );
 
-    // Добавление консультации в корзину
     const addConsultationToCart = useCallback(
         (consultation: {
             id: string;
@@ -287,7 +273,6 @@ export const CartProvider = ({ children }: CartProviderProps) => {
         [isAuthenticated],
     );
 
-    // Добавление услуги в корзину
     const addServiceToCart = useCallback(
         (service: {
             id: string;
@@ -372,7 +357,6 @@ export const CartProvider = ({ children }: CartProviderProps) => {
         [isAuthenticated],
     );
 
-    // Очистка всей корзины
     const clearCart = useCallback(() => {
         if (!isAuthenticated) {
             showAuthRequired();
@@ -382,12 +366,10 @@ export const CartProvider = ({ children }: CartProviderProps) => {
         setCartItems([]);
     }, [isAuthenticated]);
 
-    // Получение количества уникальных типов товаров
     const getTotalItems = useCallback(() => {
         return isClient ? cartItems.length : 0;
     }, [cartItems, isClient]);
 
-    // Получение общей стоимости
     const getTotalPrice = useCallback(() => {
         return isClient
             ? cartItems.reduce(
@@ -398,7 +380,6 @@ export const CartProvider = ({ children }: CartProviderProps) => {
             : 0;
     }, [cartItems, isClient]);
 
-    // Увеличение количества товара
     const incrementQuantity = useCallback(
         (id: string, currentQuantity: number, colorId?: string) => {
             if (currentQuantity < 100) {
@@ -408,7 +389,6 @@ export const CartProvider = ({ children }: CartProviderProps) => {
         [updateQuantity],
     );
 
-    // Уменьшение количества товара
     const decrementQuantity = useCallback(
         (id: string, currentQuantity: number, colorId?: string) => {
             if (currentQuantity > 1) {
@@ -418,7 +398,6 @@ export const CartProvider = ({ children }: CartProviderProps) => {
         [updateQuantity],
     );
 
-    // Открытие модального окна оформления заказа
     const openCheckoutModal = useCallback(() => {
         if (profile) {
             setCustomerInfo({
@@ -446,22 +425,18 @@ export const CartProvider = ({ children }: CartProviderProps) => {
         setShowCheckoutModal(true);
     }, [profile, user]);
 
-    // Закрытие модального окна
     const closeCheckoutModal = useCallback(() => {
         setShowCheckoutModal(false);
     }, []);
 
-    // Обновление информации о клиенте
     const updateCustomerInfo = useCallback((info: Partial<CustomerInfo>) => {
         setCustomerInfo((prev) => ({ ...prev, ...info }));
     }, []);
 
-    // Сброс состояния успешного заказа
     const resetOrderSuccess = useCallback(() => {
         setOrderSuccess(false);
     }, []);
 
-    // Обработка отправки заказа
     const handleSubmitOrder = useCallback(
         async (e: React.FormEvent) => {
             e.preventDefault();
@@ -483,7 +458,6 @@ export const CartProvider = ({ children }: CartProviderProps) => {
                     (item) => item.type === "service",
                 );
 
-                // Формируем полный адрес для отправки
                 const fullAddress = `${customerInfo.address} ${customerInfo.houseNumber}${
                     customerInfo.apartmentNumber
                         ? `, ${customerInfo.apartmentNumber}`
@@ -519,13 +493,12 @@ export const CartProvider = ({ children }: CartProviderProps) => {
                         name: customerInfo.name,
                         email: customerInfo.email,
                         phone: customerInfo.phone,
-                        address: fullAddress, // Используем полный адрес для заказа
+                        address: fullAddress, 
                     },
                 };
 
                 const orderId = await createOrder(orderData);
 
-                // Отправляем email подтверждение заказа
                 try {
                     await sendOrderEmail({
                         orderId: orderId || "unknown",
@@ -537,7 +510,7 @@ export const CartProvider = ({ children }: CartProviderProps) => {
                             price: item.price,
                         })),
                         totalPrice: getTotalPrice().toFixed(2),
-                        shippingAddress: fullAddress, // Используем полный адрес для email
+                        shippingAddress: fullAddress, 
                     });
                     console.log("✅ Order confirmation email sent");
                 } catch (emailError) {
@@ -545,7 +518,7 @@ export const CartProvider = ({ children }: CartProviderProps) => {
                         "⚠️ Error sending order confirmation email:",
                         emailError,
                     );
-                    // Не прерываем процесс - заказ уже создан
+                    
                 }
 
                 clearCart();
@@ -563,7 +536,6 @@ export const CartProvider = ({ children }: CartProviderProps) => {
         [user, cartItems, getTotalPrice, customerInfo, clearCart],
     );
 
-    // Значения, которые будут доступны через контекст
     const contextValue = {
         cartItems,
         addToCart,
@@ -578,7 +550,7 @@ export const CartProvider = ({ children }: CartProviderProps) => {
         getTotalPrice,
         isAuthenticated,
         requiresAuth,
-        // Checkout
+        
         showCheckoutModal,
         customerInfo,
         isSubmitting,
@@ -597,7 +569,6 @@ export const CartProvider = ({ children }: CartProviderProps) => {
     );
 };
 
-// Хук для удобного использования контекста корзины
 export const useCart = () => {
     const context = useContext(CartContext);
     if (context === undefined) {

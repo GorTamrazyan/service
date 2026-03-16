@@ -1,4 +1,3 @@
-// admin/login/page.tsx
 "use client";
 
 import React, { useState } from "react";
@@ -17,8 +16,6 @@ export default function AdminLogin() {
     const [isLoading, setIsLoading] = useState(false);
     const router = useRouter();
 
-    // Removed automatic admin initialization
-
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
         setError("");
@@ -30,7 +27,6 @@ export default function AdminLogin() {
                 credentials.password
             );
 
-            // Store admin session in localStorage
             localStorage.setItem("adminSessionToken", sessionToken);
             localStorage.setItem(
                 "adminUser",
@@ -57,7 +53,7 @@ export default function AdminLogin() {
     return (
         <div className="min-h-screen bg-[var(--color-background)] flex items-center justify-center p-4">
             <div className="w-full max-w-md">
-                {/* Logo and Title */}
+
                 <div className="text-center mb-8">
                     <div className="flex justify-center mb-6">
                         <div className="bg-gradient-to-r from-[var(--color-accent)] to-[var(--color-primary)] rounded-2xl p-4">
@@ -72,10 +68,9 @@ export default function AdminLogin() {
                     </p>
                 </div>
 
-                {/* Login Form */}
                 <div className="bg-[var(--color-background)] rounded-2xl shadow-2xl border border-[var(--color-text)]/10 p-8">
                     <form onSubmit={handleLogin} className="space-y-6">
-                        {/* Email Field */}
+
                         <div>
                             <label className="block text-sm font-medium text-[var(--color-text)] mb-2">
                                 <T>Email</T>
@@ -98,7 +93,6 @@ export default function AdminLogin() {
                             </div>
                         </div>
 
-                        {/* Password Field */}
                         <div>
                             <label className="block text-sm font-medium text-[var(--color-text)] mb-2">
                                 <T>Password</T>
@@ -134,14 +128,12 @@ export default function AdminLogin() {
                             </div>
                         </div>
 
-                        {/* Error Message */}
                         {error && (
                             <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-xl text-sm">
                                 {error}
                             </div>
                         )}
 
-                        {/* Login Button */}
                         <button
                             type="submit"
                             disabled={isLoading}
@@ -159,7 +151,6 @@ export default function AdminLogin() {
                     </form>
                 </div>
 
-                {/* Back to Site */}
                 <div className="text-center mt-6">
                     <button
                         onClick={() => router.push("/client/dashboard/home")}

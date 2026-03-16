@@ -17,7 +17,6 @@ import {
 import { db } from "../firebase";
 import { Category } from "./types";
 
-// Преобразование Firestore документа в Category объект
 export const firestoreToCategory = (doc: DocumentSnapshot<DocumentData>): Category | null => {
   if (!doc.exists()) return null;
 
@@ -32,7 +31,6 @@ export const firestoreToCategory = (doc: DocumentSnapshot<DocumentData>): Catego
   };
 };
 
-// Преобразование Category объекта для Firestore
 export const categoryToFirestore = (category: Omit<Category, 'id'>): DocumentData => {
   return {
     name: category.name,
@@ -43,7 +41,6 @@ export const categoryToFirestore = (category: Omit<Category, 'id'>): DocumentDat
   };
 };
 
-// Получить все категории
 export const getAllCategories = async (): Promise<Category[]> => {
   try {
     const categoriesRef = collection(db, 'categories');
@@ -59,7 +56,6 @@ export const getAllCategories = async (): Promise<Category[]> => {
   }
 };
 
-// Получить категорию по ID
 export const getCategoryById = async (id: string): Promise<Category | null> => {
   try {
     const categoryRef = doc(db, 'categories', id);
@@ -71,7 +67,6 @@ export const getCategoryById = async (id: string): Promise<Category | null> => {
   }
 };
 
-// Получить подкатегории
 export const getSubCategories = async (parentCategoryId: string): Promise<Category[]> => {
   try {
     const categoriesRef = collection(db, 'categories');
@@ -87,7 +82,6 @@ export const getSubCategories = async (parentCategoryId: string): Promise<Catego
   }
 };
 
-// Получить главные категории (без родителя)
 export const getRootCategories = async (): Promise<Category[]> => {
   try {
     const categoriesRef = collection(db, 'categories');
@@ -103,7 +97,6 @@ export const getRootCategories = async (): Promise<Category[]> => {
   }
 };
 
-// Создать новую категорию
 export const createCategory = async (
   category: Omit<Category, 'id' | 'createdAt' | 'updatedAt'>
 ): Promise<string> => {
@@ -124,7 +117,6 @@ export const createCategory = async (
   }
 };
 
-// Обновить категорию
 export const updateCategory = async (
   id: string,
   category: Partial<Omit<Category, 'id' | 'createdAt'>>
@@ -143,7 +135,6 @@ export const updateCategory = async (
   }
 };
 
-// Удалить категорию
 export const deleteCategory = async (id: string): Promise<void> => {
   try {
     const categoryRef = doc(db, 'categories', id);

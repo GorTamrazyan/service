@@ -179,7 +179,7 @@ export default function SettingsPanel() {
 
     return (
         <div className="space-y-6 animate-fadeIn">
-            {/* Appearance Settings */}
+
             <div className="bg-[var(--color-secondary)] rounded-2xl shadow-xl p-6 border border-[var(--color-text)]/10">
                 <div className="flex items-center gap-3 mb-6">
                     <div className="bg-gradient-to-r from-purple-500 to-indigo-600 rounded-xl p-3">
@@ -196,7 +196,7 @@ export default function SettingsPanel() {
                 </div>
 
                 <div className="space-y-4">
-                    {/* Dark Mode Toggle */}
+
                     <div className="flex items-center justify-between p-4 bg-gradient-to-r from-[var(--color-text)]/5 to-[var(--color-text)]/10 rounded-xl hover:shadow-md transition-all">
                         <div className="flex items-center gap-3">
                             {isDark ? (
@@ -229,7 +229,6 @@ export default function SettingsPanel() {
                         </button>
                     </div>
 
-                    {/* Language Selector */}
                     <div className="p-4 bg-gradient-to-r from-[var(--color-text)]/5 to-[var(--color-text)]/10 rounded-xl hover:shadow-md transition-all">
                         <div className="flex items-center gap-3 mb-3">
                             <FaGlobe className="w-5 h-5 text-blue-600" />
@@ -242,8 +241,8 @@ export default function SettingsPanel() {
                                 </p>
                             </div>
                         </div>
-                        <div className="grid grid-cols-3 gap-2 mt-3">
-                            {["en", "ru", "hy"].map((lang) => (
+                        <div className="grid grid-cols-4 gap-2 mt-3">
+                            {["en", "ru", "hy", "es"].map((lang) => (
                                 <button
                                     key={lang}
                                     onClick={() => handleLanguageChange(lang)}
@@ -257,7 +256,9 @@ export default function SettingsPanel() {
                                         ? "English"
                                         : lang === "ru"
                                           ? "Русский"
-                                          : "Հայերեն"}
+                                          : lang === "hy"
+                                            ? "Հայերեն"
+                                            : "Español"}
                                 </button>
                             ))}
                         </div>
@@ -265,7 +266,6 @@ export default function SettingsPanel() {
                 </div>
             </div>
 
-            {/* Notifications */}
             <div className="bg-[var(--color-secondary)] rounded-2xl shadow-xl p-6 border border-[var(--color-text)]/10">
                 <div className="flex items-center gap-3 mb-6">
                     <div className="bg-gradient-to-r from-blue-500 to-cyan-600 rounded-xl p-3">
@@ -350,7 +350,6 @@ export default function SettingsPanel() {
                 </div>
             </div>
 
-            {/* Security */}
             <div className="bg-[var(--color-secondary)] rounded-2xl shadow-xl p-6 border border-[var(--color-text)]/10">
                 <div className="flex items-center gap-3 mb-6">
                     <div className="bg-gradient-to-r from-red-500 to-pink-600 rounded-xl p-3">
@@ -413,7 +412,6 @@ export default function SettingsPanel() {
                 </div>
             </div>
 
-            {/* Password Change Modal */}
             {showPasswordModal && (
                 <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fadeIn">
                     <div className="bg-[var(--color-secondary)] rounded-2xl shadow-2xl max-w-md w-full overflow-hidden">
@@ -445,7 +443,7 @@ export default function SettingsPanel() {
                                 onSubmit={handlePasswordChange}
                                 className="space-y-4"
                             >
-                                {/* Current Password */}
+
                                 <div>
                                     <label className="block text-sm font-semibold text-[var(--color-text)] mb-2">
                                         <T>Current Password</T>
@@ -486,7 +484,6 @@ export default function SettingsPanel() {
                                     </div>
                                 </div>
 
-                                {/* New Password */}
                                 <div>
                                     <label className="block text-sm font-semibold text-[var(--color-text)] mb-2">
                                         <T>New Password</T>
@@ -524,7 +521,6 @@ export default function SettingsPanel() {
                                     </div>
                                 </div>
 
-                                {/* Confirm New Password */}
                                 <div>
                                     <label className="block text-sm font-semibold text-[var(--color-text)] mb-2">
                                         <T>Confirm New Password</T>
@@ -567,7 +563,6 @@ export default function SettingsPanel() {
                                     </div>
                                 </div>
 
-                                {/* Error/Success Messages */}
                                 {passwordError && (
                                     <div className="bg-red-500/10 border border-red-500/30 text-red-600 px-4 py-3 rounded-xl text-sm">
                                         <T>{passwordError}</T>
@@ -579,7 +574,6 @@ export default function SettingsPanel() {
                                     </div>
                                 )}
 
-                                {/* Buttons */}
                                 <div className="flex gap-3 pt-4">
                                     <button
                                         type="button"
@@ -615,7 +609,6 @@ export default function SettingsPanel() {
                 </div>
             )}
 
-            {/* Delete Account Modal */}
             {showDeleteModal && (
                 <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fadeIn">
                     <div className="bg-[var(--color-secondary)] rounded-2xl shadow-2xl max-w-md w-full overflow-hidden">
@@ -720,14 +713,12 @@ export default function SettingsPanel() {
                                     </div>
                                 </div>
 
-                                {/* Error Message */}
                                 {deleteError && (
                                     <div className="bg-red-500/10 border border-red-500/30 text-red-600 px-4 py-3 rounded-xl text-sm">
                                         <T>{deleteError}</T>
                                     </div>
                                 )}
 
-                                {/* Buttons */}
                                 <div className="flex gap-3 pt-4">
                                     <button
                                         type="button"

@@ -1,4 +1,3 @@
-// types/profile.ts
 export interface UserProfile {
     firstName: string;
     lastName: string;

@@ -61,10 +61,6 @@ export default function AppointmentBookingModal({
         return baseUrl;
     }, []);
 
-    // Временные слоты теперь загружаются из API на основе Google Calendar
-    // Используем availableSlots из состояния
-
-    // Генерация дней месяца
     const getDaysInMonth = (date: Date) => {
         const year = date.getFullYear();
         const month = date.getMonth();
@@ -75,12 +71,10 @@ export default function AppointmentBookingModal({
 
         const days = [];
 
-        // Добавляем пустые ячейки для выравнивания
         for (let i = 0; i < startingDayOfWeek; i++) {
             days.push(null);
         }
 
-        // Добавляем дни месяца
         for (let day = 1; day <= daysInMonth; day++) {
             days.push(new Date(year, month, day));
         }
@@ -101,7 +95,6 @@ export default function AppointmentBookingModal({
         setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 1));
     };
 
-    // Функция для загрузки доступных дней месяца
     const fetchAvailableDays = useCallback(async (date: Date) => {
         setIsLoadingDays(true);
         try {
@@ -146,19 +139,15 @@ export default function AppointmentBookingModal({
         const today = new Date();
         today.setHours(0, 0, 0, 0);
 
-        // Дата в прошлом
         if (date < today) return true;
 
-        // Если еще загружаем информацию о доступных днях, не блокируем
         if (isLoadingDays) return false;
 
-        // Если ошибка загрузки — разрешаем все будущие дни (кроме выходных)
         if (daysLoadError) {
             const dayOfWeek = date.getDay();
-            return dayOfWeek === 0 || dayOfWeek === 6; // блокируем только Сб и Вс
+            return dayOfWeek === 0 || dayOfWeek === 6; 
         }
 
-        // Проверяем, есть ли этот день в списке доступных
         const year = date.getFullYear();
         const month = String(date.getMonth() + 1).padStart(2, "0");
         const day = String(date.getDate()).padStart(2, "0");
@@ -172,19 +161,17 @@ export default function AppointmentBookingModal({
         return date1.toDateString() === date2.toDateString();
     };
 
-    // Функция для получения доступных слотов на выбранную дату из Google Calendar
     const fetchAvailableSlots = useCallback(async (date: Date) => {
         setIsLoadingSlots(true);
         try {
-            // Форматируем дату для API
+            
             const year = date.getFullYear();
             const month = String(date.getMonth() + 1).padStart(2, "0");
             const day = String(date.getDate()).padStart(2, "0");
             const dateString = `${year}-${month}-${day}`;
-            //const dateString = date.toISOString().split('T')[0];
+            
             console.log('🔍 Fetching slots for date:', dateString);
 
-            // Добавляем timeout 10 секунд
             const controller = new AbortController();
             const timeoutId = setTimeout(() => controller.abort(), 10000);
 
@@ -201,7 +188,6 @@ export default function AppointmentBookingModal({
 
             const data = await response.json();
 
-            // Устанавливаем все слоты из API
             setAvailableSlots(data.availableSlots || []);
             setBookedSlots(data.bookedSlots || []);
             setAllSlots(data.allSlots || []);
@@ -221,14 +207,12 @@ export default function AppointmentBookingModal({
         }
     }, []);
 
-    // Загружаем доступные дни при изменении месяца
     useEffect(() => {
         if (isOpen && !isBooked) {
             fetchAvailableDays(currentMonth);
         }
     }, [currentMonth, isOpen, isBooked, fetchAvailableDays]);
 
-    // Сбрасываем флаги при закрытии модального окна
     useEffect(() => {
         if (!isOpen) {
             setShowSuccess(false);
@@ -246,15 +230,13 @@ export default function AppointmentBookingModal({
         }
     }, [isOpen]);
 
-    // Загружаем доступные слоты при выборе даты
     useEffect(() => {
         if (selectedDate && !isBooked) {
             fetchAvailableSlots(selectedDate);
-            setSelectedTime(null); // Сбрасываем выбранное время при смене даты
+            setSelectedTime(null); 
         }
     }, [selectedDate, isBooked, fetchAvailableSlots]);
 
-    // Открывает окно подтверждения после выбора времени
     const handleOpenConfirmation = () => {
         if (!selectedDate || !selectedTime) return;
         setFormName(profile ? `${profile.firstName || ""} ${profile.lastName || ""}`.trim() : "");
@@ -263,7 +245,6 @@ export default function AppointmentBookingModal({
         setShowConfirmation(true);
     };
 
-    // Объединенная функция для бронирования консультации и создания события в Google Calendar
     const handleBookConsultation = async () => {
         if (!user) {
             alert("Пожалуйста, войдите в аккаунт");
@@ -293,12 +274,10 @@ export default function AppointmentBookingModal({
                 phone: formPhone,
             };
 
-            // Создаем полную дату со временем в локальном часовом поясе
             const [hours, minutes] = selectedTime.split(':');
             const appointmentDate = new Date(selectedDate);
             appointmentDate.setHours(parseInt(hours), parseInt(minutes), 0, 0);
 
-            // Логируем для проверки
             console.log('📅 Selected date:', selectedDate);
             console.log('⏰ Selected time:', selectedTime);
             console.log('📍 Appointment date (local):', appointmentDate.toString());
@@ -312,7 +291,6 @@ export default function AppointmentBookingModal({
                 customerInfo,
             });
 
-            // Шаг 1: Сохраняем консультацию в Firebase
             const orderId = await createConsultationOrder(
                 user.uid,
                 {
@@ -328,7 +306,6 @@ export default function AppointmentBookingModal({
 
             console.log("📝 Step 2: Creating Google Calendar event...");
 
-            // Шаг 2: Создаем событие в Google Calendar
             const response = await fetch("/api/book", {
                 method: "POST",
                 headers: {
@@ -347,10 +324,10 @@ export default function AppointmentBookingModal({
             const data = await response.json();
 
             if (!response.ok) {
-                // Если слот уже забронирован (409 Conflict)
+                
                 if (response.status === 409) {
                     alert(`❌ Это время уже забронировано! Пожалуйста, обновите страницу и выберите другое время.`);
-                    // Обновляем доступные слоты
+                    
                     if (selectedDate) {
                         await fetchAvailableSlots(selectedDate);
                     }
@@ -361,7 +338,6 @@ export default function AppointmentBookingModal({
             } else {
                 console.log("✅ Step 2 complete: Calendar event created:", data);
 
-                // Отправляем email подтверждение консультации
                 try {
                     await sendConsultationEmail({
                         customerEmail: customerInfo.email,
@@ -375,7 +351,7 @@ export default function AppointmentBookingModal({
                     console.log("✅ Consultation confirmation email sent");
                 } catch (emailError) {
                     console.error("⚠️ Error sending consultation email:", emailError);
-                    // Не прерываем процесс - консультация уже забронирована
+                    
                 }
 
                 setIsBooked(true);
@@ -406,7 +382,7 @@ export default function AppointmentBookingModal({
 
             <div className="flex min-h-full items-center justify-center p-4 sm:p-6">
                 <div className="relative bg-[var(--color-card-bg)] rounded-3xl shadow-2xl w-full max-w-6xl overflow-hidden transform transition-all border border-[var(--color-border)]">
-                    {/* Modern Header with Gradient using site colors */}
+
                     <div className="relative bg-gradient-to-br from-[var(--color-primary)] via-[#8B1515] to-[var(--color-accent)] px-8 py-8">
                         <div className="flex items-center justify-between">
                             <div className="flex items-center space-x-4">
@@ -431,7 +407,6 @@ export default function AppointmentBookingModal({
                         </div>
                     </div>
 
-                    {/* Success Notification */}
                     {showSuccess && (
                         <div className="absolute top-28 left-1/2 transform -translate-x-1/2 z-20 bg-[var(--color-success)] text-white px-8 py-4 rounded-2xl shadow-2xl flex items-center gap-4 animate-fade-in">
                             <div className="bg-white/20 p-2 rounded-full">
@@ -448,7 +423,6 @@ export default function AppointmentBookingModal({
                         </div>
                     )}
 
-                    {/* Loading Overlay */}
                     {isSaving && (
                         <div className="absolute inset-0 bg-black/30 backdrop-blur-sm z-20 flex items-center justify-center">
                             <div className="bg-[var(--color-card-bg)] rounded-2xl p-8 shadow-2xl flex flex-col items-center gap-4 border border-[var(--color-border)]">
@@ -465,9 +439,9 @@ export default function AppointmentBookingModal({
 
                     <div className="p-8 sm:p-10">
                         <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
-                            {/* Left Side: Info - Takes 2 columns */}
+
                             <div className="lg:col-span-2 space-y-6">
-                                {/* Consultation Details Card */}
+
                                 <div className="bg-gradient-to-br from-[var(--color-gray-50)] to-[var(--color-gray-100)] rounded-2xl p-6 border border-[var(--color-border)]">
                                     <h3 className="text-lg font-bold mb-6 flex items-center text-[var(--color-text)]">
                                         <div className="bg-[var(--color-info)] p-2 rounded-xl mr-3">
@@ -509,7 +483,6 @@ export default function AppointmentBookingModal({
                                     </div>
                                 </div>
 
-                                {/* Features Card */}
                                 <div className="bg-[var(--color-card-bg)] rounded-2xl p-6 border border-[var(--color-border)] shadow-sm">
                                     <h3 className="text-lg font-bold mb-4 text-[var(--color-text)]">
                                         <T>What&apos;s Included</T>
@@ -531,7 +504,6 @@ export default function AppointmentBookingModal({
                                     </ul>
                                 </div>
 
-                                {/* User Info Display */}
                                 {profile && profile.firstName && profile.email && (
                                     <div className="bg-gradient-to-br from-[var(--color-accent)]/10 to-[var(--color-accent)]/5 border border-[var(--color-accent)]/20 rounded-2xl p-4">
                                         <div className="flex items-center gap-3">
@@ -554,9 +526,8 @@ export default function AppointmentBookingModal({
                                 )}
                             </div>
 
-                            {/* Right Side: Calendar & Time Selection - Takes 3 columns */}
                             <div className="lg:col-span-3 space-y-6">
-                                {/* Calendar */}
+
                                 <div className="bg-[var(--color-card-bg)] rounded-2xl p-6 border border-[var(--color-border)] shadow-sm">
                                     <div className="flex items-center justify-between mb-6">
                                         <div className="flex items-center gap-3">
@@ -594,7 +565,6 @@ export default function AppointmentBookingModal({
                                         </div>
                                     </div>
 
-                                    {/* Day Names */}
                                     <div className="grid grid-cols-7 gap-2 mb-3">
                                         {dayNames.map((day) => (
                                             <div
@@ -606,7 +576,6 @@ export default function AppointmentBookingModal({
                                         ))}
                                     </div>
 
-                                    {/* Calendar Days */}
                                     <div className="grid grid-cols-7 gap-2">
                                         {days.map((day, index) => (
                                             <button
@@ -643,7 +612,6 @@ export default function AppointmentBookingModal({
                                         ))}
                                     </div>
 
-                                    {/* Calendar Legend */}
                                     {!isLoadingDays && (
                                         <div className="mt-4 pt-4 border-t border-[var(--color-border)]">
                                             <div className="flex flex-wrap gap-4 text-xs text-[var(--color-gray-500)]">
@@ -670,7 +638,6 @@ export default function AppointmentBookingModal({
                                     )}
                                 </div>
 
-                                {/* Time Slots */}
                                 {selectedDate && (
                                     <div className="bg-[var(--color-card-bg)] rounded-2xl p-6 border border-[var(--color-border)] shadow-sm animate-fade-in">
                                         <div className="flex items-center justify-between mb-4">
@@ -690,7 +657,6 @@ export default function AppointmentBookingModal({
                                             )}
                                         </div>
 
-                                        {/* Legend */}
                                         {allSlots.length > 0 &&
                                             !isLoadingSlots && (
                                                 <div className="mb-4 flex gap-4 text-xs text-[var(--color-gray-500)]">
@@ -712,7 +678,7 @@ export default function AppointmentBookingModal({
                                             <>
                                                 <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
                                                     {allSlots
-                                                        .filter((time) => !bookedSlots.includes(time)) // Фильтруем забронированные слоты
+                                                        .filter((time) => !bookedSlots.includes(time)) 
                                                         .map((time) => {
                                                             return (
                                                                 <button
@@ -757,7 +723,6 @@ export default function AppointmentBookingModal({
                                     </div>
                                 )}
 
-                                {/* Booking Confirmation */}
                                 {isBooked && (
                                     <div className="bg-gradient-to-r from-[var(--color-success)]/10 to-[var(--color-success)]/5 border-2 border-[var(--color-success)] rounded-2xl p-6 animate-fade-in">
                                         <div className="flex items-start gap-4">
@@ -785,7 +750,6 @@ export default function AppointmentBookingModal({
                         </div>
                     </div>
 
-                    {/* Modern Footer */}
                     <div className="bg-[var(--color-gray-50)] px-8 py-6 border-t border-[var(--color-border)]">
                         <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
                             <p className="text-xs text-[var(--color-gray-500)] flex items-center">
@@ -836,12 +800,11 @@ export default function AppointmentBookingModal({
                 </div>
             </div>
 
-            {/* Confirmation Modal */}
             {showConfirmation && selectedDate && selectedTime && (
                 <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
                     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setShowConfirmation(false)} />
                     <div className="relative bg-[var(--color-card-bg)] rounded-2xl shadow-2xl w-full max-w-lg border border-[var(--color-border)] overflow-hidden">
-                        {/* Header */}
+
                         <div className="bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-accent)] px-6 py-5">
                             <div className="flex items-center justify-between">
                                 <h3 className="text-xl font-bold text-white flex items-center gap-3">
@@ -854,7 +817,6 @@ export default function AppointmentBookingModal({
                             </div>
                         </div>
 
-                        {/* Loading Overlay */}
                         {isSaving && (
                             <div className="absolute inset-0 bg-black/30 backdrop-blur-sm z-10 flex items-center justify-center rounded-2xl">
                                 <div className="bg-[var(--color-card-bg)] rounded-2xl p-6 shadow-2xl flex flex-col items-center gap-3">
@@ -865,7 +827,7 @@ export default function AppointmentBookingModal({
                         )}
 
                         <div className="p-6 space-y-5">
-                            {/* Booking Summary */}
+
                             <div className="bg-[var(--color-gray-50)] rounded-xl p-4 space-y-3 border border-[var(--color-border)]">
                                 <div className="flex justify-between items-center">
                                     <span className="text-sm text-[var(--color-gray-500)]"><T>Consultation</T></span>
@@ -889,7 +851,6 @@ export default function AppointmentBookingModal({
                                 </div>
                             </div>
 
-                            {/* Contact Info Form */}
                             <div className="space-y-3">
                                 <h4 className="font-semibold text-[var(--color-text)]"><T>Your Information</T></h4>
                                 <div>
@@ -925,7 +886,6 @@ export default function AppointmentBookingModal({
                             </div>
                         </div>
 
-                        {/* Footer */}
                         <div className="px-6 py-4 border-t border-[var(--color-border)] flex gap-3">
                             <button
                                 onClick={() => setShowConfirmation(false)}

@@ -1,4 +1,3 @@
-// app/client/components/ProductList.tsx
 "use client";
 
 import React, { useState } from "react";
@@ -7,7 +6,6 @@ import { T } from "./T";
 import ProductModal from "./ProductModal";
 import type { Material, Color } from "../../lib/firebase/products/types";
 
-// Интерфейс для продукта
 interface Product {
     id: string;
     name: string;
@@ -22,7 +20,7 @@ interface Product {
     colorIds?: string[];
     colors?: Color[];
     tags?: string[];
-    images?: string[]; // Массив URL изображений
+    images?: string[]; 
 }
 
 interface ProductListProps {
@@ -31,9 +29,6 @@ interface ProductListProps {
     selectedCategory?: string;
 }
 
-// =========================================================================
-// ОСНОВНОЙ КОМПОНЕНТ: ProductList
-// =========================================================================
 export default function ProductList({
     products,
     showGroupedView,
@@ -95,16 +90,13 @@ export default function ProductList({
     );
 }
 
-// =========================================================================
-// ОТДЕЛЬНЫЙ КОМПОНЕНТ: ProductCard (с улучшениями)
-// =========================================================================
 export function ProductCard({ product }: { product: Product }) {
     const [isModalOpen, setIsModalOpen] = useState(false);
    
     return (
         <>
             <div className="bg-[var(--color-card-bg)] rounded-3xl shadow-lg overflow-hidden flex flex-col h-full transform transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl border border-[var(--color-border)] group">
-    {/* Изображение товара с эффектом */}
+
     <div className="relative p-3">
         <div className="relative w-full h-[200px] rounded-2xl bg-gradient-to-br from-gray-100 to-gray-300 dark:from-gray-800 dark:to-gray-700 overflow-hidden">
             {product.imageUrl ? (
@@ -124,18 +116,15 @@ export function ProductCard({ product }: { product: Product }) {
                 </div>
             )}
             
-            
         </div>
-        
-        {/* Эффект при наведении на изображение */}
+
         <div className="absolute inset-0 p-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
             <div className="w-full h-[200px] rounded-2xl bg-gradient-to-t from-black/20 to-transparent" />
         </div>
     </div>
 
-    {/* Контент карточки */}
     <div className="p-5 flex flex-col flex-grow">
-        {/* Название товара */}
+
         <h3 className="text-xl font-bold text-[var(--color-primary)] mb-2 min-h-[3.5rem] line-clamp-2 leading-tight">
             <T>{product.name}</T>
         </h3>
@@ -146,7 +135,6 @@ export function ProductCard({ product }: { product: Product }) {
             </p>
         </div>
 
-   
         {product.colors && product.colors.length > 0 && (
             <div className="mb-4">
                 <div className="flex items-center gap-2 mb-2">
@@ -176,9 +164,8 @@ export function ProductCard({ product }: { product: Product }) {
             </div>
         )}
 
-
         <div className="mt-auto space-y-4">
-            {/* Цена */}
+
             <div className="flex items-center justify-between">
                 <div className="flex items-baseline gap-2">
                     <span className="text-2xl font-extrabold text-[var(--color-accent)]">
@@ -193,26 +180,10 @@ export function ProductCard({ product }: { product: Product }) {
                     
                 </div>
                 
-                
             </div>
 
-            {/* Кнопки действий */}
             <div className="flex gap-2">
-                {/*<button
-                    onClick={handleAddToCart}
-                    disabled={isColorRequiredAndMissing}
-                    className={`flex-1 py-3 rounded-xl font-semibold text-sm border transition-all duration-200 flex items-center justify-center gap-2 group/btn ${
-                        isColorRequiredAndMissing
-                            ? "text-gray-400 border-gray-300 dark:border-gray-700 cursor-not-allowed"
-                            : "text-[var(--color-success)] border-[var(--color-success)] hover:bg-[var(--color-success)] hover:text-white"
-                    }`}
-                >
-                    <svg className="w-4 h-4 group-hover/btn:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                    </svg>
-                    <T>Add to cart</T>
-                </button>*/}
-                
+
                 <button
                     onClick={() => setIsModalOpen(true)}
                     className="flex-1 py-3 rounded-xl text-[var(--color-primary)] font-semibold text-sm border border-[var(--color-primary)] hover:bg-[var(--color-primary)] hover:text-white transition-all duration-200 flex items-center justify-center gap-2 group/btn"
@@ -224,14 +195,11 @@ export function ProductCard({ product }: { product: Product }) {
                 </button>
             </div>
             
-            
         </div>
     </div>
 
-    
 </div>
 
-{/* Product Modal */}
 <ProductModal
     product={product}
     isOpen={isModalOpen}

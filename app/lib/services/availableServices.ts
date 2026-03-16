@@ -1,5 +1,3 @@
-// lib/services/availableServices.ts
-
 export interface Service {
     id: string;
     name: string;
@@ -88,7 +86,6 @@ export const availableServices: Service[] = [
     },
 ];
 
-// Helper functions to get services by type
 export const getServicesByType = (type: Service['serviceType']): Service[] => {
     return availableServices.filter(service => service.serviceType === type);
 };
