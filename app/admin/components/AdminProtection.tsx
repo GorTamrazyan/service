@@ -3,88 +3,49 @@
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Shield } from "lucide-react";
+import { onAuthStateChanged } from "firebase/auth";
+import { doc, getDoc } from "firebase/firestore";
+import { auth, db } from "../../lib/firebase/firebase";
+import { AdminUser } from "../../lib/firebase/admin";
 
 interface AdminProtectionProps {
     children: React.ReactNode;
+    requiredPermission?: string;
 }
 
-export default function AdminProtection({ children }: AdminProtectionProps) {
-    const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
-    const [isMounted, setIsMounted] = useState(false);
+export default function AdminProtection({ children, requiredPermission }: AdminProtectionProps) {
+    const [status, setStatus] = useState<"loading" | "allowed" | "denied" | "no_permission">("loading");
     const router = useRouter();
 
     useEffect(() => {
-        setIsMounted(true);
-    }, []);
-
-    useEffect(() => {
-        if (!isMounted) return;
-
-        const checkAuth = () => {
-            try {
-                const sessionToken = localStorage.getItem("adminSessionToken");
-                const adminUser = localStorage.getItem("adminUser");
-
-                console.log("Checking auth:", { sessionToken, adminUser });
-
-                if (sessionToken && adminUser) {
-                    try {
-                        const userData = JSON.parse(adminUser);
-                        const loginTime = new Date(userData.loginTime);
-                        const now = new Date();
-                        const hoursSinceLogin = (now.getTime() - loginTime.getTime()) / (1000 * 60 * 60);
-                        
-                        console.log("Hours since login:", hoursSinceLogin);
-                        
-                        if (hoursSinceLogin < 8) {
-                            console.log("User is authenticated");
-                            setIsAuthenticated(true);
-                        } else {
-                            console.log("Session expired");
-                            
-                            localStorage.removeItem("adminSessionToken");
-                            localStorage.removeItem("adminUser");
-                            setIsAuthenticated(false);
-                        }
-                    } catch (parseError) {
-                        console.error("Error parsing admin user data:", parseError);
-                        localStorage.removeItem("adminSessionToken");
-                        localStorage.removeItem("adminUser");
-                        setIsAuthenticated(false);
+        const unsubscribe = onAuthStateChanged(auth, async (user) => {
+            if (user && user.emailVerified) {
+                const adminDoc = await getDoc(doc(db, "admins", user.uid));
+                if (adminDoc.exists() && adminDoc.data().isActive) {
+                    const adminData = adminDoc.data() as Omit<AdminUser, 'id'>;
+                    if (requiredPermission && !adminData.permissions.includes(requiredPermission)) {
+                        setStatus("no_permission");
+                    } else {
+                        setStatus("allowed");
                     }
                 } else {
-                    console.log("No valid admin session found");
-                    setIsAuthenticated(false);
+                    setStatus("denied");
                 }
-            } catch (error) {
-                console.error("Error checking authentication:", error);
-                setIsAuthenticated(false);
+            } else {
+                setStatus("denied");
             }
-        };
+        });
 
-        checkAuth();
-    }, [isMounted]);
+        return () => unsubscribe();
+    }, [requiredPermission]);
 
     useEffect(() => {
-        if (isMounted && isAuthenticated === false) {
-            console.log("Redirecting to login page");
+        if (status === "denied") {
             router.push("/admin/login");
         }
-    }, [isAuthenticated, router, isMounted]);
+    }, [status, router]);
 
-    if (!isMounted) {
-        return (
-            <div className="min-h-screen bg-[var(--color-background)] flex items-center justify-center">
-                <div className="text-center">
-                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[var(--color-accent)] mx-auto mb-4"></div>
-                    <p className="text-[var(--color-text)]/70">Loading...</p>
-                </div>
-            </div>
-        );
-    }
-
-    if (isAuthenticated === null) {
-        
+    if (status === "loading") {
         return (
             <div className="min-h-screen bg-[var(--color-background)] flex items-center justify-center">
                 <div className="text-center">
@@ -95,8 +56,19 @@ export default function AdminProtection({ children }: AdminProtectionProps) {
         );
     }
 
-    if (isAuthenticated === false) {
-        
+    if (status === "no_permission") {
+        return (
+            <div className="flex-1 flex items-center justify-center">
+                <div className="text-center">
+                    <Shield className="w-16 h-16 text-[var(--color-text)]/30 mx-auto mb-4" />
+                    <h2 className="text-xl font-bold text-[var(--color-primary)] mb-2">Access Denied</h2>
+                    <p className="text-[var(--color-text)]/60">You don't have permission to view this page.</p>
+                </div>
+            </div>
+        );
+    }
+
+    if (status === "denied") {
         return (
             <div className="min-h-screen bg-[var(--color-background)] flex items-center justify-center">
                 <div className="text-center">

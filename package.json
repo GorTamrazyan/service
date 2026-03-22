@@ -9,10 +9,11 @@
     "lint": "next lint",
     "translate": "node scripts/smart-translate.js",
     "translate:add": "node scripts/smart-translate.js add",
-    "create-admin": "node app/scripts/create-admin.js"
+    "create-admin": "node --env-file=.env app/scripts/create-admin.js"
   },
   "dependencies": {
     "@types/nodemailer": "^7.0.9",
+    "bcryptjs": "^3.0.3",
     "cloudinary": "^2.9.0",
     "firebase": "^12.0.0",
     "firebase-admin": "^13.5.0",
@@ -32,6 +33,7 @@
     "@eslint/eslintrc": "^3",
     "@playwright/test": "^1.58.2",
     "@tailwindcss/postcss": "^4",
+    "@types/bcryptjs": "^2.4.6",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",

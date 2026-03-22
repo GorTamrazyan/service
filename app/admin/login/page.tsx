@@ -22,12 +22,12 @@ export default function AdminLogin() {
         setIsLoading(true);
 
         try {
-            const { admin, sessionToken } = await loginAdmin(
+            const { admin } = await loginAdmin(
                 credentials.email,
                 credentials.password
             );
 
-            localStorage.setItem("adminSessionToken", sessionToken);
+            // Store admin info for display purposes only (auth is handled by Firebase)
             localStorage.setItem(
                 "adminUser",
                 JSON.stringify({
@@ -36,14 +36,11 @@ export default function AdminLogin() {
                     username: admin.username,
                     role: admin.role,
                     permissions: admin.permissions,
-                    loginTime: new Date().toISOString(),
                 })
             );
 
-            console.log("✅ Admin logged in successfully:", admin);
             router.push("/admin");
         } catch (error: any) {
-            console.error("❌ Login error:", error);
             setError(error.message || "Ошибка входа");
         }
 

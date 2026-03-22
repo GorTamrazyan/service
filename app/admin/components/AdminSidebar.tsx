@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
@@ -10,7 +10,7 @@ import {
     Wrench,
     ShoppingCart,
     Users,
-    BarChart3,
+    UserCog,
     Settings,
     LogOut,
     ChevronLeft,
@@ -18,49 +18,78 @@ import {
 } from "lucide-react";
 import { T } from "../../client/components/T";
 import { logoutAdmin } from "../../lib/firebase/admin";
-import { title } from "process";
 
 const menuItems = [
     {
         title: "Dashboard",
         icon: LayoutDashboard,
         href: "/admin",
+        permission: null,
     },
     {
         title: "Products",
         icon: Package,
         href: "/admin/products",
+        permission: "manage_products",
     },
     {
         title: "Services",
         icon: Wrench,
         href: "/admin/service_consultation",
+        permission: "manage_products",
     },
     {
         title: "Consultation",
         icon: Calendar,
-        href: "/admin/consultation"
+        href: "/admin/consultation",
+        permission: "manage_orders",
     },
     {
         title: "Orders",
         icon: ShoppingCart,
         href: "/admin/orders",
+        permission: "manage_orders",
     },
     {
         title: "Users",
         icon: Users,
         href: "/admin/users",
+        permission: "manage_users",
+    },
+    {
+        title: "Admins",
+        icon: UserCog,
+        href: "/admin/admins",
+        permission: "manage_admins",
     },
     {
         title: "Settings",
         icon: Settings,
         href: "/admin/settings",
+        permission: "manage_settings",
     },
 ];
 
 export default function AdminSidebar() {
     const [isCollapsed, setIsCollapsed] = useState(false);
+    const [permissions, setPermissions] = useState<string[]>([]);
     const pathname = usePathname();
+
+    useEffect(() => {
+        try {
+            const raw = localStorage.getItem("adminUser");
+            if (raw) {
+                const data = JSON.parse(raw);
+                setPermissions(data.permissions || []);
+            }
+        } catch {
+            setPermissions([]);
+        }
+    }, []);
+
+    const visibleItems = menuItems.filter(
+        (item) => !item.permission || permissions.includes(item.permission)
+    );
 
     return (
         <div
@@ -72,7 +101,6 @@ export default function AdminSidebar() {
 
                 <div className="flex items-center justify-between p-6 border-b border-[var(--color-text)]/10">
                     <div className="flex items-center space-x-3">
-
                         <div className="text-[var(--color-accent)]">
                             <svg
                                 width="32"
@@ -117,7 +145,7 @@ export default function AdminSidebar() {
                 </div>
 
                 <nav className="flex-1 p-4 space-y-2">
-                    {menuItems.map((item, index) => {
+                    {visibleItems.map((item, index) => {
                         const Icon = item.icon;
                         const isActive = pathname === item.href;
 
@@ -152,22 +180,15 @@ export default function AdminSidebar() {
                             </Link>
                         );
                     })}
+
                     <button
                         onClick={async () => {
                             try {
-                                const sessionToken =
-                                    localStorage.getItem("adminSessionToken");
-                                if (sessionToken) {
-                                    await logoutAdmin(sessionToken);
-                                }
-                                localStorage.removeItem("adminSessionToken");
+                                await logoutAdmin();
                                 localStorage.removeItem("adminUser");
                                 window.location.href = "/admin/login";
                             } catch (error) {
                                 console.error("Logout error:", error);
-                                
-                                localStorage.removeItem("adminSessionToken");
-                                localStorage.removeItem("adminUser");
                                 window.location.href = "/admin/login";
                             }
                         }}

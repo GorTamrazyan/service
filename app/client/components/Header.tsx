@@ -171,10 +171,8 @@ export default function Header() {
 
     return (
         <header className="fixed top-0 left-0 w-full py-4 px-4 sm:px-6 lg:px-8 bg-gradient-to-r from-[var(--color-primary)] via-[var(--color-primary)]/95 to-[var(--color-primary)]/90 backdrop-blur-lg border-b border-white/10 z-50 shadow-2xl">
-
             <div className="max-w-7xl mx-auto">
                 <div className="flex justify-between items-center">
-
                     <button
                         onClick={toggleMobileMenu}
                         aria-label="Menu"
@@ -203,7 +201,7 @@ export default function Header() {
                         </div>
                         <div className="hidden md:block">
                             <h1 className="text-xl font-black text-white tracking-tight">
-                                VINYL FENCE
+                                ONIK'S VINYL
                             </h1>
                             <p className="text-xs text-white/70">
                                 Premium Solutions
@@ -236,7 +234,6 @@ export default function Header() {
                     </nav>
 
                     <div className="flex items-center gap-3">
-
                         <button
                             onClick={toggleSearch}
                             className="p-3 rounded-full bg-white/10 hover:bg-white/20 transition-all duration-300 group relative"
@@ -261,13 +258,19 @@ export default function Header() {
                         ) : (
                             <div className="relative" ref={languageRef}>
                                 <button
-                                    onClick={() => setIsLanguageOpen(!isLanguageOpen)}
+                                    onClick={() =>
+                                        setIsLanguageOpen(!isLanguageOpen)
+                                    }
                                     className="p-3 rounded-full bg-white/10 hover:bg-white/20 transition-all duration-300 group flex items-center gap-2"
                                     aria-label="Language"
                                 >
                                     <FaGlobe className="w-5 h-5 text-white group-hover:scale-110 transition-transform" />
                                     <span className="text-white text-sm font-medium hidden sm:inline">
-                                        {languages.find(l => l.code === language)?.flag}
+                                        {
+                                            languages.find(
+                                                (l) => l.code === language,
+                                            )?.flag
+                                        }
                                     </span>
                                 </button>
                                 {isLanguageOpen && (
@@ -285,7 +288,9 @@ export default function Header() {
                                                         : "text-gray-700"
                                                 }`}
                                             >
-                                                <span className="text-lg">{lang.flag}</span>
+                                                <span className="text-lg">
+                                                    {lang.flag}
+                                                </span>
                                                 <span>{lang.label}</span>
                                             </button>
                                         ))}
@@ -311,7 +316,6 @@ export default function Header() {
                                     <FaUserCircle className="w-4 h-4" />
                                     <T>Sign In</T>
                                 </Link>
-                                
                             </div>
                         )}
                     </div>
@@ -331,7 +335,6 @@ export default function Header() {
                 >
                     <form onSubmit={handleSearchSubmit} className="relative">
                         <div className="flex flex-col sm:flex-row gap-3">
-
                             <div className="flex rounded-2xl bg-white/10 backdrop-blur-sm border border-white/20 overflow-hidden">
                                 <button
                                     type="button"
@@ -444,8 +447,12 @@ export default function Header() {
                                                     : "bg-white/10 text-white hover:bg-white/20"
                                             }`}
                                         >
-                                            <span className="text-lg">{lang.flag}</span>
-                                            <span className="text-sm">{lang.label}</span>
+                                            <span className="text-lg">
+                                                {lang.flag}
+                                            </span>
+                                            <span className="text-sm">
+                                                {lang.label}
+                                            </span>
                                         </button>
                                     ))}
                                 </div>

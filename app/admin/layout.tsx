@@ -6,56 +6,41 @@ import AdminSidebar from "./components/AdminSidebar";
 import AdminHeader from "./components/AdminHeader";
 import { Shield } from "lucide-react";
 import { ThemeProvider } from "../contexts/ThemeContext";
+import { onAuthStateChanged } from "firebase/auth";
+import { doc, getDoc } from "firebase/firestore";
+import { auth, db } from "../lib/firebase/firebase";
 
 export default function AdminLayout({
     children,
 }: {
     children: React.ReactNode;
 }) {
-    const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(
-        null
-    );
+    const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
     const router = useRouter();
     const pathname = usePathname();
 
     useEffect(() => {
-        
         if (pathname === "/admin/login") {
             setIsAuthenticated(true);
             return;
         }
 
-        const checkAuth = async () => {
-            const sessionToken = localStorage.getItem("adminSessionToken");
-            if (sessionToken) {
-                
-                const adminUser = localStorage.getItem("adminUser");
-                if (adminUser) {
-                    try {
-                        const userData = JSON.parse(adminUser);
-                        const loginTime = new Date(userData.loginTime);
-                        const now = new Date();
-                        const hoursSinceLogin =
-                            (now.getTime() - loginTime.getTime()) /
-                            (1000 * 60 * 60);
-
-                        if (hoursSinceLogin < 8) {
-                            setIsAuthenticated(true);
-                            return;
-                        }
-                    } catch (error) {
-                        console.error("Error parsing admin user data:", error);
-                    }
+        const unsubscribe = onAuthStateChanged(auth, async (user) => {
+            if (user && user.emailVerified) {
+                const adminDoc = await getDoc(doc(db, "admins", user.uid));
+                if (adminDoc.exists() && adminDoc.data().isActive) {
+                    setIsAuthenticated(true);
+                } else {
+                    setIsAuthenticated(false);
+                    router.push("/admin/login");
                 }
+            } else {
+                setIsAuthenticated(false);
+                router.push("/admin/login");
             }
+        });
 
-            localStorage.removeItem("adminSessionToken");
-            localStorage.removeItem("adminUser");
-            setIsAuthenticated(false);
-            router.push("/admin/login");
-        };
-
-        setTimeout(checkAuth, 100);
+        return () => unsubscribe();
     }, [pathname, router]);
 
     if (isAuthenticated === null) {
@@ -89,9 +74,7 @@ export default function AdminLayout({
     return (
         <ThemeProvider scope="admin">
             <div className="min-h-screen bg-[var(--color-background)] flex">
-
                 <AdminSidebar />
-
                 <div className="flex-1 flex flex-col">
                     <AdminHeader />
                     <main className="flex-1 p-8 overflow-y-auto">{children}</main>

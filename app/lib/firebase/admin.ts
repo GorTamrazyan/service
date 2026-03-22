@@ -1,5 +1,6 @@
 import { collection, doc, getDoc, getDocs, setDoc, query, where, addDoc } from "firebase/firestore";
-import { db } from "./firebase";
+import { signInWithEmailAndPassword, signOut } from "firebase/auth";
+import { db, auth } from "./firebase";
 
 export interface AdminUser {
     id: string;
@@ -7,235 +8,66 @@ export interface AdminUser {
     username: string;
     role: 'super_admin' | 'admin' | 'moderator';
     permissions: string[];
-    createdAt: Date | any; 
-    lastLoginAt?: Date | any; 
-    isActive: boolean;
-}
-
-export interface AdminSession {
-    adminId: string;
-    sessionToken: string;
-    createdAt: Date | any; 
-    expiresAt: Date | any; 
+    createdAt: Date | any;
+    lastLoginAt?: Date | any;
     isActive: boolean;
 }
 
 const ADMIN_COLLECTION = "admins";
-const ADMIN_SESSIONS_COLLECTION = "admin_sessions";
 
-export const createAdminUser = async (
-    email: string,
-    password: string,
-    username: string,
-    role: AdminUser['role'] = 'admin'
-): Promise<AdminUser> => {
+export const loginAdmin = async (email: string, password: string): Promise<{ admin: AdminUser }> => {
     try {
-        
-        const adminData = {
-            email,
-            username,
-            password, 
-            role,
-            permissions: getPermissionsForRole(role),
-            createdAt: new Date(),
-            isActive: true
-        };
+        const userCred = await signInWithEmailAndPassword(auth, email, password);
+        const user = userCred.user;
 
-        const adminDocRef = await addDoc(collection(db, ADMIN_COLLECTION), adminData);
+        if (!user.emailVerified) {
+            await signOut(auth);
+            throw new Error("Email not verified. Please check your inbox and verify your email before logging in.");
+        }
 
-        console.log("✅ Admin user created successfully:", adminData);
+        const adminDocRef = doc(db, ADMIN_COLLECTION, user.uid);
+        const adminDoc = await getDoc(adminDocRef);
 
-        return {
-            id: adminDocRef.id,
-            email: adminData.email,
-            username: adminData.username,
-            role: adminData.role,
-            permissions: adminData.permissions,
-            createdAt: adminData.createdAt,
-            isActive: adminData.isActive
-        };
-    } catch (error) {
-        console.error("❌ Error creating admin user:", error);
-        throw error;
-    }
-};
-
-const getPermissionsForRole = (role: AdminUser['role']): string[] => {
-    switch (role) {
-        case 'super_admin':
-            return [
-                'manage_admins',
-                'manage_products', 
-                'manage_orders', 
-                'manage_users', 
-                'view_analytics',
-                'manage_settings',
-                'delete_data'
-            ];
-        case 'admin':
-            return [
-                'manage_products', 
-                'manage_orders', 
-                'manage_users', 
-                'view_analytics'
-            ];
-        case 'moderator':
-            return [
-                'view_products',
-                'manage_orders', 
-                'view_users'
-            ];
-        default:
-            return [];
-    }
-};
-
-export const loginAdmin = async (email: string, password: string): Promise<{
-    admin: AdminUser;
-    sessionToken: string;
-}> => {
-    try {
-        
-        const adminsRef = collection(db, ADMIN_COLLECTION);
-        const adminQuery = query(adminsRef, where("email", "==", email));
-        const adminSnapshot = await getDocs(adminQuery);
-
-        if (adminSnapshot.empty) {
+        if (!adminDoc.exists()) {
+            await signOut(auth);
             throw new Error("Admin account not found");
         }
 
-        const adminDoc = adminSnapshot.docs[0];
-        const adminData = adminDoc.data() as Omit<AdminUser, 'id'> & { password: string };
-
-        if (adminData.password !== password) {
-            throw new Error("Invalid password");
-        }
+        const adminData = adminDoc.data() as Omit<AdminUser, 'id'>;
 
         if (!adminData.isActive) {
+            await signOut(auth);
             throw new Error("Admin account is deactivated");
         }
 
-        const admin: AdminUser = {
-            id: adminDoc.id,
-            email: adminData.email,
-            username: adminData.username,
-            role: adminData.role,
-            permissions: adminData.permissions,
-            createdAt: adminData.createdAt,
-            lastLoginAt: adminData.lastLoginAt,
-            isActive: adminData.isActive
-        };
-
-        await setDoc(doc(db, ADMIN_COLLECTION, adminDoc.id), {
-            ...adminData,
-            lastLoginAt: new Date()
-        });
-
-        const sessionToken = generateSessionToken();
-        const session: Omit<AdminSession, 'id'> = {
-            adminId: adminDoc.id,
-            sessionToken,
-            createdAt: new Date(),
-            expiresAt: new Date(Date.now() + 8 * 60 * 60 * 1000), 
-            isActive: true
-        };
-
-        const sessionRef = await addDoc(collection(db, ADMIN_SESSIONS_COLLECTION), session);
-        console.log("✅ Admin session created:", sessionRef.id);
+        await setDoc(adminDocRef, { ...adminData, lastLoginAt: new Date() });
 
         return {
-            admin,
-            sessionToken
+            admin: { id: user.uid, ...adminData }
         };
     } catch (error: any) {
-        console.error("❌ Admin login error:", error);
+        if (error.code === 'auth/invalid-credential' || error.code === 'auth/wrong-password') {
+            throw new Error("Invalid email or password");
+        }
+        if (error.code === 'auth/user-not-found') {
+            throw new Error("Admin account not found");
+        }
+        if (error.code === 'auth/too-many-requests') {
+            throw new Error("Too many failed attempts. Please try again later.");
+        }
         throw new Error(error.message || "Login failed");
     }
 };
 
-export const verifyAdminSession = async (sessionToken: string): Promise<AdminUser | null> => {
-    try {
-        
-        const sessionsRef = collection(db, ADMIN_SESSIONS_COLLECTION);
-        const sessionQuery = query(
-            sessionsRef, 
-            where("sessionToken", "==", sessionToken),
-            where("isActive", "==", true)
-        );
-        
-        const sessionSnapshot = await getDocs(sessionQuery);
-        
-        if (sessionSnapshot.empty) {
-            return null;
-        }
-
-        const sessionDoc = sessionSnapshot.docs[0];
-        const sessionData = sessionDoc.data() as AdminSession;
-
-        const expiresAt = toDate(sessionData.expiresAt);
-        if (new Date() > expiresAt) {
-            
-            await setDoc(doc(db, ADMIN_SESSIONS_COLLECTION, sessionDoc.id), {
-                ...sessionData,
-                isActive: false
-            });
-            return null;
-        }
-
-        const adminDocRef = doc(db, ADMIN_COLLECTION, sessionData.adminId);
-        const adminDoc = await getDoc(adminDocRef);
-
-        if (!adminDoc.exists()) {
-            return null;
-        }
-
-        const adminData = adminDoc.data() as Omit<AdminUser, 'id'>;
-        
-        if (!adminData.isActive) {
-            return null;
-        }
-
-        return {
-            id: sessionData.adminId,
-            ...adminData
-        };
-    } catch (error) {
-        console.error("❌ Error verifying admin session:", error);
-        return null;
-    }
-};
-
-export const logoutAdmin = async (sessionToken: string): Promise<void> => {
-    try {
-        
-        const sessionsRef = collection(db, ADMIN_SESSIONS_COLLECTION);
-        const sessionQuery = query(
-            sessionsRef,
-            where("sessionToken", "==", sessionToken),
-            where("isActive", "==", true)
-        );
-
-        const sessionSnapshot = await getDocs(sessionQuery);
-
-        for (const sessionDoc of sessionSnapshot.docs) {
-            await setDoc(doc(db, ADMIN_SESSIONS_COLLECTION, sessionDoc.id), {
-                ...sessionDoc.data(),
-                isActive: false
-            });
-        }
-
-        console.log("✅ Admin logged out successfully");
-    } catch (error) {
-        console.error("❌ Error logging out admin:", error);
-        throw error;
-    }
+export const logoutAdmin = async (): Promise<void> => {
+    await signOut(auth);
 };
 
 export const getAllAdmins = async (): Promise<AdminUser[]> => {
     try {
         const adminsRef = collection(db, ADMIN_COLLECTION);
         const adminsSnapshot = await getDocs(adminsRef);
-        
+
         const admins: AdminUser[] = [];
         adminsSnapshot.forEach((doc) => {
             admins.push({
@@ -251,44 +83,105 @@ export const getAllAdmins = async (): Promise<AdminUser[]> => {
     }
 };
 
-const toDate = (dateField: Date | any): Date => {
-    if (dateField instanceof Date) {
-        return dateField;
-    }
-    if (dateField && typeof dateField.toDate === 'function') {
-        return dateField.toDate();
-    }
-    
-    console.warn('Could not convert date field, using current date');
-    return new Date();
-};
+const FIREBASE_API_KEY = "AIzaSyDQh8gM-8gX4dbQ9MiBjN8WYO0dCJ6Gm1I";
 
-const generateSessionToken = (): string => {
-    return Math.random().toString(36).substring(2, 15) +
-           Math.random().toString(36).substring(2, 15) +
-           Date.now().toString(36);
-};
-
-export const initializeDefaultAdmin = async () => {
-    try {
-        const adminsRef = collection(db, ADMIN_COLLECTION);
-        const adminsSnapshot = await getDocs(adminsRef);
-        
-        if (adminsSnapshot.empty) {
-            console.log("🔧 No admins found, creating default admin...");
-            await createAdminUser(
-                "gor.tamrazyan5@mail.ru",
-                "123321",
-                "admin",
-                "super_admin"
-            );
-            console.log("✅ Default admin created successfully!");
-            console.log("📧 Email: gor.tamrazyan5@mail.ru");
-            console.log("🔑 Password: 123321");
-        } else {
-            console.log("ℹ️ Admin users already exist");
+export const createAdminUser = async (
+    email: string,
+    username: string,
+    role: AdminUser['role'] = 'admin',
+    password: string,
+    permissions: string[]
+): Promise<AdminUser> => {
+    const signUpRes = await fetch(
+        `https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=${FIREBASE_API_KEY}`,
+        {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, password, returnSecureToken: true }),
         }
-    } catch (error) {
-        console.error("❌ Error initializing default admin:", error);
+    );
+
+    const signUpData = await signUpRes.json();
+    if (signUpData.error) {
+        const msg = signUpData.error.message;
+        if (msg === 'EMAIL_EXISTS') throw new Error('Admin with this email already exists');
+        throw new Error(msg);
+    }
+
+    const { localId: uid, idToken } = signUpData;
+
+    await fetch(
+        `https://identitytoolkit.googleapis.com/v1/accounts:sendOobCode?key=${FIREBASE_API_KEY}`,
+        {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ requestType: 'VERIFY_EMAIL', idToken }),
+        }
+    );
+
+    const adminData = {
+        email,
+        username,
+        role,
+        permissions,
+        createdAt: new Date(),
+        isActive: true,
+    };
+
+    await setDoc(doc(db, ADMIN_COLLECTION, uid), adminData);
+
+    return { id: uid, ...adminData };
+};
+
+export const updateAdminPermissions = async (
+    adminId: string,
+    role: AdminUser['role'],
+    permissions: string[]
+): Promise<void> => {
+    const adminDocRef = doc(db, ADMIN_COLLECTION, adminId);
+    const adminDoc = await getDoc(adminDocRef);
+    if (!adminDoc.exists()) throw new Error("Admin not found");
+
+    await setDoc(adminDocRef, { ...adminDoc.data(), role, permissions });
+};
+
+export const toggleAdminStatus = async (
+    adminId: string,
+    isActive: boolean
+): Promise<void> => {
+    const adminDocRef = doc(db, ADMIN_COLLECTION, adminId);
+    const adminDoc = await getDoc(adminDocRef);
+    if (!adminDoc.exists()) throw new Error("Admin not found");
+
+    await setDoc(adminDocRef, { ...adminDoc.data(), isActive });
+};
+
+export const getPermissionsForRole = (role: AdminUser['role']): string[] => {
+    switch (role) {
+        case 'super_admin':
+            return [
+                'manage_admins',
+                'manage_products',
+                'manage_orders',
+                'manage_users',
+                'view_analytics',
+                'manage_settings',
+                'delete_data'
+            ];
+        case 'admin':
+            return [
+                'manage_products',
+                'manage_orders',
+                'manage_users',
+                'view_analytics'
+            ];
+        case 'moderator':
+            return [
+                'view_products',
+                'manage_orders',
+                'view_users'
+            ];
+        default:
+            return [];
     }
 };
