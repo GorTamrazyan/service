@@ -14,15 +14,12 @@ export function useTheme() {
             let shouldBeDark = false;
 
             if (savedTheme) {
-                
+
                 shouldBeDark = savedTheme === "dark";
             } else {
-                
-                shouldBeDark = window.matchMedia(
-                    "(prefers-color-scheme: dark)",
-                ).matches;
-                
-                localStorage.setItem("theme", shouldBeDark ? "dark" : "light");
+
+                shouldBeDark = false;
+                localStorage.setItem("theme", "light");
             }
 
             setIsDark(shouldBeDark);

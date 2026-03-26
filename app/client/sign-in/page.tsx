@@ -271,7 +271,10 @@ export default function SignInPage() {
                     <div className="bg-[var(--color-card-bg)] rounded-2xl shadow-2xl border border-[var(--color-border)] p-8 md:p-10 transition-all duration-300 hover:shadow-3xl">
 
                         <div className="text-center mb-8">
-                            <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-accent)] rounded-2xl mb-4 shadow-lg">
+                            <button
+                                onClick={() => window.location.href = "/"}
+                                className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-accent)] rounded-2xl mb-4 shadow-lg hover:opacity-80 transition-opacity cursor-pointer"
+                            >
                                 <svg
                                     className="w-8 h-8 text-white"
                                     fill="none"
@@ -285,7 +288,7 @@ export default function SignInPage() {
                                         d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"
                                     />
                                 </svg>
-                            </div>
+                            </button>
                             <h2 className="text-4xl md:text-5xl font-bold text-[var(--color-primary)] mb-2">
                                 Welcome Back
                             </h2>

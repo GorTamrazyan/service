@@ -32,7 +32,7 @@ export const ServiceCard = ({
 
             <div className="relative p-6 flex flex-col flex-1 z-20">
 
-                <div className="flex gap-4 items-start mb-5">
+                <div className="flex gap-4 items-start mb-5 pr-24">
                     <div className="relative inline-flex h-14 w-14 items-center justify-center rounded-xl bg-gradient-to-br from-[var(--color-gray-100)] to-white border border-[var(--color-border)] text-primary transition-all duration-300 group-hover:scale-110 group-hover:from-[var(--color-primary)]/10 group-hover:to-white group-hover:shadow-md flex-shrink-0">
                         <Icon className="w-6 h-6 text-[var(--color-primary)] group-hover:scale-110 transition-transform duration-300" />
                     </div>

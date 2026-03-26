@@ -198,13 +198,13 @@ export default function SettingsPanel() {
                 <div className="space-y-4">
 
                     <div className="flex items-center justify-between p-4 bg-gradient-to-r from-[var(--color-text)]/5 to-[var(--color-text)]/10 rounded-xl hover:shadow-md transition-all">
-                        <div className="flex items-center gap-3">
+                        <div className="flex items-center gap-3 flex-1 min-w-0">
                             {isDark ? (
-                                <FaMoon className="w-5 h-5 text-indigo-600" />
+                                <FaMoon className="w-5 h-5 text-indigo-600 flex-shrink-0" />
                             ) : (
-                                <FaSun className="w-5 h-5 text-yellow-600" />
+                                <FaSun className="w-5 h-5 text-yellow-600 flex-shrink-0" />
                             )}
-                            <div>
+                            <div className="min-w-0">
                                 <p className="font-semibold text-[var(--color-text)]">
                                     <T>Dark Mode</T>
                                 </p>
@@ -215,7 +215,7 @@ export default function SettingsPanel() {
                         </div>
                         <button
                             onClick={handleDarkModeToggle}
-                            className={`relative w-14 h-7 rounded-full transition-colors duration-300 ${
+                            className={`relative w-14 h-7 rounded-full transition-colors duration-300 flex-shrink-0 ml-3 ${
                                 isDark
                                     ? "bg-gradient-to-r from-indigo-600 to-purple-600"
                                     : "bg-[var(--color-text)]/20"
@@ -241,7 +241,7 @@ export default function SettingsPanel() {
                                 </p>
                             </div>
                         </div>
-                        <div className="grid grid-cols-4 gap-2 mt-3">
+                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mt-3">
                             {["en", "ru", "hy", "es"].map((lang) => (
                                 <button
                                     key={lang}
@@ -306,9 +306,9 @@ export default function SettingsPanel() {
                             key={item.key}
                             className="flex items-center justify-between p-4 bg-gradient-to-r from-[var(--color-text)]/5 to-[var(--color-text)]/10 rounded-xl hover:shadow-md transition-all"
                         >
-                            <div className="flex items-center gap-3">
-                                <item.icon className="w-5 h-5 text-blue-600" />
-                                <div>
+                            <div className="flex items-center gap-3 flex-1 min-w-0">
+                                <item.icon className="w-5 h-5 text-blue-600 flex-shrink-0" />
+                                <div className="min-w-0">
                                     <p className="font-semibold text-[var(--color-text)]">
                                         <T>{item.label}</T>
                                     </p>
@@ -327,7 +327,7 @@ export default function SettingsPanel() {
                                             ],
                                     }))
                                 }
-                                className={`relative w-14 h-7 rounded-full transition-colors duration-300 ${
+                                className={`relative w-14 h-7 rounded-full transition-colors duration-300 flex-shrink-0 ml-3 ${
                                     notifications[
                                         item.key as keyof typeof notifications
                                     ]

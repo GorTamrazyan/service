@@ -6,6 +6,7 @@ import AdminSidebar from "./components/AdminSidebar";
 import AdminHeader from "./components/AdminHeader";
 import { Shield } from "lucide-react";
 import { ThemeProvider } from "../contexts/ThemeContext";
+import { LanguageProvider } from "../contexts/LanguageContext";
 import { onAuthStateChanged } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
 import { auth, db } from "../lib/firebase/firebase";
@@ -68,18 +69,24 @@ export default function AdminLayout({
     }
 
     if (pathname === "/admin/login") {
-        return <ThemeProvider scope="admin">{children}</ThemeProvider>;
+        return (
+            <LanguageProvider storageKey="preferred-language-admin">
+                <ThemeProvider scope="admin">{children}</ThemeProvider>
+            </LanguageProvider>
+        );
     }
 
     return (
-        <ThemeProvider scope="admin">
-            <div className="min-h-screen bg-[var(--color-background)] flex">
-                <AdminSidebar />
-                <div className="flex-1 flex flex-col">
-                    <AdminHeader />
-                    <main className="flex-1 p-8 overflow-y-auto">{children}</main>
+        <LanguageProvider storageKey="preferred-language-admin">
+            <ThemeProvider scope="admin">
+                <div className="min-h-screen bg-[var(--color-background)] flex">
+                    <AdminSidebar />
+                    <div className="flex-1 flex flex-col">
+                        <AdminHeader />
+                        <main className="flex-1 p-8 overflow-y-auto">{children}</main>
+                    </div>
                 </div>
-            </div>
-        </ThemeProvider>
+            </ThemeProvider>
+        </LanguageProvider>
     );
 }

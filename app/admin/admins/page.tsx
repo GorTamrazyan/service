@@ -206,7 +206,7 @@ export default function AdminsPage() {
                                             <p className="text-sm text-[var(--color-text)]/60">{admin.email}</p>
                                         </td>
                                         <td className="px-6 py-4">
-                                            <span className={`px-3 py-1 rounded-full text-xs font-medium ${ROLE_COLORS[admin.role]}`}>
+                                            <span className={`px-3 py-1 rounded-full text-xs font-medium whitespace-nowrap ${ROLE_COLORS[admin.role]}`}>
                                                 {admin.role === "super_admin" ? "Super Admin" : admin.role === "admin" ? "Admin" : "Moderator"}
                                             </span>
                                         </td>

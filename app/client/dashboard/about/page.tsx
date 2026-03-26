@@ -216,7 +216,7 @@ export default function AboutUsPage() {
                             </span>
                         </div>
 
-                        <h1 className="text-5xl md:text-7xl font-black text-[var(--color-background)] leading-tight mb-8">
+                        <h1 className="text-3xl sm:text-5xl md:text-7xl font-black text-[var(--color-background)] leading-tight mb-8">
                             <T>Crafting Quality</T>
                             <br />
                             <span className="text-[var(--color-accent)]">
@@ -259,7 +259,7 @@ export default function AboutUsPage() {
                             <T>Our Mission & Vision</T>
                         </h2>
                         <div className="max-w-4xl mx-auto">
-                            <div className="relative p-12 rounded-3xl bg-gradient-to-r from-[var(--color-primary)]/5 to-[var(--color-accent)]/5 border border-[var(--color-text)]/20 backdrop-blur-sm">
+                            <div className="relative p-6 sm:p-12 rounded-3xl bg-gradient-to-r from-[var(--color-primary)]/5 to-[var(--color-accent)]/5 border border-[var(--color-text)]/20 backdrop-blur-sm">
                                 <FaAward className="absolute -top-6 left-1/2 transform -translate-x-1/2 w-12 h-12 text-[var(--color-accent)] bg-[var(--color-background)] p-3 rounded-full shadow-xl" />
                                 <p className="text-2xl md:text-3xl font-semibold text-[var(--color-primary)] leading-relaxed italic text-center">
                                     <T>
@@ -422,21 +422,42 @@ export default function AboutUsPage() {
 
                     <div className="relative">
 
-                        <div className="absolute left-1/2 transform -translate-x-1/2 h-full w-1 bg-gradient-to-b from-[var(--color-accent)] to-[var(--color-primary)]" />
+                        {/* Desktop center line */}
+                        <div className="hidden md:block absolute left-1/2 transform -translate-x-1/2 h-full w-1 bg-gradient-to-b from-[var(--color-accent)] to-[var(--color-primary)]" />
+                        {/* Mobile left line */}
+                        <div className="md:hidden absolute left-4 top-0 h-full w-1 bg-gradient-to-b from-[var(--color-accent)] to-[var(--color-primary)]" />
 
-                        <div className="space-y-20">
+                        <div className="space-y-10 md:space-y-20">
                             {milestones.map((milestone, index) => (
                                 <div
                                     key={index}
-                                    className={`relative flex items-center ${
+                                    className={`relative flex items-center md:${
                                         index % 2 === 0
                                             ? "flex-row"
                                             : "flex-row-reverse"
-                                    }`}
+                                    } flex-row`}
                                 >
+                                    {/* Mobile layout */}
+                                    <div className="md:hidden pl-12 w-full">
+                                        <div className="p-5 rounded-2xl bg-[var(--color-background)] shadow-xl border border-[var(--color-text)]/10">
+                                            <div className="flex items-center gap-3 mb-3">
+                                                <div className="text-3xl font-black text-[var(--color-primary)]">
+                                                    {milestone.year}
+                                                </div>
+                                                <milestone.icon className="w-6 h-6 text-[var(--color-accent)]" />
+                                            </div>
+                                            <h3 className="text-lg font-bold text-[var(--color-primary)] mb-2">
+                                                <T>{milestone.title}</T>
+                                            </h3>
+                                            <p className="text-sm text-[var(--color-text)]/80">
+                                                <T>{milestone.description}</T>
+                                            </p>
+                                        </div>
+                                    </div>
 
+                                    {/* Desktop layout */}
                                     <div
-                                        className={`w-1/2 ${
+                                        className={`hidden md:block w-1/2 ${
                                             index % 2 === 0
                                                 ? "pr-12 text-right"
                                                 : "pl-12"
@@ -469,7 +490,8 @@ export default function AboutUsPage() {
                                         </div>
                                     </div>
 
-                                    <div className="absolute left-1/2 transform -translate-x-1/2 w-6 h-6 rounded-full bg-[var(--color-accent)] border-4 border-[var(--color-background)] shadow-xl z-10" />
+                                    <div className="hidden md:block absolute left-1/2 transform -translate-x-1/2 w-6 h-6 rounded-full bg-[var(--color-accent)] border-4 border-[var(--color-background)] shadow-xl z-10" />
+                                    <div className="md:hidden absolute left-4 transform -translate-x-1/2 w-5 h-5 rounded-full bg-[var(--color-accent)] border-4 border-[var(--color-background)] shadow-xl z-10" />
                                 </div>
                             ))}
                         </div>
@@ -576,7 +598,7 @@ export default function AboutUsPage() {
 
             <section className="py-24 bg-gradient-to-b from-[var(--color-background)] to-[var(--color-card-bg)]">
                 <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-                    <div className="bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-accent)] rounded-3xl p-12 md:p-16 shadow-2xl">
+                    <div className="bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-accent)] rounded-3xl p-6 sm:p-12 md:p-16 shadow-2xl">
                         <h2 className="text-4xl md:text-5xl font-black text-[var(--color-background)] mb-6">
                             <T>Ready to Transform Your Space?</T>
                         </h2>

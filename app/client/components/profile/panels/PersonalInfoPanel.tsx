@@ -129,7 +129,7 @@ export default function PersonalInfoPanel({
                     </div>
 
                     <div className="space-y-4">
-                        <div className="grid grid-cols-2 gap-4">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div>
                                 <label className="block text-sm font-semibold text-[var(--color-text)] mb-2">
                                     <T>Street</T>
@@ -182,7 +182,7 @@ export default function PersonalInfoPanel({
                                 }`}
                             />
                         </div>
-                        <div className="grid grid-cols-2 gap-4">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div>
                                 <label className="block text-sm font-semibold text-[var(--color-text)] mb-2">
                                     <T>City</T>

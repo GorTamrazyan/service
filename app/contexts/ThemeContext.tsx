@@ -38,10 +38,8 @@ export function ThemeProvider({ children, scope }: ThemeProviderProps) {
             if (savedTheme) {
                 shouldBeDark = savedTheme === "dark";
             } else {
-                shouldBeDark = window.matchMedia(
-                    "(prefers-color-scheme: dark)",
-                ).matches;
-                localStorage.setItem(storageKey, shouldBeDark ? "dark" : "light");
+                shouldBeDark = false;
+                localStorage.setItem(storageKey, "light");
             }
 
             setIsDark(shouldBeDark);

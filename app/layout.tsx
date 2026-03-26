@@ -29,7 +29,7 @@ export default function RootLayout({
           <body
               className={`${geistSans.variable} ${geistMono.variable} antialiased bg-[var(--color-background)] text-[var(--color-text)]`}
           >
-              <LanguageProvider>
+              <LanguageProvider storageKey="preferred-language-client">
                   <CartProvider>
                       <main>{children}</main>
                   </CartProvider>

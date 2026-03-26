@@ -13,7 +13,7 @@ export default function Footer() {
         <footer className="bg-[var(--color-secondary)] text-[var(--color-text)] mt-auto">
 
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
 
                     <div className="space-y-4">
                         <div className="flex items-center space-x-3">
@@ -163,31 +163,33 @@ export default function Footer() {
 
             <div className="border-t border-[var(--color-text)]/10">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-                    <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
-                        <div className="flex items-center space-x-1 text-sm text-[var(--color-text)]/70">
+                    <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+                        <div className="flex flex-wrap items-center justify-center md:justify-start gap-1 text-sm text-[var(--color-text)]/70 text-center">
                             <span>&copy; {currentYear} ONIK'S VINYL.</span>
                             <T>All rights reserved.</T>
-                            <span className="mx-1">•</span>
-                            <span><T>Made with</T></span>
-                            <Heart className="w-4 h-4 text-red-500 mx-1" />
-                            <span><T>in Armenia</T></span>
+                            <span>•</span>
+                            <span className="flex items-center gap-1">
+                                <T>Made with</T>
+                                <Heart className="w-4 h-4 text-red-500" />
+                                <T>in Armenia</T>
+                            </span>
                         </div>
-                        
-                        <div className="flex items-center space-x-6 text-sm">
-                            <Link 
-                                href="/privacy" 
+
+                        <div className="flex flex-wrap items-center justify-center gap-4 text-sm">
+                            <Link
+                                href="/privacy"
                                 className="text-[var(--color-text)]/70 hover:text-[var(--color-accent)] transition-colors duration-200"
                             >
                                 <T>Privacy Policy</T>
                             </Link>
-                            <Link 
-                                href="/terms" 
+                            <Link
+                                href="/terms"
                                 className="text-[var(--color-text)]/70 hover:text-[var(--color-accent)] transition-colors duration-200"
                             >
                                 <T>Terms of Service</T>
                             </Link>
-                            <Link 
-                                href="/support" 
+                            <Link
+                                href="/support"
                                 className="text-[var(--color-text)]/70 hover:text-[var(--color-accent)] transition-colors duration-200"
                             >
                                 <T>Support</T>

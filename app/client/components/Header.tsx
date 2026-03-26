@@ -396,10 +396,10 @@ export default function Header() {
 
             <div
                 className={`
-                    lg:hidden absolute top-full left-0 w-full bg-gradient-to-b from-[var(--color-primary)] to-[var(--color-primary)]/95 backdrop-blur-lg border-t border-white/10 transition-all duration-500 ease-in-out overflow-hidden
+                    lg:hidden absolute top-full left-0 w-full bg-gradient-to-b from-[var(--color-primary)] to-[var(--color-primary)]/95 backdrop-blur-lg border-t border-white/10 transition-all duration-500 ease-in-out overflow-y-auto
                     ${
                         isMobileMenuOpen
-                            ? "max-h-[500px] opacity-100"
+                            ? "max-h-[80vh] opacity-100"
                             : "max-h-0 opacity-0"
                     }
                 `}

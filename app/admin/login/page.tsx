@@ -150,7 +150,7 @@ export default function AdminLogin() {
 
                 <div className="text-center mt-6">
                     <button
-                        onClick={() => router.push("/client/dashboard/home")}
+                        onClick={() => router.push("/")}
                         className="text-[var(--color-text)]/70 hover:text-[var(--color-accent)] transition-colors"
                     >
                         <T>← Back to main site</T>

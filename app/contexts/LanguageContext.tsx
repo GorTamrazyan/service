@@ -18,19 +18,19 @@ const translationCache: Record<string, Record<string, string>> = {
     en: {}
 };
 
-export function LanguageProvider({ children }: { children: React.ReactNode }) {
+export function LanguageProvider({ children, storageKey = 'preferred-language' }: { children: React.ReactNode; storageKey?: string }) {
     const [language, setLanguage] = useState('en');
 
     useEffect(() => {
-        const savedLanguage = localStorage.getItem('preferred-language');
+        const savedLanguage = localStorage.getItem(storageKey);
         if (savedLanguage && ['en','es', 'ru', 'hy'].includes(savedLanguage)) {
             setLanguage(savedLanguage);
         }
-    }, []);
+    }, [storageKey]);
 
     useEffect(() => {
-        localStorage.setItem('preferred-language', language);
-    }, [language]);
+        localStorage.setItem(storageKey, language);
+    }, [language, storageKey]);
 
     useEffect(() => {
         (window as any).setLanguage = (lang: string) => {
@@ -67,17 +67,17 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
                 targetLanguage = 'es';
             }
 
-            const response = await fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=${targetLanguage}&dt=t&q=${encodeURIComponent(text)}`);
-            
+            const response = await fetch(`/api/translate?tl=${targetLanguage}&q=${encodeURIComponent(text)}`);
+
             if (!response.ok) {
                 throw new Error('Translation API request failed');
             }
 
             const data = await response.json();
-            
-            let translatedText = text; 
-            if (data && data[0] && data[0][0] && data[0][0][0]) {
-                translatedText = data[0][0][0];
+
+            let translatedText = text;
+            if (data?.translated) {
+                translatedText = data.translated;
             }
 
             translationCache[language][text] = translatedText;
