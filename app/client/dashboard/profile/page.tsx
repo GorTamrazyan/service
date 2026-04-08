@@ -41,13 +41,13 @@ function ProfilePageContent() {
                 return;
             }
             setUser(currentUser);
-            await fetchUserProfile(currentUser.uid);
+            await fetchUserProfile(currentUser.uid, currentUser);
         });
 
         return () => unsubscribe();
     }, [router]);
 
-    const fetchUserProfile = async (uid: string) => {
+    const fetchUserProfile = async (uid: string, currentUser?: typeof user) => {
         setLoading(true);
         try {
             const userDocRef = doc(db, "users", uid);
@@ -55,7 +55,7 @@ function ProfilePageContent() {
 
             if (docSnap.exists()) {
                 const data = docSnap.data() as UserProfile;
-                data.email = user?.email || data.email;
+                data.email = currentUser?.email || data.email;
                 console.log("✅ Loaded profile:", data);
                 console.log("📧 User email from auth:", user?.email);
                 setProfile(data);
@@ -71,7 +71,7 @@ function ProfilePageContent() {
                         city: "",
                         zipCode: "",
                     },
-                    email: user?.email || "",
+                    email: currentUser?.email || "",
                 };
                 console.log("🆕 Created new profile:", newProfile);
                 console.log("📧 User email from auth:", user?.email);
