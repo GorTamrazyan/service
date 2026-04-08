@@ -20,7 +20,7 @@ export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
     default: "ONIK'S VINYL",
-    template: "%s | ONIK'S VINYL",
+    template: "ONIK'S VINYL",
   },
   description:
     "ONIK'S VINYL — premium custom vinyl fencing, gates, and installation services. 15+ years of experience, 10,000+ projects completed. Free quotes available.",
