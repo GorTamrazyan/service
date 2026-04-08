@@ -14,9 +14,35 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const SITE_URL = "https://oniksvinyl.com";
+
 export const metadata: Metadata = {
-  title: "ONIK'S VINYL",
-  description: "Custom vinyl fences and services by ONIK'S VINYL",
+  metadataBase: new URL(SITE_URL),
+  title: {
+    default: "ONIK'S VINYL",
+    template: "%s | ONIK'S VINYL",
+  },
+  description:
+    "ONIK'S VINYL — premium custom vinyl fencing, gates, and installation services. 15+ years of experience, 10,000+ projects completed. Free quotes available.",
+  keywords: ["vinyl fence", "vinyl fencing", "custom fence", "fence installation", "vinyl gates", "ONIK'S VINYL"],
+  authors: [{ name: "ONIK'S VINYL", url: SITE_URL }],
+  openGraph: {
+    type: "website",
+    siteName: "ONIK'S VINYL",
+    url: SITE_URL,
+    title: "ONIK'S VINYL — Premium Custom Vinyl Fencing",
+    description:
+      "Premium custom vinyl fencing, gates, and installation services. 15+ years of experience. Free quotes available.",
+    images: [{ url: "/images/oniks_vinyl_text.png", width: 1200, height: 630, alt: "ONIK'S VINYL" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "ONIK'S VINYL — Premium Custom Vinyl Fencing",
+    description: "Premium custom vinyl fencing, gates, and installation services. Free quotes available.",
+    images: ["/images/oniks_vinyl_text.png"],
+  },
+  robots: { index: true, follow: true },
+  alternates: { canonical: SITE_URL },
 };
 
 export default function RootLayout({

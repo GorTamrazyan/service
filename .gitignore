@@ -42,3 +42,11 @@ next-env.d.ts
 
 /app/generated/prisma
 mywebsiteauth-c45cd-65b26adc5b22.json
+
+# Playwright
+node_modules/
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+/playwright/.auth/

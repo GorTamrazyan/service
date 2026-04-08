@@ -5,7 +5,6 @@ import {
     FaGlobe,
     FaMoon,
     FaSun,
-    FaMobileAlt,
     FaEnvelope,
     FaEye,
     FaEyeSlash,
@@ -28,8 +27,6 @@ import { useRouter } from "next/navigation";
 export default function SettingsPanel() {
     const [notifications, setNotifications] = useState({
         email: true,
-        push: false,
-        sms: true,
     });
 
     const [showPasswordModal, setShowPasswordModal] = useState(false);
@@ -288,18 +285,6 @@ export default function SettingsPanel() {
                             icon: FaEnvelope,
                             label: "Email Notifications",
                             desc: "Receive updates via email",
-                        },
-                        {
-                            key: "push",
-                            icon: FaMobileAlt,
-                            label: "Push Notifications",
-                            desc: "Get alerts on your device",
-                        },
-                        {
-                            key: "sms",
-                            icon: FaMobileAlt,
-                            label: "SMS Notifications",
-                            desc: "Receive text messages",
                         },
                     ].map((item) => (
                         <div
