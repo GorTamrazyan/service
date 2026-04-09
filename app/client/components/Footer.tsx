@@ -189,6 +189,12 @@ export default function Footer() {
                                 <T>Terms of Service</T>
                             </Link>
                             <Link
+                                href="/refund"
+                                className="text-[var(--color-text)]/70 hover:text-[var(--color-accent)] transition-colors duration-200"
+                            >
+                                <T>Refund Policy</T>
+                            </Link>
+                            <Link
                                 href="/support"
                                 className="text-[var(--color-text)]/70 hover:text-[var(--color-accent)] transition-colors duration-200"
                             >
