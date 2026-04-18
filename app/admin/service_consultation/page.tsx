@@ -98,7 +98,7 @@ export default function AdminCombinedServicesPage() {
         icon: "",
         title: "",
         description: "",
-        features: "",
+        features: [] as string[],
         price: "",
     });
     const [editConsultation, setEditConsultation] = useState({
@@ -175,8 +175,8 @@ export default function AdminCombinedServicesPage() {
             title: service.title || "",
             description: service.description || "",
             features: Array.isArray(service.features)
-                ? service.features.join(", ")
-                : service.features || "",
+                ? service.features
+                : service.features ? [service.features] : [""],
             price: service.price || "",
         });
         setShowEditServiceForm(true);
@@ -206,9 +206,7 @@ export default function AdminCombinedServicesPage() {
         try {
             await updateService(editingService.id!, {
                 ...editService,
-                features: editService.features
-                    .split(",")
-                    .map((feature) => feature.trim()),
+                features: editService.features.filter((f) => f.trim().length > 0),
             });
 
             setShowEditServiceForm(false);
@@ -267,6 +265,10 @@ export default function AdminCombinedServicesPage() {
             ...prev,
             [field]: value,
         }));
+    };
+
+    const handleEditServiceFeaturesChange = (features: string[]) => {
+        setEditService((prev) => ({ ...prev, features }));
     };
 
     const handleCloseServiceEditModal = () => {
@@ -507,6 +509,7 @@ export default function AdminCombinedServicesPage() {
                 onUpdateService={handleUpdateService}
                 onClose={handleCloseServiceEditModal}
                 onEditServiceChange={handleEditServiceChange}
+                onFeaturesChange={handleEditServiceFeaturesChange}
             />
             <EditConsultationModal
                 isOpen={showEditConsultationForm}

@@ -46,7 +46,7 @@ export default function HomePage() {
             setError(null);
             try {
                 const response = await fetch(
-                    "/api/products?featured=true&_limit=4"
+                    "/api/products?featured=true"
                 );
                 if (!response.ok) {
                     throw new Error(`HTTP Error! Status: ${response.status}`);
@@ -189,7 +189,7 @@ export default function HomePage() {
                     )}
 
                     {!loading && products.length > 0 && (
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
                             {products.map((product, index) => (
                                 <div
                                     key={product.id}

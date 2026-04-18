@@ -19,23 +19,29 @@ export async function GET(request: Request) {
         const colorIds = searchParams.get("colorIds")?.split(",").filter(Boolean);
         const minPrice = searchParams.get("minPrice");
         const maxPrice = searchParams.get("maxPrice");
+        const featuredParam = searchParams.get("featured");
+        const featured = featuredParam === "true" ? true : featuredParam === "false" ? false : undefined;
+        const limit = searchParams.get("_limit") ? parseInt(searchParams.get("_limit")!) : undefined;
 
         let products;
 
-        const hasFilters = categoryId || typeOfProductId || materialId || minPrice || maxPrice;
+        const hasFilters = categoryId || typeOfProductId || materialId || minPrice || maxPrice || featured !== undefined;
 
         if (hasFilters) {
-            
             products = await getFilteredProductsEnriched({
                 categoryId: categoryId || undefined,
                 typeOfProductId: typeOfProductId || undefined,
                 materialId: materialId || undefined,
                 minPrice: minPrice ? parseFloat(minPrice) : undefined,
                 maxPrice: maxPrice ? parseFloat(maxPrice) : undefined,
+                featured,
             });
         } else {
-            
             products = await getAllProductsEnriched();
+        }
+
+        if (limit) {
+            products = products.slice(0, limit);
         }
 
         if (colorIds && colorIds.length > 0) {

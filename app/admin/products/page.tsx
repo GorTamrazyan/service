@@ -8,6 +8,7 @@ import {
     Edit,
     Trash2,
     Eye,
+    EyeOff,
     Package,
     X,
     Upload,
@@ -227,6 +228,19 @@ export default function AdminProductsPage() {
                         : "Failed to delete product"
                 );
             }
+        }
+    };
+
+    const handleToggleFeatured = async (product: Product) => {
+        try {
+            await updateProduct(product.id!, { featured: !product.featured });
+            setProducts((prev) =>
+                prev.map((p) =>
+                    p.id === product.id ? { ...p, featured: !p.featured } : p
+                )
+            );
+        } catch (error) {
+            console.error("Error toggling featured:", error);
         }
     };
 
@@ -489,9 +503,16 @@ export default function AdminProductsPage() {
                                                         <Package className="w-5 h-5 text-[var(--color-accent)]" />
                                                     </div>
                                                     <div>
-                                                        <p className="font-medium text-[var(--color-primary)]">
-                                                            {product.name}
-                                                        </p>
+                                                        <div className="flex items-center gap-2">
+                                                            <p className="font-medium text-[var(--color-primary)]">
+                                                                {product.name}
+                                                            </p>
+                                                            {product.featured && (
+                                                                <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-[var(--color-accent)]/15 text-[var(--color-accent)] border border-[var(--color-accent)]/30">
+                                                                    <T>Home</T>
+                                                                </span>
+                                                            )}
+                                                        </div>
                                                         <p className="text-sm text-[var(--color-text)]/60">
                                                             ID: {product.id}
                                                         </p>
@@ -534,8 +555,12 @@ export default function AdminProductsPage() {
                                             </td>
                                             <td className="p-6">
                                                 <div className="flex items-center justify-center gap-2">
-                                                    <button className="p-2 rounded-lg hover:bg-blue-100 text-blue-600 transition-colors">
-                                                        <Eye className="w-4 h-4" />
+                                                    <button
+                                                        onClick={() => handleToggleFeatured(product)}
+                                                        title={product.featured ? "Hide from home page" : "Show on home page"}
+                                                        className={`p-2 rounded-lg transition-colors ${product.featured ? "bg-[var(--color-accent)]/15 text-[var(--color-accent)] hover:bg-[var(--color-accent)]/25" : "hover:bg-blue-100 text-[var(--color-text)]/40 hover:text-blue-600"}`}
+                                                    >
+                                                        {product.featured ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
                                                     </button>
                                                     <button
                                                         onClick={() =>
@@ -836,6 +861,31 @@ export default function AdminProductsPage() {
                                         </div>
                                     )}
                                 </div>
+                            </div>
+
+                            <div>
+                                <label className="flex items-center gap-3 cursor-pointer p-3 border border-[var(--color-text)]/30 rounded-xl hover:border-[var(--color-accent)]/50 transition-colors">
+                                    <div className="relative flex-shrink-0">
+                                        <input
+                                            type="checkbox"
+                                            checked={newProduct.featured}
+                                            onChange={(e) =>
+                                                setNewProduct((prev) => ({
+                                                    ...prev,
+                                                    featured: e.target.checked,
+                                                }))
+                                            }
+                                            className="sr-only"
+                                        />
+                                        <div className={`w-10 h-6 rounded-full transition-colors ${newProduct.featured ? "bg-[var(--color-accent)]" : "bg-[var(--color-text)]/20"}`}>
+                                            <div className={`w-4 h-4 bg-white rounded-full shadow transition-transform mt-1 ${newProduct.featured ? "translate-x-5" : "translate-x-1"}`} />
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <p className="text-sm font-medium text-[var(--color-text)]"><T>Show on Home Page</T></p>
+                                        <p className="text-xs text-[var(--color-text)]/50"><T>Featured products appear in the homepage section</T></p>
+                                    </div>
+                                </label>
                             </div>
 
                             {error && (
@@ -1191,6 +1241,31 @@ export default function AdminProductsPage() {
                                         </div>
                                     )}
                                 </div>
+                            </div>
+
+                            <div>
+                                <label className="flex items-center gap-3 cursor-pointer p-3 border border-[var(--color-text)]/30 rounded-xl hover:border-[var(--color-accent)]/50 transition-colors">
+                                    <div className="relative flex-shrink-0">
+                                        <input
+                                            type="checkbox"
+                                            checked={editProduct.featured}
+                                            onChange={(e) =>
+                                                setEditProduct((prev) => ({
+                                                    ...prev,
+                                                    featured: e.target.checked,
+                                                }))
+                                            }
+                                            className="sr-only"
+                                        />
+                                        <div className={`w-10 h-6 rounded-full transition-colors ${editProduct.featured ? "bg-[var(--color-accent)]" : "bg-[var(--color-text)]/20"}`}>
+                                            <div className={`w-4 h-4 bg-white rounded-full shadow transition-transform mt-1 ${editProduct.featured ? "translate-x-5" : "translate-x-1"}`} />
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <p className="text-sm font-medium text-[var(--color-text)]"><T>Show on Home Page</T></p>
+                                        <p className="text-xs text-[var(--color-text)]/50"><T>Featured products appear in the homepage section</T></p>
+                                    </div>
+                                </label>
                             </div>
 
                             {error && (
