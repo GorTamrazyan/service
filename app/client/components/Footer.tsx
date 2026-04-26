@@ -32,7 +32,7 @@ export default function Footer() {
                                     <polygon points="38,8 41,4 44,8" />
                                 </svg>
                             </div>
-                            <h3 className="text-xl font-bold text-[var(--color-primary)]">
+                            <h3 className="font-serif text-xl font-semibold text-[var(--color-primary)]">
                                 ONIK'S VINYL
                             </h3>
                         </div>
@@ -161,7 +161,7 @@ export default function Footer() {
                 </div>
             </div>
 
-            <div className="border-t border-[var(--color-text)]/10">
+            <div className="border-t border-[var(--color-border)]">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
                     <div className="flex flex-col md:flex-row justify-between items-center gap-4">
                         <div className="flex flex-wrap items-center justify-center md:justify-start gap-1 text-sm text-[var(--color-text)]/70 text-center">

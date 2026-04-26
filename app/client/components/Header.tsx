@@ -9,7 +9,6 @@ import {
     FaUserCircle,
     FaBars,
     FaTimes,
-    FaChevronDown,
     FaHome,
     FaBox,
     FaTools,
@@ -26,26 +25,33 @@ export default function Header() {
     const [isSearchOpen, setIsSearchOpen] = useState(false);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [searchQuery, setSearchQuery] = useState("");
-    const [searchType, setSearchType] = useState<"products" | "services">(
-        "products"
-    );
+    const [searchType, setSearchType] = useState<"products" | "services">("products");
     const [isLanguageOpen, setIsLanguageOpen] = useState(false);
     const { getTotalItems, isAuthenticated } = useCart();
     const { language, setLanguage } = useLanguage();
     const searchRef = useRef<HTMLDivElement>(null);
+    const languageRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
-        const handleClickOutside = (e: MouseEvent) => {
+        const handler = (e: MouseEvent) => {
             if (searchRef.current && !searchRef.current.contains(e.target as Node)) {
                 setIsSearchOpen(false);
                 setSearchQuery("");
             }
         };
-        if (isSearchOpen) {
-            document.addEventListener("mousedown", handleClickOutside);
-        }
-        return () => document.removeEventListener("mousedown", handleClickOutside);
+        if (isSearchOpen) document.addEventListener("mousedown", handler);
+        return () => document.removeEventListener("mousedown", handler);
     }, [isSearchOpen]);
+
+    useEffect(() => {
+        const handler = (e: MouseEvent) => {
+            if (languageRef.current && !languageRef.current.contains(e.target as Node)) {
+                setIsLanguageOpen(false);
+            }
+        };
+        if (isLanguageOpen) document.addEventListener("mousedown", handler);
+        return () => document.removeEventListener("mousedown", handler);
+    }, [isLanguageOpen]);
 
     const languages = [
         { code: "en", label: "English", flag: "🇺🇸" },
@@ -54,243 +60,124 @@ export default function Header() {
         { code: "hy", label: "Հայերեն", flag: "🇦🇲" },
     ];
 
-    const languageRef = useRef<HTMLDivElement>(null);
+    const navItems = [
+        { href: "/client/dashboard/home", label: "Home", icon: FaHome },
+        { href: "/client/dashboard/products", label: "Products", icon: FaBox },
+        { href: "/client/dashboard/service", label: "Service", icon: FaTools },
+        { href: "/client/dashboard/about", label: "About us", icon: FaInfoCircle },
+    ];
 
-    useEffect(() => {
-        const handleClickOutside = (event: MouseEvent) => {
-            if (languageRef.current && !languageRef.current.contains(event.target as Node)) {
-                setIsLanguageOpen(false);
-            }
-        };
-
-        if (isLanguageOpen) {
-            document.addEventListener("mousedown", handleClickOutside);
-        }
-
-        return () => {
-            document.removeEventListener("mousedown", handleClickOutside);
-        };
-    }, [isLanguageOpen]);
-
-    const getLinkClassName = (expectedPaths: string | string[]) => {
-        const baseClasses =
-            "text-white hover:text-[var(--color-accent)] transition-all duration-300 font-medium";
-        const activeClasses =
-            "text-[var(--color-accent)] font-bold relative group";
-
-        const paths = Array.isArray(expectedPaths)
-            ? expectedPaths
-            : [expectedPaths];
-
-        const normalizedPaths = paths.map((path) =>
-            path.endsWith("/") ? path.slice(0, -1) : path
-        );
-
-        const isActive = normalizedPaths.some((path) => {
-            const normalizedCurrent = pathname.endsWith("/")
-                ? pathname.slice(0, -1)
-                : pathname;
-
-            return (
-                normalizedCurrent === path ||
-                (path !== "/" && normalizedCurrent.startsWith(`${path}/`))
-            );
-        });
-
-        return isActive ? `${activeClasses}` : baseClasses;
-    };
-
-    const toggleSearch = () => {
-        setIsSearchOpen(!isSearchOpen);
-        if (isSearchOpen) {
-            setSearchQuery("");
-        }
-    };
-
-    const toggleMobileMenu = () => {
-        setIsMobileMenuOpen(!isMobileMenuOpen);
+    const isActive = (href: string) => {
+        const normalized = pathname.endsWith("/") ? pathname.slice(0, -1) : pathname;
+        const normalizedHref = href.endsWith("/") ? href.slice(0, -1) : href;
+        return normalized === normalizedHref || (normalizedHref !== "/" && normalized.startsWith(`${normalizedHref}/`));
     };
 
     const handleSearchSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         if (searchQuery.trim()) {
-            
-            if (searchType === "products") {
-                router.push(
-                    `/client/dashboard/products?search=${encodeURIComponent(
-                        searchQuery.trim()
-                    )}`
-                );
-            } else {
-                router.push(
-                    `/client/dashboard/service?search=${encodeURIComponent(
-                        searchQuery.trim()
-                    )}`
-                );
-            }
+            router.push(
+                searchType === "products"
+                    ? `/client/dashboard/products?search=${encodeURIComponent(searchQuery.trim())}`
+                    : `/client/dashboard/service?search=${encodeURIComponent(searchQuery.trim())}`
+            );
             setIsSearchOpen(false);
             setSearchQuery("");
             setIsMobileMenuOpen(false);
         }
     };
 
-    const handleSearchInputChange = (
-        e: React.ChangeEvent<HTMLInputElement>
-    ) => {
-        setSearchQuery(e.target.value);
-    };
-
-    const handleSearchKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-        if (e.key === "Enter") {
-            handleSearchSubmit(e);
-        }
-    };
-
-    const navItems = [
-        {
-            href: "/client/dashboard/home",
-            label: "Home",
-            icon: FaHome,
-        },
-        {
-            href: "/client/dashboard/products",
-            label: "Products",
-            icon: FaBox,
-        },
-        {
-            href: "/client/dashboard/service",
-            label: "Service",
-            icon: FaTools,
-        },
-        {
-            href: "/client/dashboard/about",
-            label: "About us",
-            icon: FaInfoCircle,
-        },
-    ];
-
     return (
-        <header className="fixed top-0 left-0 w-full py-4 px-4 sm:px-6 lg:px-8 bg-gradient-to-r from-[var(--color-primary)] via-[var(--color-primary)]/95 to-[var(--color-primary)]/90 backdrop-blur-lg border-b border-white/10 z-50 shadow-2xl">
-            <div className="max-w-7xl mx-auto">
-                <div className="flex justify-between items-center">
+        <header className="fixed top-0 left-0 w-full z-50 bg-[var(--color-secondary)] border-b border-[var(--color-border)] shadow-sm">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div className="flex items-center justify-between h-16 sm:h-20">
+
+                    {/* Mobile hamburger */}
                     <button
-                        onClick={toggleMobileMenu}
+                        onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
                         aria-label="Menu"
-                        className="lg:hidden p-2 rounded-lg bg-white/10 hover:bg-white/20 transition-all duration-300"
+                        className="lg:hidden p-2 rounded-lg text-[var(--color-gray-500)] hover:bg-[var(--color-gray-100)] transition-colors"
                     >
-                        {isMobileMenuOpen ? (
-                            <FaTimes className="w-6 h-6 text-white" />
-                        ) : (
-                            <FaBars className="w-6 h-6 text-white" />
-                        )}
+                        {isMobileMenuOpen ? <FaTimes className="w-5 h-5" /> : <FaBars className="w-5 h-5" />}
                     </button>
 
-                    <Link
-                        href="/client/dashboard/home"
-                        className="flex items-center gap-3 group"
-                    >
-                        <div className="relative w-12 h-12 bg-white rounded-xl p-2 shadow-lg group-hover:scale-105 transition-transform duration-300">
+                    {/* Logo */}
+                    <Link href="/client/dashboard/home" className="flex items-center gap-3 group">
+                        <div className="relative w-10 h-10 bg-[var(--color-gray-100)] rounded-xl p-1.5 group-hover:scale-105 transition-transform duration-200">
                             <Image
                                 src="/images/oniks_vinyl_text.png"
                                 alt="Company Logo"
-                                width={40}
-                                height={40}
-                                priority={true}
+                                width={36}
+                                height={36}
+                                priority
                                 className="object-contain"
                             />
                         </div>
-                        <div className="hidden md:block">
-                            <h1 className="text-xl font-black text-white tracking-tight">
+                        <div className="hidden sm:block">
+                            <p className="font-serif text-lg font-semibold text-[var(--color-primary)] leading-tight tracking-tight">
                                 ONIK'S VINYL
-                            </h1>
-                            <p className="text-xs text-white/70">
+                            </p>
+                            <p className="text-[10px] text-[var(--color-gray-500)] tracking-widest uppercase">
                                 Premium Solutions
                             </p>
                         </div>
                     </Link>
 
+                    {/* Desktop nav */}
                     <nav className="hidden lg:flex items-center gap-1">
-                        {navItems.map((item) => {
-                            const isActive = getLinkClassName(
-                                item.href,
-                            ).includes("font-bold");
-                            return (
-                                <Link
-                                    key={item.href}
-                                    href={item.href}
-                                    className={`flex items-center gap-2 px-6 py-3 rounded-xl transition-all duration-300 ${
-                                        isActive
-                                            ? "bg-white/10 text-[var(--color-accent)]"
-                                            : "hover:bg-white/5"
-                                    }`}
-                                >
-                                    <item.icon className="w-4 h-4" />
-                                    <span className="font-medium">
-                                        <T>{item.label}</T>
-                                    </span>
-                                </Link>
-                            );
-                        })}
+                        {navItems.map((item) => (
+                            <Link
+                                key={item.href}
+                                href={item.href}
+                                className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-colors duration-200 ${
+                                    isActive(item.href)
+                                        ? "bg-[var(--color-primary)]/10 text-[var(--color-primary)]"
+                                        : "text-[var(--color-gray-600)] hover:text-[var(--color-primary)] hover:bg-[var(--color-gray-100)]"
+                                }`}
+                            >
+                                <item.icon className="w-3.5 h-3.5" />
+                                <T>{item.label}</T>
+                            </Link>
+                        ))}
                     </nav>
 
-                    <div className="flex items-center gap-3">
+                    {/* Right actions */}
+                    <div className="flex items-center gap-2">
+                        {/* Search */}
                         <button
-                            onClick={toggleSearch}
-                            className="p-3 rounded-full bg-white/10 hover:bg-white/20 transition-all duration-300 group relative"
+                            onClick={() => setIsSearchOpen(!isSearchOpen)}
+                            className="p-2 rounded-full text-[var(--color-gray-500)] hover:bg-[var(--color-gray-100)] hover:text-[var(--color-primary)] transition-colors"
                             aria-label="Search"
                         >
-                            <FaSearch className="w-5 h-5 text-white group-hover:scale-110 transition-transform" />
+                            <FaSearch className="w-4 h-4" />
                         </button>
 
-                        {isAuthenticated ? (
-                            <Link
-                                href="/client/dashboard/cart"
-                                className="p-3 rounded-full bg-white/10 hover:bg-white/20 transition-all duration-300 group relative"
-                                aria-label="Cart"
-                            >
-                                <FaShoppingCart className="w-5 h-5 text-white group-hover:scale-110 transition-transform" />
-                                {getTotalItems() > 0 && (
-                                    <span className="absolute -top-1 -right-1 bg-gradient-to-r from-red-500 to-red-600 text-white text-xs font-bold rounded-full h-6 w-6 flex items-center justify-center shadow-lg animate-pulse">
-                                        {getTotalItems()}
-                                    </span>
-                                )}
-                            </Link>
-                        ) : (
+                        {/* Language (unauthenticated) */}
+                        {!isAuthenticated && (
                             <div className="relative" ref={languageRef}>
                                 <button
-                                    onClick={() =>
-                                        setIsLanguageOpen(!isLanguageOpen)
-                                    }
-                                    className="p-3 rounded-full bg-white/10 hover:bg-white/20 transition-all duration-300 group flex items-center gap-2"
+                                    onClick={() => setIsLanguageOpen(!isLanguageOpen)}
+                                    className="p-2 rounded-full text-[var(--color-gray-500)] hover:bg-[var(--color-gray-100)] hover:text-[var(--color-primary)] transition-colors flex items-center gap-1"
                                     aria-label="Language"
                                 >
-                                    <FaGlobe className="w-5 h-5 text-white group-hover:scale-110 transition-transform" />
-                                    <span className="text-white text-sm font-medium hidden sm:inline">
-                                        {
-                                            languages.find(
-                                                (l) => l.code === language,
-                                            )?.flag
-                                        }
+                                    <FaGlobe className="w-4 h-4" />
+                                    <span className="text-sm hidden sm:inline">
+                                        {languages.find((l) => l.code === language)?.flag}
                                     </span>
                                 </button>
                                 {isLanguageOpen && (
-                                    <div className="absolute top-full right-0 mt-2 bg-white rounded-xl shadow-2xl border border-gray-100 overflow-hidden z-50 min-w-[160px]">
+                                    <div className="absolute top-full right-0 mt-2 bg-[var(--color-secondary)] rounded-xl shadow-xl border border-[var(--color-border)] overflow-hidden z-50 min-w-[160px]">
                                         {languages.map((lang) => (
                                             <button
                                                 key={lang.code}
-                                                onClick={() => {
-                                                    setLanguage(lang.code);
-                                                    setIsLanguageOpen(false);
-                                                }}
-                                                className={`w-full px-4 py-3 flex items-center gap-3 hover:bg-gray-50 transition-colors ${
+                                                onClick={() => { setLanguage(lang.code); setIsLanguageOpen(false); }}
+                                                className={`w-full px-4 py-3 flex items-center gap-3 hover:bg-[var(--color-gray-100)] transition-colors text-sm ${
                                                     language === lang.code
-                                                        ? "bg-[var(--color-primary)]/10 text-[var(--color-primary)] font-semibold"
-                                                        : "text-gray-700"
+                                                        ? "text-[var(--color-primary)] font-semibold"
+                                                        : "text-[var(--color-text)]"
                                                 }`}
                                             >
-                                                <span className="text-lg">
-                                                    {lang.flag}
-                                                </span>
+                                                <span>{lang.flag}</span>
                                                 <span>{lang.label}</span>
                                             </button>
                                         ))}
@@ -299,182 +186,153 @@ export default function Header() {
                             </div>
                         )}
 
+                        {/* Cart (authenticated) */}
+                        {isAuthenticated && (
+                            <Link
+                                href="/client/dashboard/cart"
+                                className="p-2 rounded-full text-[var(--color-gray-500)] hover:bg-[var(--color-gray-100)] hover:text-[var(--color-primary)] transition-colors relative"
+                                aria-label="Cart"
+                            >
+                                <FaShoppingCart className="w-4 h-4" />
+                                {getTotalItems() > 0 && (
+                                    <span className="absolute -top-1 -right-1 bg-[var(--color-primary)] text-white text-[10px] font-bold rounded-full h-4 w-4 flex items-center justify-center">
+                                        {getTotalItems()}
+                                    </span>
+                                )}
+                            </Link>
+                        )}
+
+                        {/* Profile / Sign In */}
                         {isAuthenticated ? (
                             <Link
                                 href="/client/dashboard/profile"
-                                className="p-3 rounded-full bg-white/10 hover:bg-white/20 transition-all duration-300 group"
+                                className="p-2 rounded-full text-[var(--color-gray-500)] hover:bg-[var(--color-gray-100)] hover:text-[var(--color-primary)] transition-colors"
                                 aria-label="Profile"
                             >
-                                <FaUserCircle className="w-5 h-5 text-white group-hover:scale-110 transition-transform" />
+                                <FaUserCircle className="w-4 h-4" />
                             </Link>
                         ) : (
-                            <div className="flex gap-1">
-                                <Link
-                                    href="/client/sign-in"
-                                    className="hidden sm:flex items-center gap-2 px-6 py-2.5 bg-gradient-to-r from-[var(--color-accent)] to-[var(--color-accent)]/80 text-[var(--color-primary)] font-bold rounded-xl hover:scale-105 transition-all duration-300 shadow-lg"
-                                >
-                                    <FaUserCircle className="w-4 h-4" />
-                                    <T>Sign In</T>
-                                </Link>
-                            </div>
+                            <Link
+                                href="/client/sign-in"
+                                className="hidden sm:flex items-center gap-2 px-5 py-2 bg-[var(--color-primary)] text-white text-sm font-semibold rounded-full hover:bg-[var(--color-primary)]/90 transition-colors"
+                            >
+                                <FaUserCircle className="w-3.5 h-3.5" />
+                                <T>Sign In</T>
+                            </Link>
                         )}
                     </div>
                 </div>
             </div>
 
-            <div className="max-w-7xl mx-auto" ref={searchRef}>
-                <div
-                    className={`
-                        transition-all duration-500 ease-in-out overflow-hidden
-                        ${
-                            isSearchOpen
-                                ? "max-h-32 opacity-100 mt-4"
-                                : "max-h-0 opacity-0"
-                        }
-                    `}
-                >
-                    <form onSubmit={handleSearchSubmit} className="relative">
-                        <div className="flex flex-col sm:flex-row gap-3">
-                            <div className="flex rounded-2xl bg-white/10 backdrop-blur-sm border border-white/20 overflow-hidden">
-                                <button
-                                    type="button"
-                                    onClick={() => setSearchType("products")}
-                                    className={`flex items-center gap-2 px-4 py-3 transition-all duration-300 ${
-                                        searchType === "products"
-                                            ? "bg-[var(--color-accent)] text-[var(--color-primary)] font-bold"
-                                            : "text-white/70 hover:text-white"
-                                    }`}
-                                >
-                                    <FaBox className="w-4 h-4" />
-                                    <span className="hidden sm:inline">
-                                        <T>Products</T>
-                                    </span>
-                                </button>
-                                <button
-                                    type="button"
-                                    onClick={() => setSearchType("services")}
-                                    className={`flex items-center gap-2 px-4 py-3 transition-all duration-300 ${
-                                        searchType === "services"
-                                            ? "bg-[var(--color-accent)] text-[var(--color-primary)] font-bold"
-                                            : "text-white/70 hover:text-white"
-                                    }`}
-                                >
-                                    <FaTools className="w-4 h-4" />
-                                    <span className="hidden sm:inline">
-                                        <T>Services</T>
-                                    </span>
-                                </button>
-                            </div>
-
-                            <div className="relative flex-1">
-                                <div className="absolute left-4 top-1/2 transform -translate-y-1/2">
-                                    <FaSearch className="w-5 h-5 text-gray-400" />
-                                </div>
-                                <input
-                                    type="text"
-                                    placeholder={
-                                        searchType === "products"
-                                            ? "Search for products..."
-                                            : "Search for services..."
-                                    }
-                                    value={searchQuery}
-                                    onChange={handleSearchInputChange}
-                                    onKeyDown={handleSearchKeyDown}
-                                    className="w-full pl-12 pr-24 py-3 rounded-2xl bg-white/10 backdrop-blur-sm border border-white/20 text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] focus:border-transparent"
-                                />
-                                <button
-                                    type="submit"
-                                    className="absolute right-2 top-1/2 transform -translate-y-1/2 px-6 py-2 bg-gradient-to-r from-[var(--color-accent)] to-[var(--color-accent)]/80 text-[var(--color-primary)] font-bold rounded-xl hover:scale-105 transition-all duration-300"
-                                >
-                                    <T>Search</T>
-                                </button>
-                            </div>
-                        </div>
-                    </form>
-                </div>
+            {/* Search bar */}
+            <div
+                className={`border-t border-[var(--color-border)] overflow-hidden transition-all duration-300 ${
+                    isSearchOpen ? "max-h-24 opacity-100" : "max-h-0 opacity-0"
+                }`}
+                ref={searchRef}
+            >
+                <form onSubmit={handleSearchSubmit} className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex gap-2">
+                    <div className="flex rounded-full border border-[var(--color-border)] overflow-hidden bg-[var(--color-gray-100)] text-xs font-medium">
+                        <button
+                            type="button"
+                            onClick={() => setSearchType("products")}
+                            className={`px-4 py-2 transition-colors ${
+                                searchType === "products"
+                                    ? "bg-[var(--color-primary)] text-white"
+                                    : "text-[var(--color-gray-600)] hover:text-[var(--color-primary)]"
+                            }`}
+                        >
+                            <T>Products</T>
+                        </button>
+                        <button
+                            type="button"
+                            onClick={() => setSearchType("services")}
+                            className={`px-4 py-2 transition-colors ${
+                                searchType === "services"
+                                    ? "bg-[var(--color-primary)] text-white"
+                                    : "text-[var(--color-gray-600)] hover:text-[var(--color-primary)]"
+                            }`}
+                        >
+                            <T>Services</T>
+                        </button>
+                    </div>
+                    <div className="relative flex-1">
+                        <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[var(--color-gray-500)]" />
+                        <input
+                            autoFocus
+                            type="text"
+                            placeholder={searchType === "products" ? "Search products..." : "Search services..."}
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            className="w-full pl-9 pr-20 py-2 rounded-full border border-[var(--color-border)] bg-[var(--color-card-bg)] text-sm text-[var(--color-text)] placeholder-[var(--color-gray-500)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]"
+                        />
+                        <button
+                            type="submit"
+                            className="absolute right-1.5 top-1/2 -translate-y-1/2 px-4 py-1.5 bg-[var(--color-primary)] text-white text-xs font-semibold rounded-full hover:bg-[var(--color-primary)]/90 transition-colors"
+                        >
+                            <T>Search</T>
+                        </button>
+                    </div>
+                </form>
             </div>
 
+            {/* Mobile menu */}
             <div
-                className={`
-                    lg:hidden absolute top-full left-0 w-full bg-gradient-to-b from-[var(--color-primary)] to-[var(--color-primary)]/95 backdrop-blur-lg border-t border-white/10 transition-all duration-500 ease-in-out overflow-y-auto
-                    ${
-                        isMobileMenuOpen
-                            ? "max-h-[80vh] opacity-100"
-                            : "max-h-0 opacity-0"
-                    }
-                `}
+                className={`lg:hidden border-t border-[var(--color-border)] bg-[var(--color-secondary)] overflow-hidden transition-all duration-300 ${
+                    isMobileMenuOpen ? "max-h-[80vh] opacity-100" : "max-h-0 opacity-0"
+                }`}
             >
-                <div className="max-w-7xl mx-auto px-4 sm:px-6">
-                    <nav className="py-6 space-y-2">
-                        {navItems.map((item) => {
-                            const isActive = getLinkClassName(
-                                item.href,
-                            ).includes("font-bold");
-                            return (
-                                <Link
-                                    key={item.href}
-                                    href={item.href}
-                                    onClick={() => setIsMobileMenuOpen(false)}
-                                    className={`flex items-center gap-4 px-6 py-4 rounded-2xl transition-all duration-300 ${
-                                        isActive
-                                            ? "bg-white/10 text-[var(--color-accent)]"
-                                            : "hover:bg-white/5"
-                                    }`}
-                                >
-                                    <item.icon className="w-5 h-5" />
-                                    <span className="font-medium">
-                                        <T>{item.label}</T>
-                                    </span>
-                                </Link>
-                            );
-                        })}
+                <nav className="max-w-7xl mx-auto px-4 py-4 space-y-1">
+                    {navItems.map((item) => (
+                        <Link
+                            key={item.href}
+                            href={item.href}
+                            onClick={() => setIsMobileMenuOpen(false)}
+                            className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-colors ${
+                                isActive(item.href)
+                                    ? "bg-[var(--color-primary)]/10 text-[var(--color-primary)]"
+                                    : "text-[var(--color-gray-600)] hover:bg-[var(--color-gray-100)]"
+                            }`}
+                        >
+                            <item.icon className="w-4 h-4" />
+                            <T>{item.label}</T>
+                        </Link>
+                    ))}
 
-                        {!isAuthenticated && (
-                            <div className="border-t border-white/10 pt-4 mt-2">
-                                <p className="text-white/60 text-sm px-6 mb-2">
+                    {!isAuthenticated && (
+                        <>
+                            <div className="pt-3 border-t border-[var(--color-border)]">
+                                <p className="text-xs text-[var(--color-gray-500)] px-4 mb-2 uppercase tracking-widest">
                                     <T>Language</T>
                                 </p>
-                                <div className="grid grid-cols-2 gap-2 px-4">
+                                <div className="grid grid-cols-2 gap-1">
                                     {languages.map((lang) => (
                                         <button
                                             key={lang.code}
-                                            onClick={() => {
-                                                setLanguage(lang.code);
-                                            }}
-                                            className={`flex items-center gap-2 px-4 py-3 rounded-xl transition-all duration-300 ${
+                                            onClick={() => setLanguage(lang.code)}
+                                            className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm transition-colors ${
                                                 language === lang.code
-                                                    ? "bg-[var(--color-accent)] text-[var(--color-primary)] font-bold"
-                                                    : "bg-white/10 text-white hover:bg-white/20"
+                                                    ? "bg-[var(--color-primary)]/10 text-[var(--color-primary)] font-semibold"
+                                                    : "text-[var(--color-gray-600)] hover:bg-[var(--color-gray-100)]"
                                             }`}
                                         >
-                                            <span className="text-lg">
-                                                {lang.flag}
-                                            </span>
-                                            <span className="text-sm">
-                                                {lang.label}
-                                            </span>
+                                            <span>{lang.flag}</span>
+                                            <span>{lang.label}</span>
                                         </button>
                                     ))}
                                 </div>
                             </div>
-                        )}
-
-                        {!isAuthenticated && (
-                            <div className="space-y-2 mt-4">
-                                <Link
-                                    href="/client/sign-in"
-                                    onClick={() => setIsMobileMenuOpen(false)}
-                                    className="flex items-center gap-4 px-6 py-4 rounded-2xl bg-gradient-to-r from-[var(--color-accent)] to-[var(--color-accent)]/80 text-[var(--color-primary)] font-bold transition-all duration-300 hover:scale-105"
-                                >
-                                    <FaUserCircle className="w-5 h-5" />
-                                    <span>
-                                        <T>Sign In</T>
-                                    </span>
-                                </Link>
-                            </div>
-                        )}
-                    </nav>
-                </div>
+                            <Link
+                                href="/client/sign-in"
+                                onClick={() => setIsMobileMenuOpen(false)}
+                                className="flex items-center justify-center gap-2 w-full py-3 bg-[var(--color-primary)] text-white text-sm font-semibold rounded-full hover:bg-[var(--color-primary)]/90 transition-colors mt-3"
+                            >
+                                <FaUserCircle className="w-4 h-4" />
+                                <T>Sign In</T>
+                            </Link>
+                        </>
+                    )}
+                </nav>
             </div>
         </header>
     );

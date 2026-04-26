@@ -273,7 +273,7 @@ export default function SignInPage() {
                         <div className="text-center mb-8">
                             <button
                                 onClick={() => window.location.href = "/"}
-                                className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-accent)] rounded-2xl mb-4 shadow-lg hover:opacity-80 transition-opacity cursor-pointer"
+                                className="inline-flex items-center justify-center w-16 h-16 bg-[var(--color-primary)] rounded-2xl mb-4 shadow hover:bg-[var(--color-primary)]/90 transition-colors cursor-pointer"
                             >
                                 <svg
                                     className="w-8 h-8 text-white"
@@ -408,7 +408,7 @@ export default function SignInPage() {
                                 <button
                                     type="submit"
                                     disabled={isLoading}
-                                    className="w-full bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-accent)] hover:from-[var(--color-primary)]/90 hover:to-[var(--color-accent)]/90 text-white font-bold py-4 px-6 rounded-xl text-lg transition-all duration-300 transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none shadow-lg hover:shadow-xl"
+                                    className="w-full bg-[var(--color-primary)] hover:bg-[var(--color-primary)]/90 text-white font-semibold py-3.5 px-6 rounded-full text-base transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                                 >
                                     {isLoading ? (
                                         <span className="flex items-center justify-center space-x-2">

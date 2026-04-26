@@ -33,10 +33,10 @@ export default function ProfileContent({
     return (
         <div className="max-w-4xl mx-auto w-full">
 
-            <div className="bg-[var(--color-secondary)] rounded-2xl shadow-xl p-6 border border-[var(--color-text)]/10 mb-6">
+            <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-card-bg)] p-6 mb-6">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <div>
-                        <h2 className="text-2xl font-black text-[var(--color-text)]">
+                        <h2 className="font-serif text-2xl font-semibold text-[var(--color-primary)]">
                             {activeSection === "personalInfo" && <T>Personal Info</T>}
                             {activeSection === "orders" && <T>Orders</T>}
                             {activeSection === "settings" && <T>Settings</T>}
@@ -59,14 +59,14 @@ export default function ProfileContent({
                                 <>
                                     <button
                                         onClick={onCancel}
-                                        className="inline-flex items-center gap-2 px-4 py-2 border-2 border-[var(--color-text)]/30 text-[var(--color-text)] rounded-lg hover:bg-[var(--color-text)]/10 transition-colors"
+                                        className="inline-flex items-center gap-2 px-4 py-2 border border-[var(--color-border)] text-[var(--color-text)] rounded-full hover:bg-[var(--color-text)]/5 transition-colors"
                                     >
                                         <FaTimes className="w-4 h-4" />
                                         <T>Cancel</T>
                                     </button>
                                     <button
                                         onClick={onSave}
-                                        className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-[var(--color-accent)] to-[var(--color-accent)]/90 text-[var(--color-primary)] font-bold rounded-lg hover:scale-105 transition-all"
+                                        className="inline-flex items-center gap-2 px-4 py-2 bg-[var(--color-primary)] text-white font-semibold rounded-full hover:bg-[var(--color-primary)]/90 transition-colors"
                                     >
                                         <FaSave className="w-4 h-4" />
                                         <T>Save Changes</T>
@@ -75,7 +75,7 @@ export default function ProfileContent({
                             ) : (
                                 <button
                                     onClick={onEdit}
-                                    className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-primary)]/90 text-white font-bold rounded-lg hover:scale-105 transition-all"
+                                    className="inline-flex items-center gap-2 px-4 py-2 bg-[var(--color-primary)] text-white font-semibold rounded-full hover:bg-[var(--color-primary)]/90 transition-colors"
                                 >
                                     <FaEdit className="w-4 h-4" />
                                     <T>Edit Profile</T>
@@ -86,7 +86,7 @@ export default function ProfileContent({
                 </div>
             </div>
 
-            <div className="bg-[var(--color-secondary)] rounded-2xl shadow-xl p-6 border border-[var(--color-text)]/10">
+            <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-card-bg)] p-6">
                 {activeSection === "personalInfo" && (
                     <PersonalInfoPanel
                         profile={profile}

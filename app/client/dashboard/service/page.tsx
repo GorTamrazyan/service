@@ -163,54 +163,20 @@ export default function ServicePage() {
 
     if (isLoading) {
         return (
-            <div className="min-h-screen bg-[var(--color-background)] flex flex-col items-center justify-center p-4">
-                <div className="text-center">
-                    <div className="relative mb-8 mx-auto w-24 h-24">
-                        <div className="w-24 h-24 rounded-full bg-gradient-to-r from-[var(--color-primary)]/20 to-[var(--color-accent)]/20 flex items-center justify-center">
-                            <div className="w-12 h-12 text-[var(--color-primary)] animate-spin">
-                                <svg fill="none" viewBox="0 0 24 24">
-                                    <circle
-                                        className="opacity-25"
-                                        cx="12"
-                                        cy="12"
-                                        r="10"
-                                        stroke="currentColor"
-                                        strokeWidth="4"
-                                    />
-                                    <path
-                                        className="opacity-75"
-                                        fill="currentColor"
-                                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                                    />
-                                </svg>
-                            </div>
-                        </div>
-                    </div>
-                    <h2 className="text-3xl font-bold text-[var(--color-primary)] mb-4">
-                        <T>Loading Services</T>
-                    </h2>
-                    <p className="text-[var(--color-text)]/60 text-lg">
-                        <T>Please wait while we fetch services...</T>
-                    </p>
-                </div>
+            <div className="flex items-center justify-center py-32">
+                <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[var(--color-primary)]" />
             </div>
         );
     }
 
     if (error) {
         return (
-            <div className="min-h-screen bg-[var(--color-background)] flex items-center justify-center p-4">
+            <div className="flex items-center justify-center py-32">
                 <div className="text-center max-w-md">
-                    <div className="w-20 h-20 mx-auto mb-6 bg-red-100 rounded-xl flex items-center justify-center">
-                        <FaTimes className="w-10 h-10 text-red-600" />
-                    </div>
-                    <h2 className="text-2xl font-bold text-red-600 mb-3">
-                        <T>Something went wrong</T>
-                    </h2>
-                    <p className="text-[var(--color-text)]/80 mb-8">{error}</p>
+                    <p className="text-[var(--color-text)]/80 mb-6">{error}</p>
                     <button
                         onClick={() => window.location.reload()}
-                        className="inline-flex items-center gap-2 bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-primary)]/90 text-white font-bold py-3 px-6 rounded-full hover:scale-105 transition-all duration-200"
+                        className="inline-flex items-center gap-2 bg-[var(--color-primary)] text-white font-semibold py-3 px-6 rounded-full hover:bg-[var(--color-primary)]/90 transition-colors"
                     >
                         <T>Try Again</T>
                     </button>
@@ -222,84 +188,52 @@ export default function ServicePage() {
     return (
         <div className="min-h-screen bg-[var(--color-background)]">
 
-            <div className="relative overflow-hidden bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-primary)]/90 py-16 md:py-24">
-                <div className="absolute inset-0 bg-[url('/pattern.svg')] opacity-5"></div>
-                <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-white/10 to-transparent rounded-full -translate-y-32 translate-x-32"></div>
-
-                <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="text-center max-w-4xl mx-auto">
-                        <div className="inline-flex items-center gap-3 px-6 py-3 bg-white/20 backdrop-blur-sm rounded-full mb-8 border border-white/30">
-                            <FaStar className="w-5 h-5 text-white" />
-                            <span className="text-white font-bold text-sm">
-                                <T>Premium Services</T>
-                            </span>
-                        </div>
-
-                        <h1 className="text-4xl md:text-6xl font-black text-white leading-tight mb-6">
-                            <span className="block">
-                                <T>Professional</T>
-                            </span>
-                            <span className="block text-[var(--color-accent)]">
-                                <T>Fencing Services</T>
-                            </span>
-                        </h1>
-
-                        <p className="text-lg md:text-xl text-white/90 mb-12 max-w-3xl mx-auto leading-relaxed">
-                            <T>
-                                Comprehensive fencing solutions from expert
-                                installation to ongoing maintenance and
-                                professional consultations.
-                            </T>
-                        </p>
-
-                        <div className="max-w-2xl mx-auto">
-                            <div className="relative">
-                                <FaSearch className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-white/50" />
-                                <input
-                                    type="text"
-                                    placeholder="Search services and consultations..."
-                                    value={searchQuery}
-                                    onChange={(e) =>
-                                        setSearchQuery(e.target.value)
-                                    }
-                                    className="w-full pl-12 pr-4 py-4 rounded-2xl bg-white/10 backdrop-blur-sm border border-white/20 text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] focus:border-transparent"
-                                />
-                                {searchQuery && (
-                                    <button
-                                        onClick={() => setSearchQuery("")}
-                                        className="absolute right-4 top-1/2 -translate-y-1/2 text-white/50 hover:text-white transition-colors"
-                                    >
-                                        <FaTimes className="w-5 h-5" />
-                                    </button>
-                                )}
-                            </div>
-                        </div>
-
-                        {searchQuery && (
-                            <div className="mt-6 text-white/90">
-                                <p>
-                                    <T>Found</T>: {filteredServices.length}{" "}
-                                    <T>services</T>,{" "}
-                                    {filteredConsultations.length}{" "}
-                                    <T>consultations</T>
-                                </p>
-                            </div>
-                        )}
-                    </div>
+            <div className="mb-10">
+                <span className="text-xs font-semibold uppercase tracking-widest text-[var(--color-accent)]">
+                    <T>Premium</T>
+                </span>
+                <h1 className="font-serif text-4xl md:text-5xl font-semibold text-[var(--color-primary)] mt-1 mb-4">
+                    <T>Fencing Services</T>
+                </h1>
+                <p className="text-[var(--color-gray-500)] max-w-2xl">
+                    <T>
+                        Comprehensive fencing solutions from expert installation
+                        to ongoing maintenance and professional consultations.
+                    </T>
+                </p>
+                <div className="relative mt-6 max-w-xl">
+                    <FaSearch className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--color-gray-500)]" />
+                    <input
+                        type="text"
+                        placeholder="Search services and consultations..."
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        className="w-full pl-10 pr-10 py-3 rounded-full border border-[var(--color-border)] bg-[var(--color-card-bg)] text-[var(--color-text)] placeholder-[var(--color-gray-500)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] text-sm"
+                    />
+                    {searchQuery && (
+                        <button
+                            onClick={() => setSearchQuery("")}
+                            className="absolute right-4 top-1/2 -translate-y-1/2 text-[var(--color-gray-500)] hover:text-[var(--color-text)] transition-colors"
+                        >
+                            <FaTimes className="w-4 h-4" />
+                        </button>
+                    )}
                 </div>
+                {searchQuery && (
+                    <p className="mt-3 text-sm text-[var(--color-gray-500)]">
+                        <T>Found</T>: {filteredServices.length} <T>services</T>, {filteredConsultations.length} <T>consultations</T>
+                    </p>
+                )}
             </div>
 
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+            <div>
                 <div className="mb-16">
-                    <div className="text-center mb-12">
-                        <h2 className="text-3xl md:text-4xl font-black text-[var(--color-primary)] mb-4">
+                    <div className="mb-10">
+                        <h2 className="font-serif text-3xl font-semibold text-[var(--color-primary)] mb-2">
                             <T>Our Services</T>
                         </h2>
-                        <p className="text-lg text-[var(--color-text)]/80 max-w-2xl mx-auto">
-                            <T>
-                                Professional fencing services tailored to your
-                                needs
-                            </T>
+                        <p className="text-[var(--color-gray-500)]">
+                            <T>Professional fencing services tailored to your needs</T>
                         </p>
                     </div>
 
@@ -321,18 +255,10 @@ export default function ServicePage() {
                         </div>
                     ) : (
                         <div className="text-center py-12">
-                            <div className="w-20 h-20 mx-auto mb-6 bg-[var(--color-primary)]/10 rounded-xl flex items-center justify-center">
-                                <FaSearch className="w-10 h-10 text-[var(--color-primary)]" />
-                            </div>
-                            <h3 className="text-2xl font-bold text-[var(--color-primary)] mb-3">
-                                <T>No services found</T>
-                            </h3>
-                            <p className="text-[var(--color-text)]/70 max-w-md mx-auto mb-6">
-                                <T>Try adjusting your search query</T>
-                            </p>
+                            <p className="text-[var(--color-gray-500)] mb-4"><T>No services found</T></p>
                             <button
                                 onClick={() => setSearchQuery("")}
-                                className="px-6 py-3 bg-[var(--color-primary)] text-white rounded-lg hover:bg-[var(--color-primary)]/90 transition-colors font-medium"
+                                className="px-6 py-2.5 bg-[var(--color-primary)] text-white rounded-full hover:bg-[var(--color-primary)]/90 transition-colors text-sm font-medium"
                             >
                                 <T>Clear Search</T>
                             </button>
@@ -341,15 +267,12 @@ export default function ServicePage() {
                 </div>
 
                 <div>
-                    <div className="text-center mb-12">
-                        <h2 className="text-3xl md:text-4xl font-black text-[var(--color-primary)] mb-4">
+                    <div className="mb-10">
+                        <h2 className="font-serif text-3xl font-semibold text-[var(--color-primary)] mb-2">
                             <T>Consultation Plans</T>
                         </h2>
-                        <p className="text-lg text-[var(--color-text)]/80 max-w-2xl mx-auto">
-                            <T>
-                                Choose the consultation package that fits your
-                                project
-                            </T>
+                        <p className="text-[var(--color-gray-500)]">
+                            <T>Choose the consultation package that fits your project</T>
                         </p>
                     </div>
 
@@ -371,18 +294,10 @@ export default function ServicePage() {
                         </div>
                     ) : (
                         <div className="text-center py-12">
-                            <div className="w-20 h-20 mx-auto mb-6 bg-[var(--color-primary)]/10 rounded-xl flex items-center justify-center">
-                                <FaSearch className="w-10 h-10 text-[var(--color-primary)]" />
-                            </div>
-                            <h3 className="text-2xl font-bold text-[var(--color-primary)] mb-3">
-                                <T>No consultations found</T>
-                            </h3>
-                            <p className="text-[var(--color-text)]/70 max-w-md mx-auto mb-6">
-                                <T>Try adjusting your search query</T>
-                            </p>
+                            <p className="text-[var(--color-gray-500)] mb-4"><T>No consultations found</T></p>
                             <button
                                 onClick={() => setSearchQuery("")}
-                                className="px-6 py-3 bg-[var(--color-primary)] text-white rounded-lg hover:bg-[var(--color-primary)]/90 transition-colors font-medium"
+                                className="px-6 py-2.5 bg-[var(--color-primary)] text-white rounded-full hover:bg-[var(--color-primary)]/90 transition-colors text-sm font-medium"
                             >
                                 <T>Clear Search</T>
                             </button>

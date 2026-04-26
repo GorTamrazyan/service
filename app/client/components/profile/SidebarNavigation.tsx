@@ -48,14 +48,12 @@ export default function SidebarNavigation({
     return (
         <div className="sticky top-8 space-y-6">
 
-            <div className="bg-[var(--color-secondary)] rounded-2xl shadow-xl p-6 border border-[var(--color-text)]/10">
+            <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-card-bg)] p-6">
                 <div className="flex flex-col items-center text-center mb-6">
-                    <div className="w-24 h-24 rounded-full bg-gradient-to-r from-[var(--color-accent)] to-[var(--color-primary)] p-1 mb-4">
-                        <div className="w-full h-full rounded-full bg-[var(--color-secondary)] flex items-center justify-center">
-                            <FaUserCircle className="w-20 h-20 text-[var(--color-primary)]" />
-                        </div>
+                    <div className="w-20 h-20 rounded-full border-2 border-[var(--color-border)] bg-[var(--color-background)] flex items-center justify-center mb-4">
+                        <FaUserCircle className="w-16 h-16 text-[var(--color-primary)]" />
                     </div>
-                    <h3 className="text-xl font-bold text-[var(--color-text)]">
+                    <h3 className="font-serif text-lg font-semibold text-[var(--color-primary)]">
                         {profile?.firstName} {profile?.lastName}
                     </h3>
                     <p className="text-[var(--color-text)]/70 text-sm mt-1">
@@ -63,19 +61,19 @@ export default function SidebarNavigation({
                     </p>
                 </div>
 
-                <nav className="space-y-2">
+                <nav className="space-y-1">
                     {menuItems.map((item) => (
                         <button
                             key={item.id}
                             onClick={() => onSectionChange(item.id)}
                             className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 ${
                                 activeSection === item.id
-                                    ? "bg-gradient-to-r from-[var(--color-primary)]/10 to-[var(--color-accent)]/10 border-l-4 border-[var(--color-accent)]"
-                                    : "hover:bg-[var(--color-text)]/5"
+                                    ? "bg-[var(--color-primary)]/10 border border-[var(--color-primary)]/20 text-[var(--color-primary)]"
+                                    : "hover:bg-[var(--color-text)]/5 text-[var(--color-text)]"
                             }`}
                         >
-                            <item.icon className={`w-5 h-5 ${item.color}`} />
-                            <span className="font-medium text-[var(--color-text)]">
+                            <item.icon className="w-5 h-5" />
+                            <span className="font-medium">
                                 <T>{item.title}</T>
                             </span>
                         </button>
@@ -83,37 +81,37 @@ export default function SidebarNavigation({
                 </nav>
             </div>
 
-            <div className="bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-primary)]/90 rounded-2xl p-6 text-white">
-                <h3 className="text-lg font-bold mb-4">
+            <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-card-bg)] p-6">
+                <h3 className="font-serif text-base font-semibold text-[var(--color-primary)] mb-4">
                     <T>Account Overview</T>
                 </h3>
-                <div className="space-y-4">
-                    <div className="flex items-center justify-between">
-                        <span className="text-white/80">
+                <div className="space-y-3">
+                    <div className="flex items-center justify-between text-sm">
+                        <span className="text-[var(--color-text)]/70">
                             <T>Member Since</T>
                         </span>
-                        <span className="font-semibold">2024</span>
+                        <span className="font-semibold text-[var(--color-text)]">2024</span>
                     </div>
-                    <div className="flex items-center justify-between">
-                        <span className="text-white/80">
+                    <div className="flex items-center justify-between text-sm">
+                        <span className="text-[var(--color-text)]/70">
                             <T>Total Orders</T>
                         </span>
-                        <span className="font-semibold">0</span>
+                        <span className="font-semibold text-[var(--color-text)]">0</span>
                     </div>
-                    <div className="flex items-center justify-between">
-                        <span className="text-white/80">
+                    <div className="flex items-center justify-between text-sm">
+                        <span className="text-[var(--color-text)]/70">
                             <T>Wishlist Items</T>
                         </span>
-                        <span className="font-semibold">0</span>
+                        <span className="font-semibold text-[var(--color-text)]">0</span>
                     </div>
                 </div>
             </div>
 
             <button
                 onClick={onLogout}
-                className="w-full group inline-flex items-center justify-center gap-2 border-2 border-red-300 hover:border-red-500 text-red-600 hover:bg-red-50 font-bold py-3 px-6 rounded-xl transition-all duration-200"
+                className="w-full inline-flex items-center justify-center gap-2 border border-red-300 hover:border-red-500 text-red-600 hover:bg-red-50 font-semibold py-3 px-6 rounded-full transition-colors"
             >
-                <FaSignOutAlt className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
+                <FaSignOutAlt className="w-4 h-4" />
                 <T>Sign Out</T>
             </button>
         </div>

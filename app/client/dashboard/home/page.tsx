@@ -1,419 +1,529 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
-import Link from "next/link";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import {
-    FaShieldAlt,
-    FaTools,
-    FaStar,
-    FaTruck,
-    FaUsers,
-    FaTag,
-    FaSpinner,
-    FaChevronRight,
-    FaQuoteLeft,
-} from "react-icons/fa";
-
-import { ProductCard } from "../../components/ProductList";
+    ArrowRight,
+    ShieldCheck,
+    Award,
+    Clock,
+    Ruler,
+    Hammer,
+    Wrench,
+    Sparkles,
+    HeadphonesIcon,
+    Truck,
+    Check,
+} from "lucide-react";
+import ProductModal from "../../components/ProductModal";
 import { T } from "../../components/T";
-import type { Material, Color } from "../../../lib/firebase/products/types";
+
+interface Color {
+    id: string;
+    name: string;
+    hexCode: string;
+}
+
+interface Material {
+    id: string;
+    name: string;
+}
 
 interface Product {
     id: string;
     name: string;
     description: string | null;
-    price: string;
     imageUrl: string | null;
-    categorId: string | null;
-    inStock: boolean;
-    materialId?: string;
-    material?: Material;
-    colorIds?: string[];
-    colors?: Color[];
-    tags?: string[];
     images?: string[];
+    tags?: string[];
+    inStock: boolean;
+    colorPrices?: Record<string, number>;
+    colors?: Color[];
+    material?: Material;
+    dimensions?: { height?: number; width?: number; length?: number; unit?: string };
+    discount?: number | null;
+    featured?: boolean;
+    categorId?: string | null | undefined;
+    typeOfProductId?: string;
+    materialId?: string;
+    colorIds?: string[];
+}
+
+const services = [
+    {
+        icon: Ruler,
+        title: "Free On-Site Consultation",
+        description: "Our specialist visits your property, takes exact measurements, and helps you choose the perfect style.",
+    },
+    {
+        icon: Sparkles,
+        title: "Custom Design",
+        description: "Unique heights, colors, lattice tops, and decorative post caps — tailored to your home.",
+    },
+    {
+        icon: Hammer,
+        title: "Professional Installation",
+        description: "Certified crews with steel-reinforced posts and concrete footings. Clean work, zero headaches.",
+    },
+    {
+        icon: Wrench,
+        title: "Repair & Replacement",
+        description: "Storm damage? Aging panels? We repair any vinyl fence — even if we didn't install it.",
+    },
+    {
+        icon: Truck,
+        title: "Material Delivery",
+        description: "DIY customer? We deliver premium vinyl panels and posts straight to your driveway.",
+    },
+    {
+        icon: HeadphonesIcon,
+        title: "Lifetime Support",
+        description: "One call, real people. We stand behind every project with a transferable lifetime warranty.",
+    },
+];
+
+const gallery = [
+    { title: "Modern Privacy Fence — Glendale", category: "Privacy Fence", image: "/images/product-privacy-fence.jpg", large: true },
+    { title: "White Picket Estate — Pasadena",  category: "Picket Fence",  image: "/images/product-picket-fence.jpg",  large: false },
+    { title: "Ranch Rail — Santa Clarita",      category: "Ranch Rail",    image: "/images/product-ranch-fence.jpg",   large: false },
+    { title: "Automated Gate — Burbank",        category: "Driveway Gate", image: "/images/product-vinyl-gate.jpg",    large: false },
+];
+
+const highlights = [
+    "Family-owned and operated since 2008",
+    "Licensed, bonded, and fully insured",
+    "100% premium vinyl materials",
+    "Transferable lifetime product warranty",
+    "4.9-star rating across 800+ reviews",
+];
+
+function ProductHomeCard({ product: p }: { product: Product }) {
+    const [modalOpen, setModalOpen] = useState(false);
+
+    const img = p.imageUrl ?? p.images?.[0] ?? null;
+    const tag = p.featured ? "Featured" : (p.tags?.[0] ?? null);
+
+    const prices = Object.values(p.colorPrices ?? {}).filter((v) => !isNaN(Number(v)));
+    const minPrice = prices.length ? Math.min(...prices) : null;
+    const maxPrice = prices.length ? Math.max(...prices) : null;
+    const priceLabel = prices.length === 0
+        ? null
+        : minPrice === maxPrice
+        ? `$${minPrice!.toFixed(0)}`
+        : `$${minPrice!.toFixed(0)} – $${maxPrice!.toFixed(0)}`;
+
+    const dims = p.dimensions;
+    const dimsLabel = dims
+        ? [dims.height && `${dims.height}`, dims.length && `${dims.length}`]
+              .filter(Boolean)
+              .join(" × ") + ` ${dims.unit ?? "ft"}`
+        : null;
+
+    return (
+        <>
+            <article className="group flex flex-col overflow-hidden rounded-xl border border-[var(--color-border)] bg-[var(--color-card-bg)] transition-all hover:-translate-y-1 hover:shadow-xl">
+                <div className="relative aspect-[4/5] overflow-hidden bg-[var(--color-gray-100)]">
+                    {img ? (
+                        <Image
+                            src={img}
+                            alt={p.name}
+                            fill
+                            className="object-cover transition-transform duration-500 group-hover:scale-105"
+                            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                        />
+                    ) : (
+                        <div className="h-full w-full bg-[var(--color-background)]" />
+                    )}
+                    {tag && (
+                        <span className="absolute left-3 top-3 rounded-full bg-[var(--color-accent)] px-3 py-1 text-xs font-semibold text-[var(--color-primary)]">
+                            <T>{tag}</T>
+                        </span>
+                    )}
+                    {p.discount && (
+                        <span className="absolute right-3 top-3 rounded-full bg-[var(--color-error)] px-2.5 py-1 text-xs font-bold text-white">
+                            -{p.discount}%
+                        </span>
+                    )}
+                </div>
+
+                <div className="flex flex-1 flex-col p-5 gap-3">
+                    {p.material && (
+                        <span className="w-fit rounded-md bg-[var(--color-gray-100)] px-2 py-0.5 text-xs font-medium text-[var(--color-gray-500)]">
+                            <T>{p.material.name}</T>
+                        </span>
+                    )}
+
+                    <h3 className="font-serif text-lg font-semibold leading-snug text-[var(--color-text)] line-clamp-2">
+                        <T>{p.name}</T>
+                    </h3>
+
+                    {p.description && (
+                        <p className="text-xs leading-relaxed text-[var(--color-gray-500)] line-clamp-2">
+                            <T>{p.description}</T>
+                        </p>
+                    )}
+
+                    {dimsLabel && (
+                        <div className="flex items-center gap-1.5 text-xs text-[var(--color-gray-500)]">
+                            <Ruler className="h-3.5 w-3.5 shrink-0" />
+                            {dimsLabel}
+                        </div>
+                    )}
+
+                    {p.colors && p.colors.length > 0 && (
+                        <div className="flex flex-wrap items-center gap-1.5">
+                            {p.colors.slice(0, 6).map((c) => (
+                                <span
+                                    key={c.id}
+                                    title={c.name}
+                                    className="h-5 w-5 rounded-full border border-[var(--color-border)] shadow-sm"
+                                    style={{ backgroundColor: c.hexCode }}
+                                />
+                            ))}
+                            {p.colors.length > 6 && (
+                                <span className="text-xs text-[var(--color-gray-500)]">+{p.colors.length - 6}</span>
+                            )}
+                        </div>
+                    )}
+
+                    {p.tags && p.tags.length > 0 && (
+                        <div className="flex flex-wrap gap-1">
+                            {p.tags.slice(0, 3).map((t) => (
+                                <span key={t} className="rounded-full border border-[var(--color-border)] px-2 py-0.5 text-xs text-[var(--color-gray-500)]">
+                                    <T>{t}</T>
+                                </span>
+                            ))}
+                        </div>
+                    )}
+
+                    <div className="mt-auto border-t border-[var(--color-border)] pt-4 flex items-center justify-between gap-2">
+                        {priceLabel ? (
+                            <span className="font-serif text-xl font-semibold text-[var(--color-accent)]">
+                                {priceLabel}
+                            </span>
+                        ) : (
+                            <span className="text-sm text-[var(--color-gray-500)]"><T>Price on request</T></span>
+                        )}
+                        <button
+                            onClick={() => setModalOpen(true)}
+                            className="inline-flex items-center gap-1 rounded-full border border-[var(--color-primary)] px-3 py-1.5 text-xs font-semibold text-[var(--color-primary)] transition-colors hover:bg-[var(--color-primary)] hover:text-white"
+                        >
+                            <T>Details</T> <ArrowRight className="h-3 w-3" />
+                        </button>
+                    </div>
+                </div>
+            </article>
+
+            <ProductModal product={p} isOpen={modalOpen} onClose={() => setModalOpen(false)} />
+        </>
+    );
 }
 
 export default function HomePage() {
     const [products, setProducts] = useState<Product[]>([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
+    const [productsLoading, setProductsLoading] = useState(true);
 
     useEffect(() => {
-        async function fetchFeaturedProducts() {
-            setLoading(true);
-            setError(null);
-            try {
-                const response = await fetch(
-                    "/api/products?featured=true"
-                );
-                if (!response.ok) {
-                    throw new Error(`HTTP Error! Status: ${response.status}`);
-                }
-                const data: Product[] = await response.json();
-                setProducts(data);
-            } catch (e: any) {
-                console.error("Ошибка загрузки продуктов:", e);
-                setError(e.message);
-            } finally {
-                setLoading(false);
-            }
-        }
-        fetchFeaturedProducts();
+        fetch("/api/products?featured=true")
+            .then((r) => r.json())
+            .then((data) => setProducts(Array.isArray(data) ? data : []))
+            .catch(() => setProducts([]))
+            .finally(() => setProductsLoading(false));
     }, []);
 
     return (
-        <div className="bg-[var(--color-background)] text-[var(--color-text)]">
+        <div className="-mx-4 sm:-mx-10 -mt-20 sm:-mt-24 -mb-10 overflow-x-hidden">
 
-            <section className="relative min-h-[90vh] flex items-center overflow-hidden">
-                <div className="absolute inset-0 z-0">
-                    <div className="absolute inset-0 bg-gradient-to-r from-[var(--color-primary)] via-[var(--color-primary)/80] to-transparent z-10" />
+            {/* ── HERO ── */}
+            <section id="home" className="relative overflow-hidden">
+                <div className="absolute inset-0">
                     <Image
-                        src="/images/vinyl_fence_classic.jpeg"
-                        alt="Premium fencing solutions"
+                        src="/images/hero-vinyl-fence.jpg"
+                        alt="Premium vinyl fence"
                         fill
                         priority
-                        className="object-cover object-center"
+                        className="object-cover"
                         sizes="100vw"
                     />
+                    <div className="absolute inset-0 bg-gradient-to-r from-[#111827]/80 via-[#111827]/55 to-[#111827]/20" />
                 </div>
 
-                <div className="relative z-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full py-20">
+                <div className="relative mx-auto flex min-h-[88vh] max-w-7xl flex-col justify-center px-4 py-20 md:px-8 md:py-28">
                     <div className="max-w-2xl">
-                        <div className="mb-6">
-                            <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[var(--color-accent)]/20 text-[var(--color-accent)] text-sm font-semibold">
-                                <FaStar className="w-4 h-4" />
-                                <T>Premium Quality Since 2010</T>
-                            </span>
-                        </div>
+                        <span className="inline-flex items-center rounded-full border border-white/30 bg-white/10 px-4 py-1.5 text-xs font-medium uppercase tracking-widest text-white backdrop-blur-sm">
+                            <T>Established 2008 · Family Owned</T>
+                        </span>
 
-                        <h1 className="text-5xl md:text-7xl lg:text-8xl font-black leading-tight mb-6 text-white">
-                            <span className="block">
-                                <T>High Quality</T>
-                            </span>
-                            <span className="block text-[var(--color-accent)] drop-shadow-lg">
-                                <T>Fences</T>
-                            </span>
+                        <h1 className="mt-6 font-serif text-5xl font-semibold leading-[1.05] text-white md:text-7xl lg:text-8xl">
+                            <T>Vinyl Fences</T>{" "}
+                            <span className="italic text-[var(--color-accent)]"><T>Built to Last</T></span>{" "}
+                            <T>a Lifetime</T>
                         </h1>
 
-                        <p className="text-xl md:text-2xl text-white/90 mb-10 max-w-xl leading-relaxed">
-                            <T>
-                                Transforming spaces with durable, beautiful
-                                fencing solutions for homes and businesses
-                                across the country.
-                            </T>
+                        <p className="mt-6 max-w-xl text-lg leading-relaxed text-white/85 md:text-xl">
+                            <T>Premium vinyl fences and gates crafted for beauty, privacy, and security. Zero maintenance, lifetime warranty, and professional installation across the region.</T>
                         </p>
 
-                        <div className="flex flex-col sm:flex-row gap-4">
+                        <div className="mt-10 flex flex-col gap-3 sm:flex-row">
+                            <Link
+                                href="/client/dashboard/service"
+                                className="inline-flex h-12 items-center justify-center gap-2 rounded-full bg-[var(--color-accent)] px-8 text-base font-semibold text-[var(--color-primary)] transition-colors hover:bg-[var(--color-accent)]/90"
+                            >
+                                <T>Get a Free Quote</T> <ArrowRight className="h-4 w-4" />
+                            </Link>
                             <Link
                                 href="/client/dashboard/products"
-                                className="group inline-flex items-center justify-center gap-3 bg-[var(--color-accent)] hover:bg-[var(--color-accent)]/90 text-[var(--color-primary)] font-bold py-4 px-8 rounded-xl text-lg transition-all duration-300 shadow-lg hover:shadow-xl hover:-translate-y-1"
+                                className="inline-flex h-12 items-center justify-center gap-2 rounded-full border border-white/40 bg-transparent px-8 text-base font-semibold text-white transition-colors hover:bg-white/10"
                             >
-                                <T>Explore Products</T>
-                                <FaChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                            </Link>
-                            <Link
-                                href="/contact"
-                                className="group inline-flex items-center justify-center gap-3 border-2 border-white/30 hover:border-[var(--color-accent)] text-white hover:text-[var(--color-accent)] font-bold py-4 px-8 rounded-xl text-lg transition-all duration-300 backdrop-blur-sm hover:backdrop-blur"
-                            >
-                                <T>Free Quote</T>
-                                <FaChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                                <T>Browse Products</T>
                             </Link>
                         </div>
 
-                        <div className="mt-16 grid grid-cols-2 md:grid-cols-4 gap-6">
-                            {[
-                                { label: "Projects Completed", value: "500+" },
-                                { label: "Happy Clients", value: "98%" },
-                                { label: "Warranty Years", value: "15" },
-                                { label: "Expert Team", value: "50+" },
-                            ].map((stat, idx) => (
-                                <div key={idx} className="text-center">
-                                    <div className="text-3xl md:text-4xl font-bold text-white mb-2">
-                                        {stat.value}
-                                    </div>
-                                    <div className="text-sm text-white/70 uppercase tracking-wider">
-                                        <T>{stat.label}</T>
-                                    </div>
+                        <dl className="mt-14 grid grid-cols-1 gap-6 sm:grid-cols-3">
+                            <div className="flex items-center gap-3">
+                                <ShieldCheck className="h-8 w-8 shrink-0 text-[var(--color-accent)]" strokeWidth={1.5} />
+                                <div>
+                                    <dt className="text-sm font-medium text-white/70"><T>Warranty</T></dt>
+                                    <dd className="font-serif text-lg font-semibold text-white"><T>Lifetime</T></dd>
                                 </div>
-                            ))}
-                        </div>
+                            </div>
+                            <div className="flex items-center gap-3">
+                                <Award className="h-8 w-8 shrink-0 text-[var(--color-accent)]" strokeWidth={1.5} />
+                                <div>
+                                    <dt className="text-sm font-medium text-white/70"><T>Projects</T></dt>
+                                    <dd className="font-serif text-lg font-semibold text-white"><T>500+ Built</T></dd>
+                                </div>
+                            </div>
+                            <div className="flex items-center gap-3">
+                                <Clock className="h-8 w-8 shrink-0 text-[var(--color-accent)]" strokeWidth={1.5} />
+                                <div>
+                                    <dt className="text-sm font-medium text-white/70"><T>Experience</T></dt>
+                                    <dd className="font-serif text-lg font-semibold text-white"><T>15+ Years</T></dd>
+                                </div>
+                            </div>
+                        </dl>
                     </div>
                 </div>
             </section>
 
-            <section className="py-24 bg-gradient-to-b from-[var(--color-background)] to-[var(--color-card-bg)]">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="text-center mb-16">
-                        <h2 className="text-4xl md:text-5xl font-black text-[var(--color-primary)] mb-6">
-                            <T>Featured Products</T>
-                        </h2>
-                        <p className="text-xl text-[var(--color-text)]/80 max-w-2xl mx-auto">
-                            <T>
-                                Discover our most popular fencing solutions,
-                                designed for durability and aesthetic appeal.
-                            </T>
-                        </p>
-                    </div>
-
-                    {loading && (
-                        <div className="flex flex-col items-center justify-center py-20">
-                            <div className="relative mx-auto w-24 h-24">
-                                <div className="w-24 h-24 border-4 border-[var(--color-accent)]/20 rounded-full" />
-                                <div className="absolute top-0 left-0 w-24 h-24 border-4 border-transparent border-t-[var(--color-accent)] rounded-full animate-spin" />
-                                <FaSpinner className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-3xl text-[var(--color-accent)] animate-pulse" />
-                            </div>
-                            <p className="mt-6 text-xl text-[var(--color-primary)] font-semibold">
-                                <T>Loading featured products...</T>
+            {/* ── PRODUCTS ── */}
+            <section id="products" className="bg-[var(--color-background)] py-20 md:py-28">
+                <div className="mx-auto max-w-7xl px-4 md:px-8">
+                    <div className="flex flex-col items-start justify-between gap-6 md:flex-row md:items-end">
+                        <div className="max-w-2xl">
+                            <span className="text-xs font-medium uppercase tracking-widest text-[var(--color-accent)]">
+                                <T>Our Products</T>
+                            </span>
+                            <h2 className="mt-3 font-serif text-4xl font-semibold leading-tight text-[var(--color-primary)] md:text-5xl">
+                                <T>Fences &amp; Gates for Every Property</T>
+                            </h2>
+                            <p className="mt-4 text-base leading-relaxed text-[var(--color-gray-500)] md:text-lg">
+                                <T>All our vinyl products are engineered with UV inhibitors, impact modifiers, and steel-reinforced posts — so they look new for decades.</T>
                             </p>
                         </div>
-                    )}
-
-                    {error && (
-                        <div className="text-center py-20">
-                            <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-[var(--color-error)]/10 mb-6">
-                                <div className="w-10 h-10 rounded-full bg-[var(--color-error)] flex items-center justify-center">
-                                    <span className="text-white font-bold text-xl">
-                                        !
-                                    </span>
-                                </div>
-                            </div>
-                            <p className="text-2xl text-[var(--color-error)] font-semibold mb-4">
-                                <T>Error loading products</T>
-                            </p>
-                            <p className="text-[var(--color-gray-500)]">
-                                {error}
-                            </p>
-                        </div>
-                    )}
-
-                    {!loading && products.length > 0 && (
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-                            {products.map((product, index) => (
-                                <div
-                                    key={product.id}
-                                    className="group relative"
-                                    style={{
-                                        animationDelay: `${index * 100}ms`,
-                                    }}
-                                >
-                                    <div className="absolute inset-0 bg-gradient-to-br from-[var(--color-accent)]/5 to-transparent rounded-2xl -z-10 group-hover:scale-105 transition-transform duration-500" />
-                                    <ProductCard product={product} />
-                                </div>
-                            ))}
-                        </div>
-                    )}
-
-                    {!loading && products.length === 0 && !error && (
-                        <div className="text-center py-20">
-                            <div className="w-24 h-24 mx-auto mb-6 rounded-full bg-[var(--color-gray-200)] flex items-center justify-center">
-                                <FaStar className="w-12 h-12 text-[var(--color-gray-400)]" />
-                            </div>
-                            <p className="text-2xl text-[var(--color-gray-600)] font-semibold">
-                                <T>No featured products available</T>
-                            </p>
-                            <p className="text-[var(--color-gray-500)] mt-2">
-                                <T>Check back soon for new arrivals</T>
-                            </p>
-                        </div>
-                    )}
-
-                    <div className="text-center mt-16">
                         <Link
                             href="/client/dashboard/products"
-                            className="group inline-flex items-center gap-3 border-2 border-[var(--color-primary)] hover:bg-[var(--color-primary)] text-[var(--color-primary)] hover:text-white font-bold py-4 px-10 rounded-full text-lg transition-all duration-300 hover:scale-105"
+                            className="inline-flex items-center gap-1.5 text-sm font-semibold text-[var(--color-primary)] transition-all hover:gap-2.5"
                         >
-                            <T>View All Products</T>
-                            <FaChevronRight className="w-5 h-5 group-hover:translate-x-2 transition-transform" />
+                            <T>View full catalog</T> <ArrowRight className="h-4 w-4" />
                         </Link>
+                    </div>
+
+                    {productsLoading && (
+                        <div className="mt-12 flex justify-center py-16">
+                            <div className="h-8 w-8 animate-spin rounded-full border-2 border-[var(--color-border)] border-t-[var(--color-accent)]" />
+                        </div>
+                    )}
+
+                    {!productsLoading && products.length === 0 && (
+                        <div className="mt-12 py-16 text-center text-sm text-[var(--color-gray-500)]">
+                            <T>No featured products available.</T>
+                        </div>
+                    )}
+
+                    {!productsLoading && products.length > 0 && (
+                        <div className="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+                            {products.map((p) => (
+                                <ProductHomeCard key={p.id} product={p} />
+                            ))}
+                        </div>
+                    )}
+                </div>
+            </section>
+
+            {/* ── SERVICES ── */}
+            <section id="services" className="bg-[var(--color-gray-100)] py-20 md:py-28">
+                <div className="mx-auto max-w-7xl px-4 md:px-8">
+                    <div className="mx-auto max-w-2xl text-center">
+                        <span className="text-xs font-medium uppercase tracking-widest text-[var(--color-accent)]">
+                            <T>What We Do</T>
+                        </span>
+                        <h2 className="mt-3 font-serif text-4xl font-semibold leading-tight text-[var(--color-text)] md:text-5xl">
+                            <T>Full-Service, End to End</T>
+                        </h2>
+                        <p className="mt-4 text-base leading-relaxed text-[var(--color-gray-500)] md:text-lg">
+                            <T>From the first measurement to the final cap, we handle every detail so you get a fence that&apos;s perfect on day one — and still perfect in 30 years.</T>
+                        </p>
+                    </div>
+
+                    <div className="mt-14 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+                        {services.map((s) => {
+                            const Icon = s.icon;
+                            return (
+                                <div
+                                    key={s.title}
+                                    className="group flex flex-col gap-4 rounded-xl border border-[var(--color-border)] bg-[var(--color-card-bg)] p-7 transition-all hover:border-[var(--color-primary)]/40 hover:shadow-lg"
+                                >
+                                    <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-[var(--color-primary)]/10 text-[var(--color-primary)] transition-colors group-hover:bg-[var(--color-primary)] group-hover:text-white">
+                                        <Icon className="h-6 w-6" strokeWidth={1.75} />
+                                    </div>
+                                    <h3 className="font-serif text-xl font-semibold text-[var(--color-text)]">
+                                        <T>{s.title}</T>
+                                    </h3>
+                                    <p className="text-sm leading-relaxed text-[var(--color-gray-500)]">
+                                        <T>{s.description}</T>
+                                    </p>
+                                </div>
+                            );
+                        })}
                     </div>
                 </div>
             </section>
 
-            <section className="py-24 bg-[var(--color-card-bg)]">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="text-center mb-20">
-                        <h2 className="text-4xl md:text-5xl font-black text-[var(--color-primary)] mb-6">
-                            <T>Why Choose Us</T>
-                        </h2>
-                        <p className="text-xl text-[var(--color-text)]/80 max-w-3xl mx-auto">
-                            <T>
-                                We combine decades of experience with innovative
-                                solutions to deliver exceptional fencing
-                                results.
-                            </T>
+            {/* ── GALLERY ── */}
+            <section id="gallery" className="bg-[var(--color-background)] py-24 md:py-32">
+                <div className="mx-auto max-w-7xl px-4 md:px-8">
+                    <div className="mb-16 flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
+                        <div className="max-w-2xl">
+                            <div className="mb-4 text-sm font-medium uppercase tracking-wider text-[var(--color-primary)]">
+                                <T>Our Work</T>
+                            </div>
+                            <h2 className="font-serif text-4xl font-bold leading-tight text-[var(--color-text)] md:text-6xl">
+                                <T>Projects we&apos;re</T>{" "}
+                                <span className="text-[var(--color-primary)]"><T>proud of.</T></span>
+                            </h2>
+                        </div>
+                        <p className="max-w-md text-lg leading-relaxed text-[var(--color-gray-500)]">
+                            <T>Every installation is custom-fitted to the property. Here&apos;s a sample from our 500+ completed projects.</T>
                         </p>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                        {[
-                            {
-                                icon: FaStar,
-                                title: "Premium Quality",
-                                description:
-                                    "We use only the best materials, ensuring durability and beauty of every fence.",
-                                color: "text-[var(--color-accent)]",
-                                bg: "bg-[var(--color-accent)]/10",
-                            },
-                            {
-                                icon: FaTruck,
-                                title: "Full Service",
-                                description:
-                                    "From design and manufacturing to installation and maintenance.",
-                                color: "text-[var(--color-primary)]",
-                                bg: "bg-[var(--color-primary)]/10",
-                            },
-                            {
-                                icon: FaUsers,
-                                title: "Individual Approach",
-                                description:
-                                    "Each project is unique, and we carefully consider all your requirements.",
-                                color: "text-[var(--color-accent)]",
-                                bg: "bg-[var(--color-accent)]/10",
-                            },
-                            {
-                                icon: FaShieldAlt,
-                                title: "Reliability Guarantee",
-                                description:
-                                    "We provide warranty on all our products and work.",
-                                color: "text-[var(--color-primary)]",
-                                bg: "bg-[var(--color-primary)]/10",
-                            },
-                            {
-                                icon: FaTag,
-                                title: "Competitive Prices",
-                                description:
-                                    "Optimal price-quality ratio, making our fences accessible.",
-                                color: "text-[var(--color-accent)]",
-                                bg: "bg-[var(--color-accent)]/10",
-                            },
-                            {
-                                icon: FaTools,
-                                title: "Professional Installation",
-                                description:
-                                    "Experienced specialists completing installation quickly and efficiently.",
-                                color: "text-[var(--color-primary)]",
-                                bg: "bg-[var(--color-primary)]/10",
-                            },
-                        ].map((benefit, index) => (
-                            <div
-                                key={index}
-                                className="group p-8 rounded-2xl bg-white/5 backdrop-blur-sm border border-white/10 hover:border-[var(--color-accent)]/30 transition-all duration-500 hover:scale-[1.02] hover:shadow-2xl"
+                    <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+                        {gallery.map((item, i) => (
+                            <article
+                                key={item.title}
+                                className={`group relative overflow-hidden rounded-2xl bg-[var(--color-card-bg)] ${
+                                    i === 0 ? "lg:col-span-2 lg:row-span-2" : ""
+                                }`}
                             >
                                 <div
-                                    className={`inline-flex items-center justify-center w-16 h-16 rounded-2xl ${benefit.bg} ${benefit.color} mb-6 group-hover:scale-110 transition-transform duration-500`}
+                                    className={`relative overflow-hidden ${
+                                        i === 0
+                                            ? "aspect-[4/3] lg:aspect-auto lg:h-full lg:min-h-[480px]"
+                                            : "aspect-[4/3]"
+                                    }`}
                                 >
-                                    <benefit.icon className="w-8 h-8" />
+                                    <Image
+                                        src={item.image}
+                                        alt={item.title}
+                                        fill
+                                        className="object-cover transition-transform duration-700 group-hover:scale-105"
+                                    />
+                                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+                                    <div className="absolute bottom-0 left-0 p-6">
+                                        <span className="mb-2 inline-block rounded-full bg-[var(--color-accent)] px-3 py-1 text-xs font-semibold text-[var(--color-primary)]">
+                                            <T>{item.category}</T>
+                                        </span>
+                                        <h3 className="font-serif text-lg font-semibold text-white md:text-xl">
+                                            <T>{item.title}</T>
+                                        </h3>
+                                    </div>
                                 </div>
-                                <h3 className="text-2xl font-bold text-[var(--color-primary)] mb-4">
-                                    <T>{benefit.title}</T>
-                                </h3>
-                                <p className="text-[var(--color-text)]/80 leading-relaxed">
-                                    <T>{benefit.description}</T>
-                                </p>
-                            </div>
+                            </article>
                         ))}
                     </div>
                 </div>
             </section>
 
-            <section className="py-24 bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-primary)]/80">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="text-center mb-16">
-                        <h2 className="text-4xl md:text-5xl font-black text-white mb-6">
-                            <T>Client Stories</T>
-                        </h2>
-                        <p className="text-xl text-white/80 max-w-2xl mx-auto">
-                            <T>
-                                See what our satisfied customers have to say
-                                about our fencing solutions and service quality.
-                            </T>
-                        </p>
-                    </div>
+            {/* ── ABOUT ── */}
+            <section id="about" className="bg-[var(--color-gray-100)] py-20 md:py-28">
+                <div className="mx-auto max-w-7xl px-4 md:px-8">
+                    <div className="grid grid-cols-1 items-center gap-12 lg:grid-cols-2 lg:gap-16">
+                        <div className="relative order-last lg:order-first">
+                            <div className="relative aspect-[4/5] overflow-hidden rounded-xl">
+                                <Image
+                                    src="/images/about-installation.jpg"
+                                    alt="ONIK'S VINYL installation team"
+                                    fill
+                                    className="object-cover"
+                                    sizes="(max-width: 1024px) 100vw, 50vw"
+                                />
+                            </div>
+                            <div className="absolute -bottom-6 -right-6 hidden w-48 rounded-xl border border-[var(--color-border)] bg-[var(--color-card-bg)] p-5 shadow-xl md:block">
+                                <div className="font-serif text-4xl font-semibold text-[var(--color-primary)]">15</div>
+                                <div className="mt-1 text-sm font-medium text-[var(--color-text)]">
+                                    <T>Years of craftsmanship</T>
+                                </div>
+                                <div className="mt-1 text-xs text-[var(--color-gray-500)]">
+                                    <T>Building fences that outlast the warranty</T>
+                                </div>
+                            </div>
+                        </div>
 
-                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12">
-                        {[
-                            {
-                                quote: "Outstanding quality and professional installation team. Our fence looks amazing!",
-                                author: "Sarah Johnson",
-                                role: "Homeowner",
-                            },
-                            {
-                                quote: "The perfect balance of durability and design. Exceeded our expectations.",
-                                author: "Michael Chen",
-                                role: "Business Owner",
-                            },
-                            {
-                                quote: "From consultation to completion - flawless experience. Highly recommended!",
-                                author: "Robert Williams",
-                                role: "Property Manager",
-                            },
-                        ].map((testimonial, index) => (
-                            <div
-                                key={index}
-                                className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 border border-white/20 hover:border-[var(--color-accent)] transition-all duration-500"
-                            >
-                                <FaQuoteLeft className="w-10 h-10 text-[var(--color-accent)] mb-6" />
-                                <p className="text-white/90 text-lg italic mb-8 leading-relaxed">
-                                    "{testimonial.quote}"
-                                </p>
-                                <div className="border-t border-white/20 pt-6">
-                                    <div className="font-bold text-white text-lg">
-                                        {testimonial.author}
+                        <div>
+                            <span className="text-xs font-medium uppercase tracking-widest text-[var(--color-accent)]">
+                                <T>About ONIK&apos;S VINYL</T>
+                            </span>
+                            <h2 className="mt-3 font-serif text-4xl font-semibold leading-tight text-[var(--color-text)] md:text-5xl">
+                                <T>A Family Business Built on Handshakes and Hard Work</T>
+                            </h2>
+                            <p className="mt-5 text-base leading-relaxed text-[var(--color-gray-500)] md:text-lg">
+                                <T>Onik started the company out of his garage in 2008 with one truck and a promise: every fence we install will be the one we&apos;d put around our own home. Fifteen years later, that promise still drives every job.</T>
+                            </p>
+
+                            <ul className="mt-8 space-y-3">
+                                {highlights.map((h) => (
+                                    <li key={h} className="flex items-start gap-3">
+                                        <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[var(--color-primary)]/15 text-[var(--color-primary)]">
+                                            <Check className="h-3 w-3" strokeWidth={3} />
+                                        </span>
+                                        <span className="text-sm leading-relaxed text-[var(--color-text)]/90 md:text-base">
+                                            <T>{h}</T>
+                                        </span>
+                                    </li>
+                                ))}
+                            </ul>
+
+                            <div className="mt-10 flex flex-col gap-3 sm:flex-row sm:items-center">
+                                <Link
+                                    href="/client/dashboard/service"
+                                    className="inline-flex h-12 items-center gap-2 rounded-full bg-[var(--color-primary)] px-8 text-base font-semibold text-white transition-colors hover:bg-[var(--color-primary)]/90"
+                                >
+                                    <T>Start Your Project</T> <ArrowRight className="h-4 w-4" />
+                                </Link>
+                                <div className="flex items-center gap-4 sm:ml-4">
+                                    <div className="flex -space-x-2">
+                                        {["A", "M", "J", "K"].map((i) => (
+                                            <div
+                                                key={i}
+                                                className="flex h-9 w-9 items-center justify-center rounded-full border-2 border-white bg-[var(--color-primary)]/80 text-xs font-bold text-white"
+                                            >
+                                                {i}
+                                            </div>
+                                        ))}
                                     </div>
-                                    <div className="text-white/60">
-                                        {testimonial.role}
+                                    <div className="text-sm">
+                                        <div className="font-semibold text-[var(--color-text)]"><T>500+ happy clients</T></div>
+                                        <div className="text-xs text-[var(--color-gray-500)]"><T>across the region</T></div>
                                     </div>
                                 </div>
                             </div>
-                        ))}
-                    </div>
-
-                    <div className="text-center">
-                        <Link
-                            href="/client/dashboard/testimonials"
-                            className="group inline-flex items-center gap-3 bg-white hover:bg-white/90 text-[var(--color-primary)] font-bold py-4 px-10 rounded-full text-lg transition-all duration-300 hover:scale-105 shadow-2xl"
-                        >
-                            <T>View All Testimonials</T>
-                            <FaChevronRight className="w-5 h-5 group-hover:translate-x-2 transition-transform" />
-                        </Link>
-                    </div>
-                </div>
-            </section>
-
-            <section className="py-24 bg-gradient-to-r from-[var(--color-accent)] to-[var(--color-accent)]/90">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="text-center">
-                        <h2 className="text-4xl md:text-6xl font-black text-[var(--color-primary)] mb-8">
-                            <T>Ready to Transform Your Space?</T>
-                        </h2>
-                        <p className="text-2xl text-[var(--color-primary)]/90 mb-12 max-w-3xl mx-auto">
-                            <T>
-                                Let's create the perfect fencing solution for
-                                your property. Contact us today for a free
-                                consultation.
-                            </T>
-                        </p>
-                        <div className="flex flex-col sm:flex-row gap-6 justify-center">
-                            <Link
-                                href="/contact"
-                                className="group inline-flex items-center justify-center gap-3 bg-[var(--color-primary)] hover:bg-[var(--color-primary)]/90 text-white font-bold py-5 px-12 rounded-full text-xl transition-all duration-300 hover:scale-105 shadow-2xl"
-                            >
-                                <T>Start Your Project</T>
-                                <FaChevronRight className="w-6 h-6 group-hover:translate-x-2 transition-transform" />
-                            </Link>
-                            <Link
-                                href="/client/dashboard/products/catalog"
-                                className="group inline-flex items-center justify-center gap-3 border-2 border-[var(--color-primary)] text-[var(--color-primary)] hover:bg-[var(--color-primary)] hover:text-white font-bold py-5 px-12 rounded-full text-xl transition-all duration-300 hover:scale-105"
-                            >
-                                <T>Browse Catalog</T>
-                                <FaChevronRight className="w-6 h-6 group-hover:translate-x-2 transition-transform" />
-                            </Link>
                         </div>
                     </div>
                 </div>
             </section>
+
         </div>
     );
 }

@@ -292,7 +292,7 @@ export default function RegisterPage() {
                     <div className="bg-[var(--color-card-bg)] rounded-2xl shadow-2xl border border-[var(--color-border)] p-8 md:p-10 transition-all duration-300 hover:shadow-3xl">
 
                         <div className="text-center mb-8">
-                            <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-accent)] rounded-2xl mb-4 shadow-lg">
+                            <div className="inline-flex items-center justify-center w-16 h-16 bg-[var(--color-primary)] rounded-2xl mb-4 shadow">
                                 <svg
                                     className="w-8 h-8 text-white"
                                     fill="none"
@@ -509,7 +509,7 @@ export default function RegisterPage() {
                                 <button
                                     type="submit"
                                     disabled={isLoading || verificationSent || !agreedToTerms}
-                                    className="w-full bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-accent)] hover:from-[var(--color-primary)]/90 hover:to-[var(--color-accent)]/90 text-white font-bold py-4 px-6 rounded-xl text-lg transition-all duration-300 transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none shadow-lg hover:shadow-xl"
+                                    className="w-full bg-[var(--color-primary)] hover:bg-[var(--color-primary)]/90 text-white font-semibold py-3.5 px-6 rounded-full text-base transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                                 >
                                     {isLoading ? (
                                         <span className="flex items-center justify-center space-x-2">

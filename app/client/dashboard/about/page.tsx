@@ -194,74 +194,48 @@ export default function AboutUsPage() {
     return (
         <div className="bg-[var(--color-background)] text-[var(--color-text)]">
 
-            <section className="relative min-h-[70vh] flex items-center overflow-hidden bg-gradient-to-br from-[var(--color-primary)] via-[var(--color-primary)]/90 to-[var(--color-accent)]/30">
-                <div className="absolute inset-0 z-0">
-                    <div className="absolute inset-0 bg-black/40 z-10" />
-                    <Image
-                        src="/images/about/hero-fence.jpg"
-                        alt="Premium fencing manufacturing"
-                        fill
-                        priority
-                        className="object-cover object-center"
-                        sizes="100vw"
-                    />
-                </div>
-
-                <div className="relative z-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full py-20">
-                    <div className="max-w-3xl">
-                        <div className="mb-8">
-                            <span className="inline-flex items-center gap-3 px-6 py-3 rounded-full bg-[var(--color-background)]/20 backdrop-blur-sm text-[var(--color-text)] text-sm font-semibold border border-[var(--color-text)]/30">
-                                <FaAward className="w-5 h-5" />
-                                <T>Industry Leaders Since 2010</T>
-                            </span>
-                        </div>
-
-                        <h1 className="text-3xl sm:text-5xl md:text-7xl font-black text-[var(--color-background)] leading-tight mb-8">
-                            <T>Crafting Quality</T>
-                            <br />
-                            <span className="text-[var(--color-accent)]">
-                                <T>Since Day One</T>
-                            </span>
-                        </h1>
-
-                        <p className="text-xl md:text-2xl text-[var(--color-background)]/90 mb-12 leading-relaxed">
-                            <T>
-                                We're not just building fences—we're creating
-                                security, privacy, and beauty for homes and
-                                businesses across America.
-                            </T>
-                        </p>
-
-                        <div className="flex flex-col sm:flex-row gap-4">
-                            <Link
-                                href="/contact"
-                                className="group inline-flex items-center justify-center gap-3 bg-[var(--color-accent)] hover:bg-[var(--color-accent)]/90 text-[var(--color-primary)] font-bold py-4 px-10 rounded-full text-lg transition-all duration-300 hover:scale-105 shadow-2xl"
-                            >
-                                <T>Start Your Project</T>
-                                <FaChevronRight className="w-5 h-5 group-hover:translate-x-2 transition-transform" />
-                            </Link>
-                            <Link
-                                href="#projects"
-                                className="group inline-flex items-center justify-center gap-3 border-2 border-[var(--color-background)]/40 hover:border-[var(--color-background)] text-[var(--color-background)] font-bold py-4 px-10 rounded-full text-lg transition-all duration-300 backdrop-blur-sm"
-                            >
-                                <T>View Our Work</T>
-                                <FaChevronRight className="w-5 h-5 group-hover:translate-x-2 transition-transform" />
-                            </Link>
-                        </div>
-                    </div>
+            <section className="pb-12">
+                <span className="text-xs font-semibold uppercase tracking-widest text-[var(--color-accent)]">
+                    <T>Industry Leaders Since 2010</T>
+                </span>
+                <h1 className="font-serif text-4xl md:text-5xl font-semibold text-[var(--color-primary)] mt-1 mb-4">
+                    <T>Crafting Quality Since Day One</T>
+                </h1>
+                <p className="text-[var(--color-gray-500)] max-w-2xl mb-8">
+                    <T>
+                        We're not just building fences—we're creating security,
+                        privacy, and beauty for homes and businesses across
+                        America.
+                    </T>
+                </p>
+                <div className="flex flex-col sm:flex-row gap-3">
+                    <Link
+                        href="/contact"
+                        className="inline-flex items-center justify-center gap-2 bg-[var(--color-primary)] text-white font-semibold py-3 px-8 rounded-full hover:bg-[var(--color-primary)]/90 transition-colors"
+                    >
+                        <T>Start Your Project</T>
+                        <FaChevronRight className="w-4 h-4" />
+                    </Link>
+                    <Link
+                        href="#projects"
+                        className="inline-flex items-center justify-center gap-2 border border-[var(--color-primary)] text-[var(--color-primary)] font-semibold py-3 px-8 rounded-full hover:bg-[var(--color-primary)] hover:text-white transition-colors"
+                    >
+                        <T>View Our Work</T>
+                        <FaChevronRight className="w-4 h-4" />
+                    </Link>
                 </div>
             </section>
 
-            <section className="py-24 bg-gradient-to-b from-[var(--color-background)] to-[var(--color-card-bg)]">
+            <section className="py-16 border-t border-[var(--color-border)]">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="text-center mb-20">
-                        <h2 className="text-4xl md:text-5xl font-black text-[var(--color-primary)] mb-8">
+                    <div className="text-center mb-16">
+                        <h2 className="font-serif text-3xl md:text-4xl font-semibold text-[var(--color-primary)] mb-6">
                             <T>Our Mission & Vision</T>
                         </h2>
                         <div className="max-w-4xl mx-auto">
-                            <div className="relative p-6 sm:p-12 rounded-3xl bg-gradient-to-r from-[var(--color-primary)]/5 to-[var(--color-accent)]/5 border border-[var(--color-text)]/20 backdrop-blur-sm">
-                                <FaAward className="absolute -top-6 left-1/2 transform -translate-x-1/2 w-12 h-12 text-[var(--color-accent)] bg-[var(--color-background)] p-3 rounded-full shadow-xl" />
-                                <p className="text-2xl md:text-3xl font-semibold text-[var(--color-primary)] leading-relaxed italic text-center">
+                            <div className="relative p-6 sm:p-12 rounded-xl border border-[var(--color-border)] bg-[var(--color-card-bg)]">
+                                <FaAward className="absolute -top-6 left-1/2 transform -translate-x-1/2 w-12 h-12 text-[var(--color-accent)] bg-[var(--color-background)] p-3 rounded-full shadow" />
+                                <p className="text-xl md:text-2xl font-serif font-semibold text-[var(--color-primary)] leading-relaxed italic text-center">
                                     <T>
                                         "To redefine property boundaries through
                                         innovative design, exceptional
@@ -278,12 +252,12 @@ export default function AboutUsPage() {
                         {stats.map((stat, index) => (
                             <div
                                 key={index}
-                                className="text-center p-8 rounded-2xl bg-[var(--color-background)] shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 border border-[var(--color-text)]/10"
+                                className="text-center p-8 rounded-xl bg-[var(--color-card-bg)] hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border border-[var(--color-border)]"
                             >
-                                <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-accent)] mb-4">
-                                    <stat.icon className="w-8 h-8 text-[var(--color-background)]" />
+                                <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-[var(--color-primary)]/10 mb-4">
+                                    <stat.icon className="w-8 h-8 text-[var(--color-primary)]" />
                                 </div>
-                                <div className="text-4xl md:text-5xl font-black text-[var(--color-primary)] mb-2">
+                                <div className="font-serif text-4xl md:text-5xl font-semibold text-[var(--color-primary)] mb-2">
                                     {stat.value}
                                 </div>
                                 <div className="text-[var(--color-text)]/70 font-medium">
@@ -295,13 +269,13 @@ export default function AboutUsPage() {
                 </div>
             </section>
 
-            <section id="projects" className="py-24 bg-[var(--color-card-bg)]">
+            <section id="projects" className="py-16 border-t border-[var(--color-border)]">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="text-center mb-16">
-                        <h2 className="text-4xl md:text-5xl font-black text-[var(--color-primary)] mb-6">
+                    <div className="text-center mb-12">
+                        <h2 className="font-serif text-3xl md:text-4xl font-semibold text-[var(--color-primary)] mb-4">
                             <T>Transformations That Speak</T>
                         </h2>
-                        <p className="text-xl text-[var(--color-text)]/80 max-w-3xl mx-auto">
+                        <p className="text-[var(--color-gray-500)] max-w-3xl mx-auto">
                             <T>
                                 Witness the remarkable before-and-after journeys
                                 of spaces transformed by our premium fencing
@@ -406,13 +380,13 @@ export default function AboutUsPage() {
                 </div>
             </section>
 
-            <section className="py-24 bg-gradient-to-b from-[var(--color-background)] to-[var(--color-card-bg)]">
+            <section className="py-16 border-t border-[var(--color-border)]">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="text-center mb-20">
-                        <h2 className="text-4xl md:text-5xl font-black text-[var(--color-primary)] mb-6">
+                    <div className="text-center mb-16">
+                        <h2 className="font-serif text-3xl md:text-4xl font-semibold text-[var(--color-primary)] mb-4">
                             <T>Our Journey</T>
                         </h2>
-                        <p className="text-xl text-[var(--color-text)]/80 max-w-3xl mx-auto">
+                        <p className="text-[var(--color-gray-500)] max-w-3xl mx-auto">
                             <T>
                                 Over a decade of dedication to excellence in
                                 fencing solutions across America.
@@ -423,9 +397,9 @@ export default function AboutUsPage() {
                     <div className="relative">
 
                         {/* Desktop center line */}
-                        <div className="hidden md:block absolute left-1/2 transform -translate-x-1/2 h-full w-1 bg-gradient-to-b from-[var(--color-accent)] to-[var(--color-primary)]" />
+                        <div className="hidden md:block absolute left-1/2 transform -translate-x-1/2 h-full w-1 bg-[var(--color-accent)]" />
                         {/* Mobile left line */}
-                        <div className="md:hidden absolute left-4 top-0 h-full w-1 bg-gradient-to-b from-[var(--color-accent)] to-[var(--color-primary)]" />
+                        <div className="md:hidden absolute left-4 top-0 h-full w-1 bg-[var(--color-accent)]" />
 
                         <div className="space-y-10 md:space-y-20">
                             {milestones.map((milestone, index) => (
@@ -439,9 +413,9 @@ export default function AboutUsPage() {
                                 >
                                     {/* Mobile layout */}
                                     <div className="md:hidden pl-12 w-full">
-                                        <div className="p-5 rounded-2xl bg-[var(--color-background)] shadow-xl border border-[var(--color-text)]/10">
+                                        <div className="p-5 rounded-xl bg-[var(--color-card-bg)] shadow border border-[var(--color-border)]">
                                             <div className="flex items-center gap-3 mb-3">
-                                                <div className="text-3xl font-black text-[var(--color-primary)]">
+                                                <div className="font-serif text-3xl font-semibold text-[var(--color-primary)]">
                                                     {milestone.year}
                                                 </div>
                                                 <milestone.icon className="w-6 h-6 text-[var(--color-accent)]" />
@@ -463,11 +437,11 @@ export default function AboutUsPage() {
                                                 : "pl-12"
                                         }`}
                                     >
-                                        <div className="inline-block p-8 rounded-2xl bg-[var(--color-background)] shadow-2xl border border-[var(--color-text)]/10 hover:border-[var(--color-accent)]/30 transition-all duration-500 hover:scale-105">
+                                        <div className="inline-block p-8 rounded-xl bg-[var(--color-card-bg)] shadow border border-[var(--color-border)] hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
                                             <div className="flex items-center gap-3 mb-4">
                                                 {index % 2 === 0 ? (
                                                     <>
-                                                        <div className="text-5xl font-black text-[var(--color-primary)]">
+                                                        <div className="font-serif text-4xl font-semibold text-[var(--color-primary)]">
                                                             {milestone.year}
                                                         </div>
                                                         <milestone.icon className="w-8 h-8 text-[var(--color-accent)]" />
@@ -475,7 +449,7 @@ export default function AboutUsPage() {
                                                 ) : (
                                                     <>
                                                         <milestone.icon className="w-8 h-8 text-[var(--color-accent)]" />
-                                                        <div className="text-5xl font-black text-[var(--color-primary)]">
+                                                        <div className="font-serif text-4xl font-semibold text-[var(--color-primary)]">
                                                             {milestone.year}
                                                         </div>
                                                     </>
@@ -499,13 +473,13 @@ export default function AboutUsPage() {
                 </div>
             </section>
 
-            <section className="py-24 bg-[var(--color-card-bg)]">
+            <section className="py-16 border-t border-[var(--color-border)]">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="text-center mb-20">
-                        <h2 className="text-4xl md:text-5xl font-black text-[var(--color-primary)] mb-6">
+                    <div className="text-center mb-16">
+                        <h2 className="font-serif text-3xl md:text-4xl font-semibold text-[var(--color-primary)] mb-4">
                             <T>Our Core Values</T>
                         </h2>
-                        <p className="text-xl text-[var(--color-text)]/80 max-w-3xl mx-auto">
+                        <p className="text-[var(--color-gray-500)] max-w-3xl mx-auto">
                             <T>
                                 The principles that guide every decision and
                                 every project we undertake.
@@ -517,20 +491,17 @@ export default function AboutUsPage() {
                         {values.map((value, index) => (
                             <div
                                 key={index}
-                                className="group relative p-8 rounded-3xl bg-[var(--color-background)]/50 backdrop-blur-sm border border-[var(--color-text)]/10 hover:border-[var(--color-accent)]/30 transition-all duration-500 hover:scale-[1.02] hover:shadow-2xl"
+                                className="group relative p-8 rounded-xl bg-[var(--color-card-bg)] border border-[var(--color-border)] hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
                             >
                                 <div
-                                    className={`absolute inset-0 bg-gradient-to-br ${value.gradient} rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500`}
-                                />
-                                <div
-                                    className={`relative z-10 inline-flex items-center justify-center w-20 h-20 rounded-2xl ${value.color} bg-[var(--color-background)]/10 mb-8 group-hover:scale-110 transition-transform duration-500`}
+                                    className={`inline-flex items-center justify-center w-16 h-16 rounded-xl ${value.color} bg-[var(--color-gray-100)] mb-6 group-hover:scale-110 transition-transform duration-300`}
                                 >
-                                    <value.icon className="w-10 h-10" />
+                                    <value.icon className="w-8 h-8" />
                                 </div>
-                                <h3 className="relative z-10 text-2xl font-bold text-[var(--color-primary)] mb-4">
+                                <h3 className="font-serif text-xl font-semibold text-[var(--color-primary)] mb-3">
                                     <T>{value.title}</T>
                                 </h3>
-                                <p className="relative z-10 text-[var(--color-text)]/80 leading-relaxed">
+                                <p className="text-[var(--color-gray-500)] leading-relaxed text-sm">
                                     <T>{value.description}</T>
                                 </p>
                             </div>
@@ -539,13 +510,13 @@ export default function AboutUsPage() {
                 </div>
             </section>
 
-            <section className="py-24 bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-primary)]/90">
+            <section className="py-16 border-t border-[var(--color-border)] bg-[var(--color-primary)]">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="text-center mb-20">
-                        <h2 className="text-4xl md:text-5xl font-black text-[var(--color-background)] mb-6">
+                    <div className="text-center mb-16">
+                        <h2 className="font-serif text-3xl md:text-4xl font-semibold text-white mb-4">
                             <T>Why We Stand Out</T>
                         </h2>
-                        <p className="text-xl text-[var(--color-background)]/80 max-w-3xl mx-auto">
+                        <p className="text-white/80 max-w-3xl mx-auto">
                             <T>
                                 Numbers that reflect our commitment to
                                 excellence and customer satisfaction.
@@ -554,12 +525,12 @@ export default function AboutUsPage() {
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                        <div className="text-center p-10 rounded-3xl bg-[var(--color-background)]/10 backdrop-blur-sm border border-[var(--color-background)]/20 hover:bg-[var(--color-background)]/20 transition-all duration-300">
+                        <div className="text-center p-10 rounded-xl bg-white/10 border border-white/20 hover:bg-white/20 transition-all duration-300">
                             <FaShieldAlt className="w-16 h-16 text-[var(--color-accent)] mx-auto mb-6" />
-                            <h3 className="text-2xl font-bold text-[var(--color-background)] mb-4">
+                            <h3 className="font-serif text-xl font-semibold text-white mb-4">
                                 <T>Lifetime Warranty</T>
                             </h3>
-                            <p className="text-[var(--color-background)]/80 leading-relaxed">
+                            <p className="text-white/80 leading-relaxed text-sm">
                                 <T>
                                     We stand behind our work with comprehensive
                                     warranty coverage on all installations.
@@ -567,12 +538,12 @@ export default function AboutUsPage() {
                             </p>
                         </div>
 
-                        <div className="text-center p-10 rounded-3xl bg-[var(--color-background)]/10 backdrop-blur-sm border border-[var(--color-background)]/20 hover:bg-[var(--color-background)]/20 transition-all duration-300">
+                        <div className="text-center p-10 rounded-xl bg-white/10 border border-white/20 hover:bg-white/20 transition-all duration-300">
                             <FaTools className="w-16 h-16 text-[var(--color-accent)] mx-auto mb-6" />
-                            <h3 className="text-2xl font-bold text-[var(--color-background)] mb-4">
+                            <h3 className="font-serif text-xl font-semibold text-white mb-4">
                                 <T>Expert Installation</T>
                             </h3>
-                            <p className="text-[var(--color-background)]/80 leading-relaxed">
+                            <p className="text-white/80 leading-relaxed text-sm">
                                 <T>
                                     Our certified professionals ensure perfect
                                     installation every single time.
@@ -580,12 +551,12 @@ export default function AboutUsPage() {
                             </p>
                         </div>
 
-                        <div className="text-center p-10 rounded-3xl bg-[var(--color-background)]/10 backdrop-blur-sm border border-[var(--color-background)]/20 hover:bg-[var(--color-background)]/20 transition-all duration-300">
+                        <div className="text-center p-10 rounded-xl bg-white/10 border border-white/20 hover:bg-white/20 transition-all duration-300">
                             <FaHandshake className="w-16 h-16 text-[var(--color-accent)] mx-auto mb-6" />
-                            <h3 className="text-2xl font-bold text-[var(--color-background)] mb-4">
+                            <h3 className="font-serif text-xl font-semibold text-white mb-4">
                                 <T>Customer First</T>
                             </h3>
-                            <p className="text-[var(--color-background)]/80 leading-relaxed">
+                            <p className="text-white/80 leading-relaxed text-sm">
                                 <T>
                                     Your satisfaction is our priority, with
                                     dedicated support throughout your project.
@@ -596,13 +567,13 @@ export default function AboutUsPage() {
                 </div>
             </section>
 
-            <section className="py-24 bg-gradient-to-b from-[var(--color-background)] to-[var(--color-card-bg)]">
+            <section className="py-16 border-t border-[var(--color-border)]">
                 <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-                    <div className="bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-accent)] rounded-3xl p-6 sm:p-12 md:p-16 shadow-2xl">
-                        <h2 className="text-4xl md:text-5xl font-black text-[var(--color-background)] mb-6">
+                    <div className="bg-[var(--color-primary)] rounded-2xl p-8 sm:p-12 shadow-xl">
+                        <h2 className="font-serif text-3xl md:text-4xl font-semibold text-white mb-4">
                             <T>Ready to Transform Your Space?</T>
                         </h2>
-                        <p className="text-xl text-[var(--color-background)]/90 mb-10 leading-relaxed">
+                        <p className="text-white/90 mb-8 leading-relaxed">
                             <T>
                                 Let's bring your vision to life with our premium
                                 fencing solutions. Contact us today for a free
@@ -613,17 +584,17 @@ export default function AboutUsPage() {
                         <div className="flex flex-col sm:flex-row gap-4 justify-center">
                             <Link
                                 href="/contact"
-                                className="group inline-flex items-center justify-center gap-3 bg-[var(--color-background)] text-[var(--color-primary)] hover:bg-[var(--color-background)]/90 font-bold py-4 px-10 rounded-full text-lg transition-all duration-300 hover:scale-105 shadow-xl"
+                                className="inline-flex items-center justify-center gap-2 bg-white text-[var(--color-primary)] hover:bg-white/90 font-semibold py-3 px-8 rounded-full transition-colors"
                             >
                                 <T>Start Your Project</T>
-                                <FaChevronRight className="w-5 h-5 group-hover:translate-x-2 transition-transform" />
+                                <FaChevronRight className="w-4 h-4" />
                             </Link>
                             <Link
-                                href="/client/dashboard/products/catalog"
-                                className="group inline-flex items-center justify-center gap-3 border-2 border-[var(--color-background)] text-[var(--color-background)] hover:bg-[var(--color-background)]/10 font-bold py-4 px-10 rounded-full text-lg transition-all duration-300"
+                                href="/client/dashboard/products"
+                                className="inline-flex items-center justify-center gap-2 border border-white text-white hover:bg-white/10 font-semibold py-3 px-8 rounded-full transition-colors"
                             >
                                 <T>Browse Catalog</T>
-                                <FaChevronRight className="w-5 h-5 group-hover:translate-x-2 transition-transform" />
+                                <FaChevronRight className="w-4 h-4" />
                             </Link>
                         </div>
                     </div>

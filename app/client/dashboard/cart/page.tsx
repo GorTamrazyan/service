@@ -44,10 +44,10 @@ export default function CartPage() {
             <div className="min-h-screen bg-[var(--color-background)] flex items-center justify-center p-4">
                 <div className="max-w-md w-full text-center">
                     <div className="mb-8">
-                        <div className="w-24 h-24 mx-auto mb-6 rounded-full bg-gradient-to-r from-green-500 to-emerald-600 flex items-center justify-center animate-pulse">
-                            <FaCheckCircle className="w-12 h-12 text-white" />
+                        <div className="w-24 h-24 mx-auto mb-6 rounded-full bg-[var(--color-success)]/10 border-2 border-[var(--color-success)] flex items-center justify-center">
+                            <FaCheckCircle className="w-12 h-12 text-[var(--color-success)]" />
                         </div>
-                        <h1 className="text-3xl md:text-4xl font-black text-[var(--color-primary)] mb-4">
+                        <h1 className="font-serif text-3xl md:text-4xl font-semibold text-[var(--color-primary)] mb-4">
                             <T>Order Confirmed!</T>
                         </h1>
                         <p className="text-lg text-[var(--color-text)]/80 mb-8">
@@ -60,9 +60,9 @@ export default function CartPage() {
                     <div className="space-y-4">
                         <Link
                             href="/client/dashboard/products"
-                            className="group inline-flex items-center justify-center gap-3 w-full bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-primary)]/90 text-white font-bold py-4 px-6 rounded-xl text-lg transition-all duration-300 hover:scale-105 shadow-lg"
+                            className="inline-flex items-center justify-center gap-2 w-full bg-[var(--color-primary)] text-white font-semibold py-3.5 px-6 rounded-full hover:bg-[var(--color-primary)]/90 transition-colors"
                         >
-                            <FaArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
+                            <FaArrowLeft className="w-4 h-4" />
                             <T>Continue Shopping</T>
                         </Link>
                         <Link
@@ -83,10 +83,10 @@ export default function CartPage() {
             <div className="min-h-screen bg-[var(--color-background)] flex flex-col items-center justify-center p-4">
                 <div className="max-w-md w-full text-center">
                     <div className="mb-8">
-                        <div className="w-32 h-32 mx-auto mb-6 rounded-full bg-gradient-to-r from-[var(--color-accent)]/10 to-[var(--color-primary)]/10 flex items-center justify-center">
-                            <FaShoppingCart className="w-16 h-16 text-[var(--color-accent)]" />
+                        <div className="w-24 h-24 mx-auto mb-6 rounded-full border-2 border-[var(--color-border)] flex items-center justify-center">
+                            <FaShoppingCart className="w-10 h-10 text-[var(--color-gray-500)]" />
                         </div>
-                        <h1 className="text-4xl md:text-5xl font-black text-[var(--color-primary)] mb-4">
+                        <h1 className="font-serif text-3xl md:text-4xl font-semibold text-[var(--color-primary)] mb-4">
                             <T>Your Cart is Empty</T>
                         </h1>
                         <p className="text-lg text-[var(--color-text)]/80 mb-8">
@@ -98,10 +98,10 @@ export default function CartPage() {
                     </div>
                     <Link
                         href="/client/dashboard/products"
-                        className="group inline-flex items-center justify-center gap-3 bg-gradient-to-r from-[var(--color-accent)] to-[var(--color-accent)]/90 text-[var(--color-primary)] font-bold py-4 px-10 rounded-full text-lg transition-all duration-300 hover:scale-105 shadow-xl"
+                        className="inline-flex items-center justify-center gap-2 bg-[var(--color-primary)] text-white font-semibold py-3 px-8 rounded-full hover:bg-[var(--color-primary)]/90 transition-colors"
                     >
                         <T>Browse Products</T>
-                        <FaChevronRight className="w-5 h-5 group-hover:translate-x-2 transition-transform" />
+                        <FaChevronRight className="w-4 h-4" />
                     </Link>
                 </div>
             </div>
@@ -114,7 +114,7 @@ export default function CartPage() {
 
                 <div className="mb-8 md:mb-12">
                     <div className="flex items-center justify-between mb-6">
-                        <h1 className="text-3xl md:text-5xl font-black text-[var(--color-primary)]">
+                        <h1 className="font-serif text-3xl md:text-4xl font-semibold text-[var(--color-primary)]">
                             <T>Shopping Cart</T>
                         </h1>
                         <div className="flex items-center gap-2 px-4 py-2 bg-[var(--color-accent)]/10 rounded-full">
@@ -158,15 +158,15 @@ export default function CartPage() {
                                 key={`${item.id}-${
                                     item.color?.id || "default"
                                 }`}
-                                className="group bg-[var(--color-card)] rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 overflow-hidden border border-[var(--color-border)]"
+                                className="group bg-[var(--color-card-bg)] rounded-xl hover:shadow-lg transition-all duration-300 overflow-hidden border border-[var(--color-border)]"
                             >
                                 <div className="p-6">
                                     <div className="flex flex-col sm:flex-row gap-6">
 
                                         <div className="relative">
                                             {item.type === "service" ? (
-                                                <div className="w-24 h-24 rounded-xl bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center shadow-lg">
-                                                    <div className="w-12 h-12 text-white">
+                                                <div className="w-24 h-24 rounded-xl bg-[var(--color-gray-100)] flex items-center justify-center">
+                                                    <div className="w-10 h-10 text-[var(--color-gray-500)]">
                                                         <svg
                                                             fill="none"
                                                             stroke="currentColor"
@@ -189,11 +189,10 @@ export default function CartPage() {
                                                         fill
                                                         className="object-cover group-hover:scale-110 transition-transform duration-500"
                                                     />
-                                                    <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
-                                                </div>
+                                                    </div>
                                             ) : (
-                                                <div className="w-24 h-24 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-lg">
-                                                    <div className="w-12 h-12 text-white">
+                                                <div className="w-24 h-24 rounded-xl bg-[var(--color-gray-100)] flex items-center justify-center">
+                                                    <div className="w-10 h-10 text-[var(--color-gray-500)]">
                                                         <svg
                                                             fill="none"
                                                             stroke="currentColor"
@@ -211,11 +210,7 @@ export default function CartPage() {
                                             )}
 
                                             <div
-                                                className={`absolute -top-2 -left-2 px-3 py-1 rounded-full text-xs font-bold shadow-lg ${
-                                                    item.type === "service"
-                                                        ? "bg-green-600 text-white"
-                                                        : "bg-blue-600 text-white"
-                                                }`}
+                                                className="absolute -top-2 -left-2 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-[var(--color-accent)] text-[var(--color-primary)] shadow"
                                             >
                                                 {item.type === "service" ? (
                                                     <T>SERVICE</T>
@@ -227,13 +222,7 @@ export default function CartPage() {
 
                                         <div className="flex-grow">
                                             <div className="flex justify-between items-start mb-2">
-                                                <h3
-                                                    className={`text-xl font-bold ${
-                                                        item.type === "service"
-                                                            ? "text-green-700"
-                                                            : "text-blue-700"
-                                                    }`}
-                                                >
+                                                <h3 className="font-serif text-lg font-semibold text-[var(--color-text)]">
                                                     {item.name}
                                                 </h3>
                                                 <button
@@ -388,8 +377,8 @@ export default function CartPage() {
                     <div className="lg:col-span-1">
                         <div className="sticky top-8 space-y-8">
 
-                            <div className="bg-[var(--color-card)] rounded-2xl shadow-xl p-6 border border-[var(--color-border)]">
-                                <h2 className="text-2xl font-bold text-[var(--color-primary)] mb-6">
+                            <div className="bg-[var(--color-card-bg)] rounded-xl p-6 border border-[var(--color-border)]">
+                                <h2 className="font-serif text-2xl font-semibold text-[var(--color-primary)] mb-6">
                                     <T>Order Summary</T>
                                 </h2>
 
@@ -445,7 +434,7 @@ export default function CartPage() {
                                 <div className="mt-6 space-y-4">
                                     <button
                                         onClick={openCheckoutModal}
-                                        className="group w-full bg-gradient-to-r from-[var(--color-accent)] to-[var(--color-accent)]/90 text-[var(--color-primary)] font-bold py-4 px-6 rounded-xl text-lg transition-all duration-300 hover:scale-105 shadow-lg flex items-center justify-center gap-3"
+                                        className="w-full bg-[var(--color-accent)] text-[var(--color-primary)] font-semibold py-3.5 px-6 rounded-full hover:bg-[var(--color-accent)]/90 transition-colors flex items-center justify-center gap-2"
                                     >
                                         <FaCreditCard className="w-5 h-5" />
                                         <T>Proceed to Checkout</T>
@@ -454,7 +443,7 @@ export default function CartPage() {
 
                                     <button
                                         onClick={clearCart}
-                                        className="w-full border-2 border-red-500 text-red-500 hover:bg-red-50 font-bold py-3 px-6 rounded-xl transition-colors duration-200 flex items-center justify-center gap-2"
+                                        className="w-full border border-[var(--color-error)] text-[var(--color-error)] hover:bg-[var(--color-error)]/5 font-semibold py-3 px-6 rounded-full transition-colors duration-200 flex items-center justify-center gap-2"
                                     >
                                         <FaTrashAlt className="w-4 h-4" />
                                         <T>Clear Cart</T>
@@ -462,7 +451,7 @@ export default function CartPage() {
 
                                     <Link
                                         href="/client/dashboard/products"
-                                        className="group w-full border-2 border-[var(--color-primary)] text-[var(--color-primary)] hover:bg-[var(--color-primary)] hover:text-white font-bold py-3 px-6 rounded-xl transition-all duration-300 flex items-center justify-center gap-2"
+                                        className="w-full border border-[var(--color-primary)] text-[var(--color-primary)] hover:bg-[var(--color-primary)] hover:text-white font-semibold py-3 px-6 rounded-full transition-colors flex items-center justify-center gap-2"
                                     >
                                         <FaArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
                                         <T>Continue Shopping</T>
@@ -470,53 +459,47 @@ export default function CartPage() {
                                 </div>
                             </div>
 
-                            <div className="bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-primary)]/90 rounded-2xl p-6 text-white">
-                                <h3 className="text-xl font-bold mb-4">
+                            <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-card-bg)] p-6">
+                                <h3 className="font-serif text-lg font-semibold text-[var(--color-primary)] mb-4">
                                     <T>Order Benefits</T>
                                 </h3>
                                 <div className="space-y-4">
                                     <div className="flex items-center gap-3">
-                                        <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0">
-                                            <FaShippingFast className="w-5 h-5" />
+                                        <div className="w-9 h-9 rounded-full bg-[var(--color-primary)]/10 flex items-center justify-center flex-shrink-0">
+                                            <FaShippingFast className="w-4 h-4 text-[var(--color-primary)]" />
                                         </div>
                                         <div>
-                                            <div className="font-semibold">
+                                            <div className="text-sm font-semibold text-[var(--color-text)]">
                                                 <T>Free Shipping</T>
                                             </div>
-                                            <div className="text-sm text-white/80">
+                                            <div className="text-xs text-[var(--color-gray-500)]">
                                                 <T>On orders over $500</T>
                                             </div>
                                         </div>
                                     </div>
                                     <div className="flex items-center gap-3">
-                                        <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0">
-                                            <FaShieldAlt className="w-5 h-5" />
+                                        <div className="w-9 h-9 rounded-full bg-[var(--color-primary)]/10 flex items-center justify-center flex-shrink-0">
+                                            <FaShieldAlt className="w-4 h-4 text-[var(--color-primary)]" />
                                         </div>
                                         <div>
-                                            <div className="font-semibold">
+                                            <div className="text-sm font-semibold text-[var(--color-text)]">
                                                 <T>Warranty Included</T>
                                             </div>
-                                            <div className="text-sm text-white/80">
-                                                <T>
-                                                    15-year warranty on all
-                                                    products
-                                                </T>
+                                            <div className="text-xs text-[var(--color-gray-500)]">
+                                                <T>15-year warranty on all products</T>
                                             </div>
                                         </div>
                                     </div>
                                     <div className="flex items-center gap-3">
-                                        <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0">
-                                            <FaTag className="w-5 h-5" />
+                                        <div className="w-9 h-9 rounded-full bg-[var(--color-primary)]/10 flex items-center justify-center flex-shrink-0">
+                                            <FaTag className="w-4 h-4 text-[var(--color-primary)]" />
                                         </div>
                                         <div>
-                                            <div className="font-semibold">
+                                            <div className="text-sm font-semibold text-[var(--color-text)]">
                                                 <T>Price Match</T>
                                             </div>
-                                            <div className="text-sm text-white/80">
-                                                <T>
-                                                    Find it cheaper? We'll match
-                                                    it
-                                                </T>
+                                            <div className="text-xs text-[var(--color-gray-500)]">
+                                                <T>Find it cheaper? We'll match it</T>
                                             </div>
                                         </div>
                                     </div>
