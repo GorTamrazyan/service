@@ -236,20 +236,28 @@ export default function HomePage() {
         <div className="-mx-4 sm:-mx-10 -mt-20 sm:-mt-24 -mb-10 overflow-x-hidden">
 
             {/* ── HERO ── */}
-            <section id="home" className="relative overflow-hidden">
+            <section id="home" className="relative overflow-hidden print:overflow-visible">
                 <div className="absolute inset-0">
+                    {/* Screen: next/image with fill */}
                     <Image
                         src="/images/hero-vinyl-fence.jpg"
                         alt="Premium vinyl fence"
                         fill
                         priority
-                        className="object-cover"
+                        className="object-cover print:hidden"
                         sizes="100vw"
+                    />
+                    {/* Print fallback: regular img (Safari PDF doesn't render next/image fill) */}
+                    <img
+                        src="/images/hero-vinyl-fence.jpg"
+                        alt=""
+                        aria-hidden="true"
+                        className="hidden print:block absolute inset-0 w-full h-full object-cover"
                     />
                     <div className="absolute inset-0 bg-gradient-to-r from-[#111827]/80 via-[#111827]/55 to-[#111827]/20" />
                 </div>
 
-                <div className="relative mx-auto flex min-h-[88vh] max-w-7xl flex-col justify-center px-4 py-20 md:px-8 md:py-28">
+                <div className="relative mx-auto flex min-h-[88vh] print:min-h-[500px] max-w-7xl flex-col justify-center px-4 py-20 md:px-8 md:py-28">
                     <div className="max-w-2xl">
                         <span className="inline-flex items-center rounded-full border border-white/30 bg-white/10 px-4 py-1.5 text-xs font-medium uppercase tracking-widest text-white backdrop-blur-sm">
                             <T>Established 2008 · Family Owned</T>
