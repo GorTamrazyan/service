@@ -243,76 +243,44 @@ export default function RegisterPage() {
     };
 
     return (
-        <div className="min-h-screen bg-[var(--color-background)] flex flex-col relative overflow-hidden">
+        <div className="min-h-screen bg-[var(--color-background)] flex flex-col">
 
-            <div className="absolute inset-0 overflow-hidden pointer-events-none">
-                <div className="absolute top-0 right-0 w-96 h-96 bg-[var(--color-primary)]/5 rounded-full blur-3xl"></div>
-                <div className="absolute bottom-0 left-0 w-96 h-96 bg-[var(--color-accent)]/5 rounded-full blur-3xl"></div>
-            </div>
-
-            <div className="relative w-full py-6 bg-[var(--color-secondary)] shadow-sm border-b border-[var(--color-border)]">
+            <div className="w-full py-5 bg-[var(--color-secondary)] border-b border-[var(--color-border)]">
                 <div className="max-w-7xl mx-auto px-4">
-                    <Link
-                        href="/"
-                        className="flex items-center justify-center group"
-                    >
-                        <div className="flex items-center space-x-4 transition-transform duration-300 group-hover:scale-105">
-
-                            <div className="text-[var(--color-accent)] transform transition-all duration-300 group-hover:rotate-6">
-                                <svg
-                                    width="60"
-                                    height="40"
-                                    viewBox="0 0 60 40"
-                                    className="drop-shadow-lg"
-                                    fill="currentColor"
-                                >
-                                    <rect x="8" y="8" width="6" height="24" />
-                                    <rect x="18" y="8" width="6" height="24" />
-                                    <rect x="28" y="8" width="6" height="24" />
-                                    <rect x="38" y="8" width="6" height="24" />
-                                    <rect x="4" y="12" width="44" height="4" />
-                                    <rect x="4" y="20" width="44" height="4" />
-                                    <polygon points="8,8 11,4 14,8" />
-                                    <polygon points="18,8 21,4 24,8" />
-                                    <polygon points="28,8 31,4 34,8" />
-                                    <polygon points="38,8 41,4 44,8" />
-                                </svg>
-                            </div>
-                            <h1 className="text-4xl font-bold text-[var(--color-primary)]">
-                                ONIK'S VINYL
-                            </h1>
+                    <Link href="/" className="flex items-center justify-center gap-3 group">
+                        <div className="text-[var(--color-accent)]">
+                            <svg width="40" height="28" viewBox="0 0 60 40" fill="currentColor">
+                                <rect x="8" y="8" width="6" height="24" />
+                                <rect x="18" y="8" width="6" height="24" />
+                                <rect x="28" y="8" width="6" height="24" />
+                                <rect x="38" y="8" width="6" height="24" />
+                                <rect x="4" y="12" width="44" height="4" />
+                                <rect x="4" y="20" width="44" height="4" />
+                                <polygon points="8,8 11,4 14,8" />
+                                <polygon points="18,8 21,4 24,8" />
+                                <polygon points="28,8 31,4 34,8" />
+                                <polygon points="38,8 41,4 44,8" />
+                            </svg>
                         </div>
+                        <span className="font-serif text-2xl font-semibold text-[var(--color-primary)] group-hover:text-[var(--color-accent)] transition-colors">
+                            ONIK&apos;S VINYL
+                        </span>
                     </Link>
                 </div>
             </div>
 
-            <div className="relative flex-1 flex items-center justify-center px-4 py-12">
+            <div className="flex-1 flex items-center justify-center px-4 py-12">
                 <div className="w-full max-w-md">
 
-                    <div className="bg-[var(--color-card-bg)] rounded-2xl shadow-2xl border border-[var(--color-border)] p-8 md:p-10 transition-all duration-300 hover:shadow-3xl">
+                    <div className="bg-[var(--color-card-bg)] rounded-2xl border border-[var(--color-border)] shadow-lg p-8 md:p-10">
 
                         <div className="text-center mb-8">
-                            <div className="inline-flex items-center justify-center w-16 h-16 bg-[var(--color-primary)] rounded-2xl mb-4 shadow">
-                                <svg
-                                    className="w-8 h-8 text-white"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    viewBox="0 0 24 24"
-                                >
-                                    <path
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        strokeWidth={2}
-                                        d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"
-                                    />
-                                </svg>
-                            </div>
-                            <h2 className="text-4xl md:text-5xl font-bold text-[var(--color-primary)] mb-2">
+                            <h2 className="font-serif text-4xl font-semibold text-[var(--color-primary)] mb-1">
                                 Create Account
                             </h2>
+                            <div className="mx-auto mt-2 mb-3 h-0.5 w-12 rounded-full bg-[var(--color-accent)]" />
                             <p className="text-[var(--color-text)]/60 text-sm">
-                                Join us to get started with premium fencing
-                                solutions
+                                Join us to get started with premium fencing solutions
                             </p>
                         </div>
 
@@ -596,43 +564,16 @@ export default function RegisterPage() {
 
             <style jsx>{`
                 @keyframes shake {
-                    0%,
-                    100% {
-                        transform: translateX(0);
-                    }
-                    10%,
-                    30%,
-                    50%,
-                    70%,
-                    90% {
-                        transform: translateX(-5px);
-                    }
-                    20%,
-                    40%,
-                    60%,
-                    80% {
-                        transform: translateX(5px);
-                    }
+                    0%, 100% { transform: translateX(0); }
+                    10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+                    20%, 40%, 60%, 80% { transform: translateX(5px); }
                 }
-
                 @keyframes fadeIn {
-                    from {
-                        opacity: 0;
-                        transform: translateY(-10px);
-                    }
-                    to {
-                        opacity: 1;
-                        transform: translateY(0);
-                    }
+                    from { opacity: 0; transform: translateY(-10px); }
+                    to { opacity: 1; transform: translateY(0); }
                 }
-
-                .animate-shake {
-                    animation: shake 0.5s ease-in-out;
-                }
-
-                .animate-fadeIn {
-                    animation: fadeIn 0.3s ease-out;
-                }
+                .animate-shake { animation: shake 0.5s ease-in-out; }
+                .animate-fadeIn { animation: fadeIn 0.3s ease-out; }
             `}</style>
         </div>
     );
