@@ -383,28 +383,23 @@ export default function AppointmentBookingModal({
             <div className="flex min-h-full items-center justify-center p-4 sm:p-6">
                 <div className="relative bg-[var(--color-card-bg)] rounded-3xl shadow-2xl w-full max-w-6xl overflow-hidden transform transition-all border border-[var(--color-border)]">
 
-                    <div className="relative bg-gradient-to-br from-[var(--color-primary)] via-[#8B1515] to-[var(--color-accent)] px-8 py-8">
-                        <div className="flex items-center justify-between">
-                            <div className="flex items-center space-x-4">
-                                <div className="bg-white/20 backdrop-blur-sm p-3 rounded-2xl">
-                                    <FaCalendarCheck className="w-7 h-7 text-white" />
-                                </div>
-                                <div>
-                                    <h2 className="text-3xl font-bold text-white mb-1">
-                                        {consultationType}
-                                    </h2>
-                                    <p className="text-white/80 text-sm">
-                                        <T>Book your consultation slot</T>
-                                    </p>
-                                </div>
+                    <div className="px-8 py-5 border-b border-[var(--color-border)] flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[var(--color-primary)]/10 text-[var(--color-primary)]">
+                                <FaCalendarCheck className="w-5 h-5" />
                             </div>
-                            <button
-                                onClick={onClose}
-                                className="p-2.5 hover:bg-white/20 rounded-full transition-all duration-200 group"
-                            >
-                                <FaTimes className="w-6 h-6 text-white group-hover:rotate-90 transition-transform duration-200" />
-                            </button>
+                            <div>
+                                <h2 className="font-serif text-xl font-semibold text-[var(--color-primary)]">
+                                    {consultationType}
+                                </h2>
+                                <p className="text-xs text-[var(--color-gray-500)]">
+                                    <T>Book your consultation slot</T>
+                                </p>
+                            </div>
                         </div>
+                        <button onClick={onClose} className="p-2 rounded-full text-[var(--color-gray-500)] hover:bg-[var(--color-gray-100)] hover:text-[var(--color-text)] transition-colors">
+                            <FaTimes className="w-4 h-4" />
+                        </button>
                     </div>
 
                     {showSuccess && (
@@ -442,85 +437,56 @@ export default function AppointmentBookingModal({
 
                             <div className="lg:col-span-2 space-y-6">
 
-                                <div className="bg-gradient-to-br from-[var(--color-gray-50)] to-[var(--color-gray-100)] rounded-2xl p-6 border border-[var(--color-border)]">
-                                    <h3 className="text-lg font-bold mb-6 flex items-center text-[var(--color-text)]">
-                                        <div className="bg-[var(--color-info)] p-2 rounded-xl mr-3">
-                                            <FaInfoCircle className="text-white w-4 h-4" />
-                                        </div>
+                                <div className="rounded-xl border border-[var(--color-border)] p-5">
+                                    <h3 className="font-serif text-base font-semibold text-[var(--color-primary)] mb-4 flex items-center gap-2">
+                                        <FaInfoCircle className="w-4 h-4 text-[var(--color-primary)]/60" />
                                         <T>Details</T>
                                     </h3>
-                                    <div className="space-y-5">
-                                        <div className="flex items-center justify-between bg-[var(--color-card-bg)] rounded-xl p-4 shadow-sm border border-[var(--color-border)]">
-                                            <div className="flex items-center">
-                                                <div className="w-12 h-12 bg-[var(--color-info)]/10 rounded-xl flex items-center justify-center mr-4">
-                                                    <FaClock className="text-[var(--color-info)] w-6 h-6" />
-                                                </div>
-                                                <div>
-                                                    <p className="text-xs text-[var(--color-gray-500)] uppercase tracking-wide">
-                                                        <T>Duration</T>
-                                                    </p>
-                                                    <p className="text-lg font-bold text-[var(--color-text)]">
-                                                        {duration} <T>min</T>
-                                                    </p>
-                                                </div>
+                                    <div className="space-y-3">
+                                        <div className="flex items-center gap-3 p-3 rounded-xl border border-[var(--color-border)] bg-[var(--color-gray-100)]">
+                                            <div className="w-9 h-9 bg-[var(--color-primary)]/10 rounded-lg flex items-center justify-center shrink-0">
+                                                <FaClock className="text-[var(--color-primary)] w-4 h-4" />
+                                            </div>
+                                            <div>
+                                                <p className="text-xs text-[var(--color-gray-500)] uppercase tracking-wide"><T>Duration</T></p>
+                                                <p className="font-semibold text-[var(--color-text)] text-sm">{duration} <T>min</T></p>
                                             </div>
                                         </div>
-                                        <div className="flex items-center justify-between bg-[var(--color-card-bg)] rounded-xl p-4 shadow-sm border border-[var(--color-border)]">
-                                            <div className="flex items-center">
-                                                <div className="w-12 h-12 bg-[var(--color-success)]/10 rounded-xl flex items-center justify-center mr-4">
-                                                    <FaMoneyBillWave className="text-[var(--color-success)] w-6 h-6" />
-                                                </div>
-                                                <div>
-                                                    <p className="text-xs text-[var(--color-gray-500)] uppercase tracking-wide">
-                                                        <T>Price</T>
-                                                    </p>
-                                                    <p className="text-2xl font-bold text-[var(--color-success)]">
-                                                        ${price}
-                                                    </p>
-                                                </div>
+                                        <div className="flex items-center gap-3 p-3 rounded-xl border border-[var(--color-border)] bg-[var(--color-gray-100)]">
+                                            <div className="w-9 h-9 bg-[var(--color-accent)]/10 rounded-lg flex items-center justify-center shrink-0">
+                                                <FaMoneyBillWave className="text-[var(--color-accent)] w-4 h-4" />
+                                            </div>
+                                            <div>
+                                                <p className="text-xs text-[var(--color-gray-500)] uppercase tracking-wide"><T>Price</T></p>
+                                                <p className="font-serif font-semibold text-[var(--color-accent)] text-xl">${price}</p>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
 
-                                <div className="bg-[var(--color-card-bg)] rounded-2xl p-6 border border-[var(--color-border)] shadow-sm">
-                                    <h3 className="text-lg font-bold mb-4 text-[var(--color-text)]">
+                                <div className="rounded-xl border border-[var(--color-border)] p-5">
+                                    <h3 className="font-serif text-base font-semibold text-[var(--color-primary)] mb-4">
                                         <T>What&apos;s Included</T>
                                     </h3>
-                                    <ul className="space-y-3">
+                                    <ul className="space-y-2.5">
                                         {features.map((feature, index) => (
-                                            <li
-                                                key={index}
-                                                className="flex items-start gap-3 text-sm text-[var(--color-text)]"
-                                            >
-                                                <div className="bg-[var(--color-success)]/10 p-1 rounded-lg mt-0.5">
-                                                    <FaCheckCircle className="text-[var(--color-success)] w-4 h-4" />
-                                                </div>
-                                                <span>
-                                                    <T>{feature}</T>
-                                                </span>
+                                            <li key={index} className="flex items-start gap-2.5 text-sm text-[var(--color-text)]">
+                                                <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--color-accent)]" />
+                                                <span className="leading-relaxed"><T>{feature}</T></span>
                                             </li>
                                         ))}
                                     </ul>
                                 </div>
 
                                 {profile && profile.firstName && profile.email && (
-                                    <div className="bg-gradient-to-br from-[var(--color-accent)]/10 to-[var(--color-accent)]/5 border border-[var(--color-accent)]/20 rounded-2xl p-4">
-                                        <div className="flex items-center gap-3">
-                                            <div className="bg-[var(--color-accent)] p-2 rounded-xl">
-                                                <FaInfoCircle className="w-4 h-4 text-white" />
-                                            </div>
-                                            <div>
-                                                <p className="text-xs text-[var(--color-gray-500)] mb-1">
-                                                    <T>Booking as:</T>
-                                                </p>
-                                                <p className="font-semibold text-[var(--color-text)]">
-                                                    {profile.firstName} {profile.lastName}
-                                                </p>
-                                                <p className="text-sm text-[var(--color-gray-500)]">
-                                                    {profile.email}
-                                                </p>
-                                            </div>
+                                    <div className="rounded-xl border border-[var(--color-border)] p-4 flex items-center gap-3">
+                                        <div className="w-8 h-8 shrink-0 rounded-full bg-[var(--color-primary)]/10 flex items-center justify-center">
+                                            <FaInfoCircle className="w-3.5 h-3.5 text-[var(--color-primary)]" />
+                                        </div>
+                                        <div>
+                                            <p className="text-xs text-[var(--color-gray-500)]"><T>Booking as:</T></p>
+                                            <p className="text-sm font-semibold text-[var(--color-text)]">{profile.firstName} {profile.lastName}</p>
+                                            <p className="text-xs text-[var(--color-gray-500)]">{profile.email}</p>
                                         </div>
                                     </div>
                                 )}
@@ -528,10 +494,10 @@ export default function AppointmentBookingModal({
 
                             <div className="lg:col-span-3 space-y-6">
 
-                                <div className="bg-[var(--color-card-bg)] rounded-2xl p-6 border border-[var(--color-border)] shadow-sm">
+                                <div className="rounded-xl border border-[var(--color-border)] p-6">
                                     <div className="flex items-center justify-between mb-6">
                                         <div className="flex items-center gap-3">
-                                            <h3 className="text-xl font-bold text-[var(--color-text)]">
+                                            <h3 className="font-serif text-lg font-semibold text-[var(--color-primary)]">
                                                 <T>Select Date</T>
                                             </h3>
                                             {isLoadingDays && (
@@ -598,11 +564,8 @@ export default function AppointmentBookingModal({
                                                             : "hover:bg-[var(--color-primary)]/10 cursor-pointer text-[var(--color-text)]"
                                                     }
                                                     ${
-                                                        isSameDay(
-                                                            day,
-                                                            selectedDate
-                                                        )
-                                                            ? "bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-accent)] text-white shadow-lg scale-105"
+                                                        isSameDay(day, selectedDate)
+                                                            ? "bg-[var(--color-primary)] text-white shadow-md scale-105"
                                                             : ""
                                                     }
                                                 `}
@@ -616,7 +579,7 @@ export default function AppointmentBookingModal({
                                         <div className="mt-4 pt-4 border-t border-[var(--color-border)]">
                                             <div className="flex flex-wrap gap-4 text-xs text-[var(--color-gray-500)]">
                                                 <div className="flex items-center gap-1.5">
-                                                    <div className="w-6 h-6 rounded-lg bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-accent)] flex items-center justify-center">
+                                                    <div className="w-6 h-6 rounded-lg bg-[var(--color-primary)] flex items-center justify-center">
                                                         <span className="text-white text-xs font-medium">1</span>
                                                     </div>
                                                     <span><T>Selected</T></span>
@@ -639,9 +602,9 @@ export default function AppointmentBookingModal({
                                 </div>
 
                                 {selectedDate && (
-                                    <div className="bg-[var(--color-card-bg)] rounded-2xl p-6 border border-[var(--color-border)] shadow-sm animate-fade-in">
+                                    <div className="rounded-xl border border-[var(--color-border)] p-6">
                                         <div className="flex items-center justify-between mb-4">
-                                            <h3 className="text-xl font-bold text-[var(--color-text)]">
+                                            <h3 className="font-serif text-lg font-semibold text-[var(--color-primary)]">
                                                 <T>Select Time</T>
                                             </h3>
                                             {isLoadingSlots && (
@@ -689,7 +652,7 @@ export default function AppointmentBookingModal({
                                                                         py-3 px-4 rounded-xl font-semibold text-sm transition-all duration-200
                                                                         ${
                                                                             selectedTime === time
-                                                                                ? "bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-accent)] text-white shadow-lg scale-105"
+                                                                                ? "bg-[var(--color-primary)] text-white shadow-md scale-105"
                                                                                 : "bg-[var(--color-gray-100)] text-[var(--color-text)] hover:bg-[var(--color-gray-200)] cursor-pointer"
                                                                         }
                                                                     `}
@@ -724,7 +687,7 @@ export default function AppointmentBookingModal({
                                 )}
 
                                 {isBooked && (
-                                    <div className="bg-gradient-to-r from-[var(--color-success)]/10 to-[var(--color-success)]/5 border-2 border-[var(--color-success)] rounded-2xl p-6 animate-fade-in">
+                                    <div className="border border-[var(--color-border)] rounded-xl p-5 bg-[var(--color-gray-100)]">
                                         <div className="flex items-start gap-4">
                                             <div className="bg-[var(--color-success)] p-3 rounded-2xl">
                                                 <FaCheckCircle className="w-6 h-6 text-white" />
@@ -750,51 +713,33 @@ export default function AppointmentBookingModal({
                         </div>
                     </div>
 
-                    <div className="bg-[var(--color-gray-50)] px-8 py-6 border-t border-[var(--color-border)]">
-                        <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
-                            <p className="text-xs text-[var(--color-gray-500)] flex items-center">
-                                <span className="w-2 h-2 bg-[var(--color-success)] rounded-full mr-2 animate-pulse"></span>
-                                <T>Secure & encrypted booking</T>
-                            </p>
-                            <div className="flex gap-3 w-full sm:w-auto">
-                                <button
-                                    onClick={onClose}
-                                    className="flex-1 sm:flex-none px-6 py-3 border-2 border-[var(--color-border)] rounded-xl text-[var(--color-text)] font-semibold hover:bg-[var(--color-gray-100)] transition-all duration-200"
-                                >
-                                    <T>Cancel</T>
-                                </button>
-                                <button
-                                    onClick={handleOpenConfirmation}
-                                    disabled={
-                                        isBooked ||
-                                        !selectedDate ||
-                                        !selectedTime
-                                    }
-                                    className={`
-                                        flex-1 sm:flex-none px-8 py-3 font-bold rounded-xl shadow-lg
-                                        flex items-center justify-center gap-2
-                                        disabled:opacity-50 disabled:cursor-not-allowed
-                                        transition-all duration-200 transform hover:scale-105
-                                        ${
-                                            isBooked
-                                                ? "bg-[var(--color-success)] text-white"
-                                                : "bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-accent)] text-white hover:shadow-xl"
-                                        }
-                                    `}
-                                >
-                                    {isBooked ? (
-                                        <>
-                                            <FaCheckCircle className="w-5 h-5" />
-                                            <T>Booked!</T>
-                                        </>
-                                    ) : (
-                                        <>
-                                            <FaChevronRight className="w-5 h-5" />
-                                            <T>Continue</T>
-                                        </>
-                                    )}
-                                </button>
-                            </div>
+                    <div className="px-8 py-5 border-t border-[var(--color-border)] flex flex-col sm:flex-row justify-between items-center gap-4">
+                        <p className="text-xs text-[var(--color-gray-500)] flex items-center gap-2">
+                            <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
+                            <T>Secure & encrypted booking</T>
+                        </p>
+                        <div className="flex gap-3 w-full sm:w-auto">
+                            <button
+                                onClick={onClose}
+                                className="flex-1 sm:flex-none px-6 py-2.5 border border-[var(--color-border)] rounded-full text-[var(--color-text)] text-sm font-semibold hover:border-[var(--color-primary)] hover:text-[var(--color-primary)] transition-colors"
+                            >
+                                <T>Cancel</T>
+                            </button>
+                            <button
+                                onClick={handleOpenConfirmation}
+                                disabled={isBooked || !selectedDate || !selectedTime}
+                                className={`flex-1 sm:flex-none px-8 py-2.5 text-sm font-semibold rounded-full flex items-center justify-center gap-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
+                                    isBooked
+                                        ? "bg-green-500 text-white"
+                                        : "bg-[var(--color-primary)] text-white hover:bg-[var(--color-primary)]/90"
+                                }`}
+                            >
+                                {isBooked ? (
+                                    <><FaCheckCircle className="w-4 h-4" /><T>Booked!</T></>
+                                ) : (
+                                    <><FaChevronRight className="w-4 h-4" /><T>Continue</T></>
+                                )}
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -805,16 +750,14 @@ export default function AppointmentBookingModal({
                     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setShowConfirmation(false)} />
                     <div className="relative bg-[var(--color-card-bg)] rounded-2xl shadow-2xl w-full max-w-lg border border-[var(--color-border)] overflow-hidden">
 
-                        <div className="bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-accent)] px-6 py-5">
-                            <div className="flex items-center justify-between">
-                                <h3 className="text-xl font-bold text-white flex items-center gap-3">
-                                    <FaCalendarCheck className="w-5 h-5" />
-                                    <T>Confirm Booking</T>
-                                </h3>
-                                <button onClick={() => setShowConfirmation(false)} className="p-2 hover:bg-white/20 rounded-full transition-colors">
-                                    <FaTimes className="w-5 h-5 text-white" />
-                                </button>
-                            </div>
+                        <div className="px-6 py-4 border-b border-[var(--color-border)] flex items-center justify-between">
+                            <h3 className="font-serif text-lg font-semibold text-[var(--color-primary)] flex items-center gap-2">
+                                <FaCalendarCheck className="w-4 h-4 text-[var(--color-primary)]/60" />
+                                <T>Confirm Booking</T>
+                            </h3>
+                            <button onClick={() => setShowConfirmation(false)} className="p-2 rounded-full text-[var(--color-gray-500)] hover:bg-[var(--color-gray-100)] transition-colors">
+                                <FaTimes className="w-4 h-4" />
+                            </button>
                         </div>
 
                         {isSaving && (
@@ -889,23 +832,23 @@ export default function AppointmentBookingModal({
                         <div className="px-6 py-4 border-t border-[var(--color-border)] flex gap-3">
                             <button
                                 onClick={() => setShowConfirmation(false)}
-                                className="flex-1 px-4 py-3 border-2 border-[var(--color-border)] rounded-xl text-[var(--color-text)] font-semibold hover:bg-[var(--color-gray-100)] transition-colors"
+                                className="flex-1 px-4 py-2.5 border border-[var(--color-border)] rounded-full text-sm text-[var(--color-text)] font-semibold hover:border-[var(--color-primary)] hover:text-[var(--color-primary)] transition-colors"
                             >
                                 <T>Back</T>
                             </button>
                             <button
                                 onClick={handleBookConsultation}
                                 disabled={isSaving || !formName || !formEmail || !formPhone}
-                                className="flex-1 px-4 py-3 bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-accent)] text-white font-bold rounded-xl shadow-lg hover:shadow-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                                className="flex-1 px-4 py-2.5 bg-[var(--color-primary)] text-white text-sm font-semibold rounded-full hover:bg-[var(--color-primary)]/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                             >
                                 {isSaving ? (
                                     <>
-                                        <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent"></div>
+                                        <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent" />
                                         <T>Booking...</T>
                                     </>
                                 ) : (
                                     <>
-                                        <FaCalendarCheck className="w-5 h-5" />
+                                        <FaCalendarCheck className="w-4 h-4" />
                                         <T>Confirm Booking</T>
                                     </>
                                 )}

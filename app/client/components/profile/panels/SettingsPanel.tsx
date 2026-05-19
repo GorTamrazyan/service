@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useState } from "react";
 import {
     FaBell,
@@ -177,13 +179,13 @@ export default function SettingsPanel() {
     return (
         <div className="space-y-6 animate-fadeIn">
 
-            <div className="bg-[var(--color-secondary)] rounded-2xl shadow-xl p-6 border border-[var(--color-text)]/10">
+            <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-card-bg)] p-6">
                 <div className="flex items-center gap-3 mb-6">
-                    <div className="bg-gradient-to-r from-purple-500 to-indigo-600 rounded-xl p-3">
-                        <FaCog className="w-6 h-6 text-white" />
+                    <div className="bg-[var(--color-primary)]/10 rounded-xl p-3">
+                        <FaCog className="w-6 h-6 text-[var(--color-primary)]" />
                     </div>
                     <div>
-                        <h3 className="text-xl font-bold text-[var(--color-text)]">
+                        <h3 className="font-serif text-xl font-semibold text-[var(--color-text)]">
                             <T>Appearance</T>
                         </h3>
                         <p className="text-sm text-[var(--color-text)]/60">
@@ -194,12 +196,12 @@ export default function SettingsPanel() {
 
                 <div className="space-y-4">
 
-                    <div className="flex items-center justify-between p-4 bg-gradient-to-r from-[var(--color-text)]/5 to-[var(--color-text)]/10 rounded-xl hover:shadow-md transition-all">
+                    <div className="flex items-center justify-between p-4 bg-[var(--color-text)]/5 rounded-xl transition-all">
                         <div className="flex items-center gap-3 flex-1 min-w-0">
                             {isDark ? (
-                                <FaMoon className="w-5 h-5 text-indigo-600 flex-shrink-0" />
+                                <FaMoon className="w-5 h-5 text-[var(--color-primary)] flex-shrink-0" />
                             ) : (
-                                <FaSun className="w-5 h-5 text-yellow-600 flex-shrink-0" />
+                                <FaSun className="w-5 h-5 text-[var(--color-accent)] flex-shrink-0" />
                             )}
                             <div className="min-w-0">
                                 <p className="font-semibold text-[var(--color-text)]">
@@ -214,7 +216,7 @@ export default function SettingsPanel() {
                             onClick={handleDarkModeToggle}
                             className={`relative w-14 h-7 rounded-full transition-colors duration-300 flex-shrink-0 ml-3 ${
                                 isDark
-                                    ? "bg-gradient-to-r from-indigo-600 to-purple-600"
+                                    ? "bg-[var(--color-primary)]"
                                     : "bg-[var(--color-text)]/20"
                             }`}
                         >
@@ -226,7 +228,7 @@ export default function SettingsPanel() {
                         </button>
                     </div>
 
-                    <div className="p-4 bg-gradient-to-r from-[var(--color-text)]/5 to-[var(--color-text)]/10 rounded-xl hover:shadow-md transition-all">
+                    <div className="p-4 bg-[var(--color-text)]/5 rounded-xl transition-all">
                         <div className="flex items-center gap-3 mb-3">
                             <FaGlobe className="w-5 h-5 text-blue-600" />
                             <div>
@@ -243,10 +245,10 @@ export default function SettingsPanel() {
                                 <button
                                     key={lang}
                                     onClick={() => handleLanguageChange(lang)}
-                                    className={`px-4 py-2 rounded-lg font-medium transition-all ${
+                                    className={`px-4 py-2 rounded-full font-medium transition-all ${
                                         language === lang
-                                            ? "bg-gradient-to-r from-[var(--color-accent)] to-[var(--color-primary)] text-white shadow-lg transform scale-105"
-                                            : "bg-[var(--color-secondary)] text-[var(--color-text)] hover:bg-[var(--color-text)]/5 border border-[var(--color-text)]/20"
+                                            ? "bg-[var(--color-primary)] text-white"
+                                            : "bg-[var(--color-card-bg)] text-[var(--color-text)] hover:bg-[var(--color-text)]/5 border border-[var(--color-border)]"
                                     }`}
                                 >
                                     {lang === "en"
@@ -263,13 +265,13 @@ export default function SettingsPanel() {
                 </div>
             </div>
 
-            <div className="bg-[var(--color-secondary)] rounded-2xl shadow-xl p-6 border border-[var(--color-text)]/10">
+            <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-card-bg)] p-6">
                 <div className="flex items-center gap-3 mb-6">
-                    <div className="bg-gradient-to-r from-blue-500 to-cyan-600 rounded-xl p-3">
-                        <FaBell className="w-6 h-6 text-white" />
+                    <div className="bg-[var(--color-primary)]/10 rounded-xl p-3">
+                        <FaBell className="w-6 h-6 text-[var(--color-primary)]" />
                     </div>
                     <div>
-                        <h3 className="text-xl font-bold text-[var(--color-text)]">
+                        <h3 className="font-serif text-xl font-semibold text-[var(--color-text)]">
                             <T>Notifications</T>
                         </h3>
                         <p className="text-sm text-[var(--color-text)]/60">
@@ -289,7 +291,7 @@ export default function SettingsPanel() {
                     ].map((item) => (
                         <div
                             key={item.key}
-                            className="flex items-center justify-between p-4 bg-gradient-to-r from-[var(--color-text)]/5 to-[var(--color-text)]/10 rounded-xl hover:shadow-md transition-all"
+                            className="flex items-center justify-between p-4 bg-[var(--color-text)]/5 rounded-xl transition-all"
                         >
                             <div className="flex items-center gap-3 flex-1 min-w-0">
                                 <item.icon className="w-5 h-5 text-blue-600 flex-shrink-0" />
@@ -316,7 +318,7 @@ export default function SettingsPanel() {
                                     notifications[
                                         item.key as keyof typeof notifications
                                     ]
-                                        ? "bg-gradient-to-r from-green-500 to-emerald-600"
+                                        ? "bg-[var(--color-primary)]"
                                         : "bg-[var(--color-text)]/20"
                                 }`}
                             >
@@ -335,13 +337,13 @@ export default function SettingsPanel() {
                 </div>
             </div>
 
-            <div className="bg-[var(--color-secondary)] rounded-2xl shadow-xl p-6 border border-[var(--color-text)]/10">
+            <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-card-bg)] p-6">
                 <div className="flex items-center gap-3 mb-6">
-                    <div className="bg-gradient-to-r from-red-500 to-pink-600 rounded-xl p-3">
-                        <FaShieldAlt className="w-6 h-6 text-white" />
+                    <div className="bg-[var(--color-primary)]/10 rounded-xl p-3">
+                        <FaShieldAlt className="w-6 h-6 text-[var(--color-primary)]" />
                     </div>
                     <div>
-                        <h3 className="text-xl font-bold text-[var(--color-text)]">
+                        <h3 className="font-serif text-xl font-semibold text-[var(--color-text)]">
                             <T>Security</T>
                         </h3>
                         <p className="text-sm text-[var(--color-text)]/60">
@@ -399,10 +401,10 @@ export default function SettingsPanel() {
 
             {showPasswordModal && (
                 <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fadeIn">
-                    <div className="bg-[var(--color-secondary)] rounded-2xl shadow-2xl max-w-md w-full overflow-hidden">
-                        <div className="bg-gradient-to-r from-[var(--color-accent)] to-[var(--color-primary)] px-6 py-4">
+                    <div className="bg-[var(--color-card-bg)] rounded-xl border border-[var(--color-border)] shadow-xl max-w-md w-full overflow-hidden">
+                        <div className="px-6 py-4 border-b border-[var(--color-border)]">
                             <div className="flex items-center justify-between">
-                                <h3 className="text-xl font-bold text-white">
+                                <h3 className="font-serif text-xl font-semibold text-[var(--color-primary)]">
                                     <T>Change Password</T>
                                 </h3>
                                 <button
@@ -416,7 +418,7 @@ export default function SettingsPanel() {
                                             confirmNewPassword: "",
                                         });
                                     }}
-                                    className="text-white/80 hover:text-white text-2xl font-bold"
+                                    className="text-[var(--color-text)]/50 hover:text-[var(--color-text)] text-2xl font-bold"
                                 >
                                     ×
                                 </button>
@@ -572,14 +574,14 @@ export default function SettingsPanel() {
                                                 confirmNewPassword: "",
                                             });
                                         }}
-                                        className="flex-1 px-4 py-3 border-2 border-[var(--color-text)]/30 rounded-xl text-[var(--color-text)] hover:bg-[var(--color-text)]/5 transition-colors font-medium"
+                                        className="flex-1 px-4 py-3 border border-[var(--color-border)] rounded-full text-[var(--color-text)] hover:bg-[var(--color-text)]/5 transition-colors font-medium"
                                     >
                                         <T>Cancel</T>
                                     </button>
                                     <button
                                         type="submit"
                                         disabled={isChangingPassword}
-                                        className="flex-1 px-4 py-3 bg-gradient-to-r from-[var(--color-accent)] to-[var(--color-primary)] text-white rounded-xl hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed font-bold shadow-lg"
+                                        className="flex-1 px-4 py-3 bg-[var(--color-primary)] text-white rounded-full hover:bg-[var(--color-primary)]/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-semibold"
                                     >
                                         {isChangingPassword ? (
                                             <T>Changing...</T>
@@ -596,10 +598,10 @@ export default function SettingsPanel() {
 
             {showDeleteModal && (
                 <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fadeIn">
-                    <div className="bg-[var(--color-secondary)] rounded-2xl shadow-2xl max-w-md w-full overflow-hidden">
-                        <div className="bg-gradient-to-r from-red-600 to-red-700 px-6 py-4">
+                    <div className="bg-[var(--color-card-bg)] rounded-xl border border-[var(--color-border)] shadow-xl max-w-md w-full overflow-hidden">
+                        <div className="px-6 py-4 border-b border-[var(--color-border)]">
                             <div className="flex items-center justify-between">
-                                <h3 className="text-xl font-bold text-white">
+                                <h3 className="font-serif text-xl font-semibold text-red-600">
                                     <T>Delete Account</T>
                                 </h3>
                                 <button
@@ -608,7 +610,7 @@ export default function SettingsPanel() {
                                         setDeleteError("");
                                         setDeleteConfirmPassword("");
                                     }}
-                                    className="text-white/80 hover:text-white text-2xl font-bold"
+                                    className="text-[var(--color-text)]/50 hover:text-[var(--color-text)] text-2xl font-bold"
                                 >
                                     ×
                                 </button>
@@ -712,14 +714,14 @@ export default function SettingsPanel() {
                                             setDeleteError("");
                                             setDeleteConfirmPassword("");
                                         }}
-                                        className="flex-1 px-4 py-3 border-2 border-[var(--color-text)]/30 rounded-xl text-[var(--color-text)] hover:bg-[var(--color-text)]/5 transition-colors font-medium"
+                                        className="flex-1 px-4 py-3 border border-[var(--color-border)] rounded-full text-[var(--color-text)] hover:bg-[var(--color-text)]/5 transition-colors font-medium"
                                     >
                                         <T>Cancel</T>
                                     </button>
                                     <button
                                         type="submit"
                                         disabled={isDeletingAccount}
-                                        className="flex-1 px-4 py-3 bg-gradient-to-r from-red-600 to-red-700 text-white rounded-xl hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed font-bold shadow-lg"
+                                        className="flex-1 px-4 py-3 bg-red-600 text-white rounded-full hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-semibold"
                                     >
                                         {isDeletingAccount ? (
                                             <T>Deleting...</T>

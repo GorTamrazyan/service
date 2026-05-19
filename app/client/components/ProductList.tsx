@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import Image from "next/image";
+import { ArrowRight, Ruler } from "lucide-react";
 import { T } from "./T";
 import ProductModal from "./ProductModal";
 import type { Material, Color } from "../../lib/firebase/products/types";
@@ -20,7 +21,10 @@ interface Product {
     colorIds?: string[];
     colors?: Color[];
     tags?: string[];
-    images?: string[]; 
+    images?: string[];
+    featured?: boolean;
+    discount?: number | null;
+    dimensions?: { height?: number; width?: number; length?: number; unit?: string };
 }
 
 interface ProductListProps {
@@ -35,7 +39,7 @@ export default function ProductList({
     selectedCategory,
 }: ProductListProps) {
     const groupedProducts = products.reduce((acc, product) => {
-        const category = product.categorId || "Other";
+        const category = product.categorId || (product as any).categoryId || "Other";
         if (!acc[category]) {
             acc[category] = [];
         }
@@ -66,21 +70,18 @@ export default function ProductList({
             {showGroupedView ? (
                 sortedCategoriesDisplay.map((category) => (
                     <div key={category} className="mb-12">
-                        <h2 className="text-3xl md:text-4xl font-bold text-[var(--color-primary)] mb-8 text-center capitalize">
+                        <h2 className="font-serif text-3xl md:text-4xl font-semibold text-[var(--color-primary)] mb-8 capitalize">
                             {category}
                         </h2>
-                        <div className="grid grid-cols-1 sm:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                             {groupedProducts[category].map((product) => (
-                                <ProductCard
-                                    key={product.id}
-                                    product={product}
-                                />
+                                <ProductCard key={product.id} product={product} />
                             ))}
                         </div>
                     </div>
                 ))
             ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                     {products.map((product) => (
                         <ProductCard key={product.id} product={product} />
                     ))}
@@ -90,120 +91,126 @@ export default function ProductList({
     );
 }
 
-export function ProductCard({ product }: { product: Product }) {
+export function ProductCard({ product: p }: { product: Product }) {
     const [isModalOpen, setIsModalOpen] = useState(false);
-   
+
+    const img = p.imageUrl ?? p.images?.[0] ?? null;
+    const tag = p.featured ? "Featured" : (p.tags?.[0] ?? null);
+
+    const prices = Object.values(p.colorPrices ?? {}).filter((v) => !isNaN(Number(v)));
+    const minPrice = prices.length ? Math.min(...prices) : null;
+    const maxPrice = prices.length ? Math.max(...prices) : null;
+    const priceLabel = prices.length === 0
+        ? null
+        : minPrice === maxPrice
+        ? `$${minPrice!.toFixed(0)}`
+        : `$${minPrice!.toFixed(0)} – $${maxPrice!.toFixed(0)}`;
+
+    const dims = p.dimensions;
+    const dimsLabel = dims
+        ? [dims.height && `${dims.height}`, dims.length && `${dims.length}`]
+              .filter(Boolean)
+              .join(" × ") + ` ${dims.unit ?? "ft"}`
+        : null;
+
     return (
         <>
-            <div className="bg-[var(--color-card-bg)] rounded-3xl shadow-lg overflow-hidden flex flex-col h-full transform transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl border border-[var(--color-border)] group">
-
-    <div className="relative p-3">
-        <div className="relative w-full h-[200px] rounded-2xl bg-gradient-to-br from-gray-100 to-gray-300 dark:from-gray-800 dark:to-gray-700 overflow-hidden">
-            {product.imageUrl ? (
-                <Image
-                    src={product.imageUrl}
-                    alt={product.name}
-                    width={400}
-                    height={500}
-                    className="w-full h-full object-cover transform transition-transform duration-500 group-hover:scale-110"
-                    priority
-                />
-            ) : (
-                <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-gray-200 to-gray-300 dark:from-gray-700 dark:to-gray-800">
-                    <svg className="w-16 h-16 text-gray-400 dark:text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                    </svg>
-                </div>
-            )}
-            
-        </div>
-
-        <div className="absolute inset-0 p-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
-            <div className="w-full h-[200px] rounded-2xl bg-gradient-to-t from-black/20 to-transparent" />
-        </div>
-    </div>
-
-    <div className="p-5 flex flex-col flex-grow">
-
-        <h3 className="text-xl font-bold text-[var(--color-primary)] mb-2 min-h-[3.5rem] line-clamp-2 leading-tight">
-            <T>{product.name}</T>
-        </h3>
-     
-        <div className="mb-4">
-            <p className="text-sm text-[var(--color-text)]/80 leading-relaxed line-clamp-2 min-h-[2.5rem]">
-                <T>{product.description || "No description available."}</T>
-            </p>
-        </div>
-
-        {product.colors && product.colors.length > 0 && (
-            <div className="mb-4">
-                <div className="flex items-center gap-2 mb-2">
-                    <span className="text-xs font-medium text-[var(--color-text)]/60">
-                        <T>Colors</T>:
-                    </span>
-                    <span className="text-xs text-[var(--color-text)]/40">
-                        {product.colors.length} <T>options</T>
-                    </span>
-                </div>
-                <div className="flex flex-wrap gap-1.5">
-                    {product.colors.map((color) => (
-                        <button
-                            key={color.id}
-                            className="w-7 h-7 rounded-full border-2 border-gray-300 dark:border-gray-600 transition-all duration-200 hover:scale-110 hover:shadow-md active:scale-95"
-                            style={{ backgroundColor: color.hexCode }}
-                            aria-label={`Color: ${color.name}`}
-                            title={color.name}
+            <article className="group flex flex-col overflow-hidden rounded-xl border border-[var(--color-border)] bg-[var(--color-card-bg)] transition-all hover:-translate-y-1 hover:shadow-xl">
+                {/* Image */}
+                <div className="relative aspect-[4/5] overflow-hidden bg-[var(--color-gray-100)]">
+                    {img ? (
+                        <Image
+                            src={img}
+                            alt={p.name}
+                            fill
+                            className="object-cover transition-transform duration-500 group-hover:scale-105"
+                            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
                         />
-                    ))}
-                    {product.colors.length > 6 && (
-                        <div className="w-7 h-7 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
-                            <span className="text-xs text-gray-500 dark:text-gray-400">+{product.colors.length - 6}</span>
-                        </div>
+                    ) : (
+                        <div className="h-full w-full bg-[var(--color-gray-200)]" />
+                    )}
+                    {tag && (
+                        <span className="absolute left-3 top-3 rounded-full bg-[var(--color-accent)] px-3 py-1 text-xs font-semibold text-[var(--color-primary)]">
+                            <T>{tag}</T>
+                        </span>
+                    )}
+                    {p.discount && (
+                        <span className="absolute right-3 top-3 rounded-full bg-[var(--color-error)] px-2.5 py-1 text-xs font-bold text-white">
+                            -{p.discount}%
+                        </span>
                     )}
                 </div>
-            </div>
-        )}
 
-        <div className="mt-auto space-y-4">
+                {/* Content */}
+                <div className="flex flex-1 flex-col p-5 gap-3">
+                    {p.material && (
+                        <span className="w-fit rounded-md bg-[var(--color-gray-100)] px-2 py-0.5 text-xs font-medium text-[var(--color-gray-500)]">
+                            <T>{p.material.name}</T>
+                        </span>
+                    )}
 
-            <div className="flex items-center justify-between">
-                <div className="flex items-baseline gap-2">
-                    <span className="text-2xl font-extrabold text-[var(--color-accent)]">
-                        {(() => {
-                            const prices = Object.values(product.colorPrices || {}).filter((v) => !isNaN(v));
-                            if (prices.length === 0) return "-";
-                            const min = Math.min(...prices);
-                            const max = Math.max(...prices);
-                            return min === max ? `$${min.toFixed(2)}` : `$${min.toFixed(2)} - $${max.toFixed(2)}`;
-                        })()}
-                    </span>
-                    
+                    <h3 className="font-serif text-lg font-semibold leading-snug text-[var(--color-text)] line-clamp-2">
+                        <T>{p.name}</T>
+                    </h3>
+
+                    {p.description && (
+                        <p className="text-xs leading-relaxed text-[var(--color-gray-500)] line-clamp-2">
+                            <T>{p.description}</T>
+                        </p>
+                    )}
+
+                    {dimsLabel && (
+                        <div className="flex items-center gap-1.5 text-xs text-[var(--color-gray-500)]">
+                            <Ruler className="h-3.5 w-3.5 shrink-0" />
+                            {dimsLabel}
+                        </div>
+                    )}
+
+                    {p.colors && p.colors.length > 0 && (
+                        <div className="flex flex-wrap items-center gap-1.5">
+                            {p.colors.slice(0, 6).map((c) => (
+                                <span
+                                    key={c.id}
+                                    title={c.name}
+                                    className="h-5 w-5 rounded-full border border-[var(--color-border)] shadow-sm"
+                                    style={{ backgroundColor: c.hexCode }}
+                                />
+                            ))}
+                            {p.colors.length > 6 && (
+                                <span className="text-xs text-[var(--color-gray-500)]">+{p.colors.length - 6}</span>
+                            )}
+                        </div>
+                    )}
+
+                    {p.tags && p.tags.length > 0 && (
+                        <div className="flex flex-wrap gap-1">
+                            {p.tags.slice(0, 3).map((t) => (
+                                <span key={t} className="rounded-full border border-[var(--color-border)] px-2 py-0.5 text-xs text-[var(--color-gray-500)]">
+                                    <T>{t}</T>
+                                </span>
+                            ))}
+                        </div>
+                    )}
+
+                    <div className="mt-auto border-t border-[var(--color-border)] pt-4 flex items-center justify-between gap-2">
+                        {priceLabel ? (
+                            <span className="font-serif text-xl font-semibold text-[var(--color-accent)]">
+                                {priceLabel}
+                            </span>
+                        ) : (
+                            <span className="text-sm text-[var(--color-gray-500)]"><T>Price on request</T></span>
+                        )}
+                        <button
+                            onClick={() => setIsModalOpen(true)}
+                            className="inline-flex items-center gap-1 rounded-full border border-[var(--color-primary)] px-3 py-1.5 text-xs font-semibold text-[var(--color-primary)] transition-colors hover:bg-[var(--color-primary)] hover:text-white"
+                        >
+                            <T>Details</T> <ArrowRight className="h-3 w-3" />
+                        </button>
+                    </div>
                 </div>
-                
-            </div>
+            </article>
 
-            <div className="flex gap-2">
-
-                <button
-                    onClick={() => setIsModalOpen(true)}
-                    className="flex-1 py-3 rounded-xl text-[var(--color-primary)] font-semibold text-sm border border-[var(--color-primary)] hover:bg-[var(--color-primary)] hover:text-white transition-all duration-200 flex items-center justify-center gap-2 group/btn"
-                >
-                    <svg className="w-4 h-4 group-hover/btn:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                    <T>Details</T>
-                </button>
-            </div>
-            
-        </div>
-    </div>
-
-</div>
-
-<ProductModal
-    product={product}
-    isOpen={isModalOpen}
-    onClose={() => setIsModalOpen(false)}
-/>
-</>
-);}
+            <ProductModal product={p} isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
+        </>
+    );
+}

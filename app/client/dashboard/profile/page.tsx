@@ -161,13 +161,10 @@ function ProfilePageContent() {
         return (
             <div className="min-h-screen bg-[var(--color-background)] flex flex-col items-center justify-center p-4">
                 <div className="text-center">
-                    <div className="relative mb-8 mx-auto w-24 h-24">
-                        <div className="w-24 h-24 rounded-full bg-gradient-to-r from-[var(--color-primary)]/20 to-[var(--color-accent)]/20 flex items-center justify-center">
-                            <FaSpinner className="w-12 h-12 text-[var(--color-accent)] animate-spin" />
-                        </div>
-                        <div className="absolute inset-0 rounded-full border-4 border-transparent border-t-[var(--color-accent)] animate-spin" />
+                    <div className="mb-8 mx-auto w-16 h-16 flex items-center justify-center">
+                        <FaSpinner className="w-10 h-10 text-[var(--color-primary)] animate-spin" />
                     </div>
-                    <h2 className="text-2xl font-bold text-[var(--color-primary)] mb-2">
+                    <h2 className="font-serif text-2xl font-semibold text-[var(--color-primary)] mb-2">
                         <T>Loading Your Profile</T>
                     </h2>
                     <p className="text-[var(--color-text)]/60">
@@ -195,7 +192,7 @@ function ProfilePageContent() {
                     <p className="text-[var(--color-text)]/70 mb-8">{error}</p>
                     <button
                         onClick={() => window.location.reload()}
-                        className="inline-flex items-center gap-2 bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-primary)]/90 text-white font-bold py-3 px-6 rounded-full hover:scale-105 transition-all duration-200"
+                        className="inline-flex items-center gap-2 bg-[var(--color-primary)] text-white font-semibold py-3 px-6 rounded-full hover:bg-[var(--color-primary)]/90 transition-colors"
                     >
                         <T>Try Again</T>
                     </button>
@@ -217,14 +214,14 @@ function ProfilePageContent() {
     return (
         <div className="min-h-screen bg-[var(--color-background)] text-[var(--color-text)]">
 
-            <header className="bg-gradient-to-r from-[var(--color-primary)] via-[var(--color-primary)]/90 to-[var(--color-accent)]/90 py-6 px-4 sm:px-6 lg:px-8">
+            <header className="bg-[var(--color-card-bg)] border-b border-[var(--color-border)] py-6 px-4 sm:px-6 lg:px-8">
                 <div className="max-w-7xl mx-auto">
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                         <div>
-                            <h1 className="text-3xl md:text-4xl font-black text-white mb-2">
+                            <h1 className="font-serif text-3xl md:text-4xl font-semibold text-[var(--color-primary)] mb-2">
                                 <T>My Account</T>
                             </h1>
-                            <p className="text-white/80">
+                            <p className="text-[var(--color-text)]/70">
                                 <T>
                                     Manage your profile, orders, and preferences
                                 </T>
@@ -237,14 +234,14 @@ function ProfilePageContent() {
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 
                 {saveSuccess && (
-                    <div className="mb-6 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-xl p-4 shadow-lg animate-fadeIn">
+                    <div className="mb-6 bg-green-50 border border-green-200 text-green-800 rounded-xl p-4">
                         <div className="flex items-center gap-3">
-                            <FaCheckCircle className="w-6 h-6" />
+                            <FaCheckCircle className="w-5 h-5 text-green-600 shrink-0" />
                             <div>
-                                <h4 className="font-bold">
+                                <h4 className="font-semibold">
                                     <T>Profile Updated!</T>
                                 </h4>
-                                <p className="text-sm text-white/90">
+                                <p className="text-sm text-green-700">
                                     <T>
                                         Your changes have been saved
                                         successfully.
@@ -280,45 +277,6 @@ function ProfilePageContent() {
                 </div>
             </div>
 
-            <style jsx global>{`
-                @keyframes fadeIn {
-                    from {
-                        opacity: 0;
-                        transform: translateY(-10px);
-                    }
-                    to {
-                        opacity: 1;
-                        transform: translateY(0);
-                    }
-                }
-                .animate-fadeIn {
-                    animation: fadeIn 0.3s ease-out;
-                }
-                @keyframes slideIn {
-                    from {
-                        opacity: 0;
-                        transform: translateX(-20px);
-                    }
-                    to {
-                        opacity: 1;
-                        transform: translateX(0);
-                    }
-                }
-                .animate-slideIn {
-                    animation: slideIn 0.3s ease-out;
-                }
-                @keyframes spin {
-                    from {
-                        transform: rotate(0deg);
-                    }
-                    to {
-                        transform: rotate(360deg);
-                    }
-                }
-                .animate-spin {
-                    animation: spin 1s linear infinite;
-                }
-            `}</style>
         </div>
     );
 }
@@ -329,13 +287,10 @@ export default function ProfilePage() {
             fallback={
                 <div className="min-h-screen bg-[var(--color-background)] flex flex-col items-center justify-center p-4">
                     <div className="text-center">
-                        <div className="relative mb-8 mx-auto w-24 h-24">
-                            <div className="w-24 h-24 rounded-full bg-gradient-to-r from-[var(--color-primary)]/20 to-[var(--color-accent)]/20 flex items-center justify-center">
-                                <FaSpinner className="w-12 h-12 text-[var(--color-accent)] animate-spin" />
-                            </div>
-                            <div className="absolute inset-0 rounded-full border-4 border-transparent border-t-[var(--color-accent)] animate-spin" />
+                        <div className="mb-8 mx-auto w-16 h-16 flex items-center justify-center">
+                            <FaSpinner className="w-10 h-10 text-[var(--color-primary)] animate-spin" />
                         </div>
-                        <h2 className="text-2xl font-bold text-[var(--color-primary)] mb-2">
+                        <h2 className="font-serif text-2xl font-semibold text-[var(--color-primary)] mb-2">
                             <T>Loading Your Profile</T>
                         </h2>
                         <p className="text-[var(--color-text)]/60">

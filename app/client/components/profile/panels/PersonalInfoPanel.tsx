@@ -35,7 +35,7 @@ export default function PersonalInfoPanel({
 
                 <div className="space-y-6">
                     <div>
-                        <h3 className="text-lg font-bold text-[var(--color-text)] mb-4 flex items-center gap-2">
+                        <h3 className="text-lg font-serif font-semibold text-[var(--color-text)] mb-4 flex items-center gap-2">
                             <FaUserCircle className="w-5 h-5 text-[var(--color-accent)]" />
                             <T>Personal Information</T>
                         </h3>
@@ -78,7 +78,7 @@ export default function PersonalInfoPanel({
                     </div>
 
                     <div>
-                        <h3 className="text-lg font-bold text-[var(--color-text)] mb-4 flex items-center gap-2">
+                        <h3 className="text-lg font-serif font-semibold text-[var(--color-text)] mb-4 flex items-center gap-2">
                             <FaEnvelope className="w-5 h-5 text-[var(--color-accent)]" />
                             <T>Contact Information</T>
                         </h3>
@@ -121,7 +121,7 @@ export default function PersonalInfoPanel({
 
                 <div>
                     <div className="flex items-center justify-between mb-4">
-                        <h3 className="text-lg font-bold text-[var(--color-text)] flex items-center gap-2">
+                        <h3 className="text-lg font-serif font-semibold text-[var(--color-text)] flex items-center gap-2">
                             <FaMapMarkerAlt className="w-5 h-5 text-[var(--color-accent)]" />
                             <T>Address Information</T>
                         </h3>
