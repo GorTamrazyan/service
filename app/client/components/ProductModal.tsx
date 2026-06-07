@@ -76,10 +76,46 @@ export default function ProductModal({ product, isOpen, onClose }: ProductModalP
     const handleHeightChange = (e: React.ChangeEvent<HTMLInputElement>) => setHeight(Math.max(1, parseInt(e.target.value) || 0));
     const handleLengthChange = (e: React.ChangeEvent<HTMLInputElement>) => setLength(Math.max(1, parseInt(e.target.value) || 0));
 
+    const offerPrices = Object.values(product.colorPrices ?? {}).filter((v) => !isNaN(Number(v)));
+    const minPrice = offerPrices.length ? Math.min(...offerPrices) : null;
+    const maxPrice = offerPrices.length ? Math.max(...offerPrices) : null;
+    const productJsonLd = {
+        "@context": "https://schema.org",
+        "@type": "Product",
+        name: product.name,
+        ...(product.description ? { description: product.description } : {}),
+        ...(allImages.length > 0 ? { image: allImages } : {}),
+        ...(product.material?.name ? { brand: { "@type": "Brand", name: product.material.name } } : {}),
+        ...(minPrice !== null
+            ? {
+                  offers:
+                      minPrice === maxPrice
+                          ? {
+                                "@type": "Offer",
+                                price: minPrice,
+                                priceCurrency: "USD",
+                                availability: "https://schema.org/InStock",
+                            }
+                          : {
+                                "@type": "AggregateOffer",
+                                lowPrice: minPrice,
+                                highPrice: maxPrice,
+                                priceCurrency: "USD",
+                                availability: "https://schema.org/InStock",
+                            },
+              }
+            : {}),
+    };
+
     if (!isOpen) return null;
 
     return (
         <>
+            <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{ __html: JSON.stringify(productJsonLd) }}
+            />
+
             {/* Notification */}
             {showNotification && (
                 <div className="fixed top-6 right-6 z-[60]">

@@ -21,6 +21,30 @@ const playfair = Playfair_Display({
 
 const SITE_URL = "https://oniksvinyl.com";
 
+const organizationJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  name: "ONIK'S VINYL",
+  url: SITE_URL,
+  logo: `${SITE_URL}/images/oniks_vinyl_text.png`,
+  description:
+    "ONIK'S VINYL — premium custom vinyl fencing, gates, and installation services. 15+ years of experience, 10,000+ projects completed.",
+  email: "info@oniksvinyl.com",
+  telephone: "+1-234-567-890",
+  contactPoint: {
+    "@type": "ContactPoint",
+    contactType: "customer service",
+    email: "info@oniksvinyl.com",
+    telephone: "+1-234-567-890",
+  },
+  sameAs: [
+    "https://facebook.com",
+    "https://instagram.com",
+    "https://twitter.com",
+    "https://youtube.com",
+  ],
+};
+
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
@@ -60,6 +84,10 @@ export default function RootLayout({
           <body
               className={`${geistSans.variable} ${geistMono.variable} ${playfair.variable} antialiased bg-[var(--color-background)] text-[var(--color-text)]`}
           >
+              <script
+                  type="application/ld+json"
+                  dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }}
+              />
               <LanguageProvider storageKey="preferred-language-client">
                   <CartProvider>
                       <main>{children}</main>
