@@ -8,11 +8,6 @@ import { ThemeProvider } from "../../contexts/ThemeContext";
 
 const inter = Inter({ subsets: ["latin"] });
 
-export const metadata = {
-    title: "My Website",
-    description: "A Next.js application with Firebase integration.",
-};
-
 export default function RootLayout({
     children,
 }: {
