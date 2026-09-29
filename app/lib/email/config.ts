@@ -39,7 +39,7 @@ export const verifyEmailConnection = async (): Promise<boolean> => {
 
 export const defaultSender = {
     name: "ONIK'S VINYL",
-    email: process.env.EMAIL_USER || 'noreply@oniks-vinyl.com',
+    email: process.env.EMAIL_USER || "Info@vinylfencegeneral.com",
 };
 
 export const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';

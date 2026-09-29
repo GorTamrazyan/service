@@ -11,15 +11,17 @@ export default function Footer() {
 
     return (
         <footer className="bg-[var(--color-secondary)] text-[var(--color-text)] mt-auto">
-
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-
                     <div className="space-y-4">
                         <div className="flex items-center space-x-3">
-
                             <div className="text-[var(--color-accent)]">
-                                <svg width="40" height="28" viewBox="0 0 60 40" fill="currentColor">
+                                <svg
+                                    width="40"
+                                    height="28"
+                                    viewBox="0 0 60 40"
+                                    fill="currentColor"
+                                >
                                     <rect x="8" y="8" width="6" height="24" />
                                     <rect x="18" y="8" width="6" height="24" />
                                     <rect x="28" y="8" width="6" height="24" />
@@ -37,35 +39,39 @@ export default function Footer() {
                             </h3>
                         </div>
                         <p className="text-[var(--color-text)]/70">
-                            <T>Quality fences and protection for your home and business. Professional installation and reliable service since 2020.</T>
+                            <T>
+                                Quality fences and protection for your home and
+                                business. Professional installation and reliable
+                                service since 2020.
+                            </T>
                         </p>
                         <div className="flex space-x-4">
-                            <a 
-                                href="https://facebook.com" 
+                            <a
+                                href="https://facebook.com"
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="text-[var(--color-text)]/60 hover:text-[var(--color-accent)] transition-colors duration-200"
                             >
                                 <FaFacebook className="w-5 h-5" />
                             </a>
-                            <a 
-                                href="https://instagram.com" 
+                            <a
+                                href="https://instagram.com"
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="text-[var(--color-text)]/60 hover:text-[var(--color-accent)] transition-colors duration-200"
                             >
                                 <FaInstagram className="w-5 h-5" />
                             </a>
-                            <a 
-                                href="https://twitter.com" 
+                            <a
+                                href="https://twitter.com"
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="text-[var(--color-text)]/60 hover:text-[var(--color-accent)] transition-colors duration-200"
                             >
                                 <FaTwitter className="w-5 h-5" />
                             </a>
-                            <a 
-                                href="https://youtube.com" 
+                            <a
+                                href="https://youtube.com"
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="text-[var(--color-text)]/60 hover:text-[var(--color-accent)] transition-colors duration-200"
@@ -80,26 +86,26 @@ export default function Footer() {
                             <T>Quick Links</T>
                         </h4>
                         <nav className="space-y-2">
-                            <Link 
-                                href="/client/dashboard/products" 
+                            <Link
+                                href="/client/dashboard/products"
                                 className="block text-[var(--color-text)]/70 hover:text-[var(--color-accent)] transition-colors duration-200"
                             >
                                 <T>Products</T>
                             </Link>
-                            <Link 
-                                href="/client/dashboard/cart" 
+                            <Link
+                                href="/client/dashboard/cart"
                                 className="block text-[var(--color-text)]/70 hover:text-[var(--color-accent)] transition-colors duration-200"
                             >
                                 <T>Shopping Cart</T>
                             </Link>
-                            <Link 
-                                href="/client/dashboard/profile" 
+                            <Link
+                                href="/client/dashboard/profile"
                                 className="block text-[var(--color-text)]/70 hover:text-[var(--color-accent)] transition-colors duration-200"
                             >
                                 <T>My Profile</T>
                             </Link>
-                            <Link 
-                                href="/about" 
+                            <Link
+                                href="/client/dashboard/about"
                                 className="block text-[var(--color-text)]/70 hover:text-[var(--color-accent)] transition-colors duration-200"
                             >
                                 <T>About Us</T>
@@ -115,25 +121,28 @@ export default function Footer() {
                             <div className="flex items-center space-x-3">
                                 <MapPin className="w-5 h-5 text-[var(--color-accent)] flex-shrink-0" />
                                 <span className="text-[var(--color-text)]/70">
-                                    <T>123 Main Street, City, Country 12345</T>
+                                    <T>
+                                        8058 Troost Ave, North Hollywood, CA
+                                        91605, United States
+                                    </T>
                                 </span>
                             </div>
                             <div className="flex items-center space-x-3">
                                 <Phone className="w-5 h-5 text-[var(--color-accent)] flex-shrink-0" />
-                                <a 
-                                    href="tel:+1234567890" 
+                                <a
+                                    href="tel:+1234567890"
                                     className="text-[var(--color-text)]/70 hover:text-[var(--color-accent)] transition-colors duration-200"
                                 >
-                                    +1 (234) 567-890
+                                    (888) 336 - 2330
                                 </a>
                             </div>
                             <div className="flex items-center space-x-3">
                                 <Mail className="w-5 h-5 text-[var(--color-accent)] flex-shrink-0" />
-                                <a 
-                                    href="mailto:info@oniksvinyl.com" 
+                                <a
+                                    href="mailto:info@oniksvinyl.com"
                                     className="text-[var(--color-text)]/70 hover:text-[var(--color-accent)] transition-colors duration-200"
                                 >
-                                    info@oniksvinyl.com
+                                    Info@vinylfencegeneral.com
                                 </a>
                             </div>
                         </div>
@@ -144,16 +153,24 @@ export default function Footer() {
                             </h5>
                             <div className="space-y-1 text-sm text-[var(--color-text)]/70">
                                 <div className="flex justify-between">
-                                    <span><T>Mon - Fri:</T></span>
+                                    <span>
+                                        <T>Mon - Fri:</T>
+                                    </span>
                                     <span>9:00 - 18:00</span>
                                 </div>
                                 <div className="flex justify-between">
-                                    <span><T>Saturday:</T></span>
+                                    <span>
+                                        <T>Saturday:</T>
+                                    </span>
                                     <span>9:00 - 16:00</span>
                                 </div>
                                 <div className="flex justify-between">
-                                    <span><T>Sunday:</T></span>
-                                    <span><T>Closed</T></span>
+                                    <span>
+                                        <T>Sunday:</T>
+                                    </span>
+                                    <span>
+                                        <T>Closed</T>
+                                    </span>
                                 </div>
                             </div>
                         </div>
