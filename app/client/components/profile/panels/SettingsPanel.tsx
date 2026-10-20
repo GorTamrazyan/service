@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
     FaBell,
     FaShieldAlt,
@@ -22,14 +22,37 @@ import {
     EmailAuthProvider,
     deleteUser,
 } from "firebase/auth";
-import { doc, deleteDoc } from "firebase/firestore";
+import { doc, deleteDoc, getDoc, setDoc } from "firebase/firestore";
 import { db } from "../../../../lib/firebase/firebase";
 import { useRouter } from "next/navigation";
+import { useAuthState } from "../../../../hooks/useAuthState";
 
 export default function SettingsPanel() {
     const [notifications, setNotifications] = useState({
         email: true,
     });
+    const [user] = useAuthState();
+
+    useEffect(() => {
+        if (!user) return;
+        getDoc(doc(db, "users", user.uid))
+            .then((snap) => {
+                setNotifications({ email: snap.data()?.emailNotifications !== false });
+            })
+            .catch((error) => console.error("Error loading notification settings:", error));
+    }, [user]);
+
+    const handleNotificationToggle = async (key: keyof typeof notifications) => {
+        if (!user) return;
+        const value = !notifications[key];
+        setNotifications((prev) => ({ ...prev, [key]: value }));
+        try {
+            await setDoc(doc(db, "users", user.uid), { emailNotifications: value }, { merge: true });
+        } catch (error) {
+            console.error("Error saving notification settings:", error);
+            setNotifications((prev) => ({ ...prev, [key]: !value }));
+        }
+    };
 
     const [showPasswordModal, setShowPasswordModal] = useState(false);
     const [passwordData, setPasswordData] = useState({
@@ -306,13 +329,16 @@ export default function SettingsPanel() {
                             </div>
                             <button
                                 onClick={() =>
-                                    setNotifications((prev) => ({
-                                        ...prev,
-                                        [item.key]:
-                                            !prev[
-                                                item.key as keyof typeof prev
-                                            ],
-                                    }))
+                                    handleNotificationToggle(
+                                        item.key as keyof typeof notifications
+                                    )
+                                }
+                                disabled={!user}
+                                role="switch"
+                                aria-checked={
+                                    notifications[
+                                        item.key as keyof typeof notifications
+                                    ]
                                 }
                                 className={`relative w-14 h-7 rounded-full transition-colors duration-300 flex-shrink-0 ml-3 ${
                                     notifications[

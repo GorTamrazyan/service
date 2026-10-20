@@ -15,9 +15,15 @@ import {
     HeadphonesIcon,
     Truck,
     Check,
+    CalendarCheck,
+    Flag,
+    FileText,
+    MapPin,
+    Phone,
 } from "lucide-react";
 import ProductModal from "../../components/ProductModal";
 import { T } from "../../components/T";
+import CallbackForm from "../../components/CallbackForm";
 
 interface Color {
     id: string;
@@ -78,8 +84,8 @@ const services = [
     },
     {
         icon: HeadphonesIcon,
-        title: "Lifetime Support",
-        description: "One call, real people. We stand behind every project with a transferable lifetime warranty.",
+        title: "Ongoing Support",
+        description: "One call, real people. We stand behind every project with our 15-year warranty.",
     },
 ];
 
@@ -91,11 +97,59 @@ const gallery = [
 ];
 
 const highlights = [
-    "Family-owned and operated since 2008",
+    "Family-owned and operated since 2010",
     "Licensed, bonded, and fully insured",
-    "100% premium vinyl materials",
-    "Transferable lifetime product warranty",
-    "4.9-star rating across 800+ reviews",
+    "100% premium vinyl materials, made in the USA",
+    "15-year warranty",
+    "Free on-site estimate with a price on the spot",
+];
+
+const reasons = [
+    {
+        icon: CalendarCheck,
+        title: "In Business Since 2010",
+        description: "Over 15 years of installing vinyl fences for homes and businesses across Southern California.",
+    },
+    {
+        icon: Flag,
+        title: "Made in USA Materials",
+        description: "We install vinyl fencing produced in the USA by trusted American manufacturers.",
+    },
+    {
+        icon: Ruler,
+        title: "Free On-Site Estimate",
+        description: "We come to your property, take measurements, and give you a price on the spot — free and with no obligation.",
+    },
+    {
+        icon: ShieldCheck,
+        title: "15-Year Warranty",
+        description: "Every fence we install is backed by our 15-year warranty.",
+    },
+];
+
+const steps = [
+    {
+        icon: Ruler,
+        title: "Free Estimate",
+        description: "We visit your property, measure the fence line, help you choose a style and color, and give you a price on the spot.",
+    },
+    {
+        icon: FileText,
+        title: "Contract",
+        description: "You receive a written contract with the scope of work, materials, price, and installation date.",
+    },
+    {
+        icon: Hammer,
+        title: "Installation",
+        description: "Our crew installs your fence, cleans up the site, and walks through the finished work with you.",
+    },
+];
+
+const serviceAreas = [
+    "San Fernando Valley",
+    "Los Angeles",
+    "Orange County",
+    "Ventura County",
 ];
 
 function ProductHomeCard({ product: p }: { product: Product }) {
@@ -260,17 +314,16 @@ export default function HomePage() {
                 <div className="relative mx-auto flex min-h-[88vh] print:min-h-[500px] max-w-7xl flex-col justify-center px-4 py-20 md:px-8 md:py-28">
                     <div className="max-w-2xl">
                         <span className="inline-flex items-center rounded-full border border-white/30 bg-white/10 px-4 py-1.5 text-xs font-medium uppercase tracking-widest text-white backdrop-blur-sm">
-                            <T>Established 2008 · Family Owned</T>
+                            <T>Established 2010 · Family Owned</T>
                         </span>
 
                         <h1 className="mt-6 font-serif text-5xl font-semibold leading-[1.05] text-white md:text-7xl lg:text-8xl">
                             <T>Vinyl Fences</T>{" "}
-                            <span className="italic text-[var(--color-accent)]"><T>Built to Last</T></span>{" "}
-                            <T>a Lifetime</T>
+                            <span className="italic text-[var(--color-accent)]"><T>Built to Last</T></span>
                         </h1>
 
                         <p className="mt-6 max-w-xl text-lg leading-relaxed text-white/85 md:text-xl">
-                            <T>Premium vinyl fences and gates crafted for beauty, privacy, and security. Zero maintenance, lifetime warranty, and professional installation across the region.</T>
+                            <T>Premium vinyl fences and gates crafted for beauty, privacy, and security. Low maintenance, a 15-year warranty, and professional installation across Southern California.</T>
                         </p>
 
                         <div className="mt-10 flex flex-col gap-3 sm:flex-row">
@@ -293,14 +346,14 @@ export default function HomePage() {
                                 <ShieldCheck className="h-8 w-8 shrink-0 text-[var(--color-accent)]" strokeWidth={1.5} />
                                 <div>
                                     <dt className="text-sm font-medium text-white/70"><T>Warranty</T></dt>
-                                    <dd className="font-serif text-lg font-semibold text-white"><T>Lifetime</T></dd>
+                                    <dd className="font-serif text-lg font-semibold text-white"><T>15 Years</T></dd>
                                 </div>
                             </div>
                             <div className="flex items-center gap-3">
                                 <Award className="h-8 w-8 shrink-0 text-[var(--color-accent)]" strokeWidth={1.5} />
                                 <div>
-                                    <dt className="text-sm font-medium text-white/70"><T>Projects</T></dt>
-                                    <dd className="font-serif text-lg font-semibold text-white"><T>500+ Built</T></dd>
+                                    <dt className="text-sm font-medium text-white/70"><T>Materials</T></dt>
+                                    <dd className="font-serif text-lg font-semibold text-white"><T>Made in USA</T></dd>
                                 </div>
                             </div>
                             <div className="flex items-center gap-3">
@@ -311,6 +364,42 @@ export default function HomePage() {
                                 </div>
                             </div>
                         </dl>
+                    </div>
+                </div>
+            </section>
+
+            {/* ── WHY US ── */}
+            <section id="why-us" className="bg-[var(--color-gray-100)] py-20 md:py-28">
+                <div className="mx-auto max-w-7xl px-4 md:px-8">
+                    <div className="mx-auto max-w-2xl text-center">
+                        <span className="text-xs font-medium uppercase tracking-widest text-[var(--color-accent)]">
+                            <T>Why Us</T>
+                        </span>
+                        <h2 className="mt-3 font-serif text-4xl font-semibold leading-tight text-[var(--color-text)] md:text-5xl">
+                            <T>Why Homeowners Choose Us</T>
+                        </h2>
+                    </div>
+
+                    <div className="mt-14 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+                        {reasons.map((r) => {
+                            const Icon = r.icon;
+                            return (
+                                <div
+                                    key={r.title}
+                                    className="flex flex-col gap-4 rounded-xl border border-[var(--color-border)] bg-[var(--color-card-bg)] p-7"
+                                >
+                                    <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-[var(--color-accent)]/15 text-[var(--color-accent)]">
+                                        <Icon className="h-6 w-6" strokeWidth={1.75} />
+                                    </div>
+                                    <h3 className="font-serif text-xl font-semibold text-[var(--color-text)]">
+                                        <T>{r.title}</T>
+                                    </h3>
+                                    <p className="text-sm leading-relaxed text-[var(--color-gray-500)]">
+                                        <T>{r.description}</T>
+                                    </p>
+                                </div>
+                            );
+                        })}
                     </div>
                 </div>
             </section>
@@ -371,7 +460,7 @@ export default function HomePage() {
                             <T>Full-Service, End to End</T>
                         </h2>
                         <p className="mt-4 text-base leading-relaxed text-[var(--color-gray-500)] md:text-lg">
-                            <T>From the first measurement to the final cap, we handle every detail so you get a fence that&apos;s perfect on day one — and still perfect in 30 years.</T>
+                            <T>From the first measurement to the final cap, we handle every detail so you get a fence that&apos;s perfect on day one — and for years to come.</T>
                         </p>
                     </div>
 
@@ -399,6 +488,45 @@ export default function HomePage() {
                 </div>
             </section>
 
+            {/* ── HOW WE WORK ── */}
+            <section id="how-we-work" className="border-b border-[var(--color-border)] bg-[var(--color-background)] py-20 md:py-28">
+                <div className="mx-auto max-w-7xl px-4 md:px-8">
+                    <div className="mx-auto max-w-2xl text-center">
+                        <span className="text-xs font-medium uppercase tracking-widest text-[var(--color-accent)]">
+                            <T>How We Work</T>
+                        </span>
+                        <h2 className="mt-3 font-serif text-4xl font-semibold leading-tight text-[var(--color-primary)] md:text-5xl">
+                            <T>Three Simple Steps</T>
+                        </h2>
+                    </div>
+
+                    <ol className="mt-14 grid grid-cols-1 gap-5 md:grid-cols-3">
+                        {steps.map((step, i) => {
+                            const Icon = step.icon;
+                            return (
+                                <li
+                                    key={step.title}
+                                    className="relative flex flex-col gap-4 rounded-xl border border-[var(--color-border)] bg-[var(--color-card-bg)] p-7"
+                                >
+                                    <span className="font-serif text-5xl font-semibold text-[var(--color-accent)]/40">
+                                        {String(i + 1).padStart(2, "0")}
+                                    </span>
+                                    <div className="flex items-center gap-3">
+                                        <Icon className="h-6 w-6 text-[var(--color-primary)]" strokeWidth={1.75} />
+                                        <h3 className="font-serif text-xl font-semibold text-[var(--color-text)]">
+                                            <T>{step.title}</T>
+                                        </h3>
+                                    </div>
+                                    <p className="text-sm leading-relaxed text-[var(--color-gray-500)]">
+                                        <T>{step.description}</T>
+                                    </p>
+                                </li>
+                            );
+                        })}
+                    </ol>
+                </div>
+            </section>
+
             {/* ── GALLERY ── */}
             <section id="gallery" className="bg-[var(--color-background)] py-24 md:py-32">
                 <div className="mx-auto max-w-7xl px-4 md:px-8">
@@ -413,7 +541,7 @@ export default function HomePage() {
                             </h2>
                         </div>
                         <p className="max-w-md text-lg leading-relaxed text-[var(--color-gray-500)]">
-                            <T>Every installation is custom-fitted to the property. Here&apos;s a sample from our 500+ completed projects.</T>
+                            <T>Every installation is custom-fitted to the property. Here&apos;s a sample of our recent work.</T>
                         </p>
                     </div>
 
@@ -469,12 +597,12 @@ export default function HomePage() {
                                 />
                             </div>
                             <div className="absolute -bottom-6 -right-6 hidden w-48 rounded-xl border border-[var(--color-border)] bg-[var(--color-card-bg)] p-5 shadow-xl md:block">
-                                <div className="font-serif text-4xl font-semibold text-[var(--color-primary)]">15</div>
+                                <div className="font-serif text-4xl font-semibold text-[var(--color-primary)]">2010</div>
                                 <div className="mt-1 text-sm font-medium text-[var(--color-text)]">
-                                    <T>Years of craftsmanship</T>
+                                    <T>Building fences since</T>
                                 </div>
                                 <div className="mt-1 text-xs text-[var(--color-gray-500)]">
-                                    <T>Building fences that outlast the warranty</T>
+                                    <T>Family owned and operated</T>
                                 </div>
                             </div>
                         </div>
@@ -487,7 +615,7 @@ export default function HomePage() {
                                 <T>A Family Business Built on Handshakes and Hard Work</T>
                             </h2>
                             <p className="mt-5 text-base leading-relaxed text-[var(--color-gray-500)] md:text-lg">
-                                <T>Onik started the company out of his garage in 2008 with one truck and a promise: every fence we install will be the one we&apos;d put around our own home. Fifteen years later, that promise still drives every job.</T>
+                                <T>Onik started the company in 2010 with one truck and a promise: every fence we install will be the one we&apos;d put around our own home. That promise still drives every job.</T>
                             </p>
 
                             <ul className="mt-8 space-y-3">
@@ -510,24 +638,61 @@ export default function HomePage() {
                                 >
                                     <T>Start Your Project</T> <ArrowRight className="h-4 w-4" />
                                 </Link>
-                                <div className="flex items-center gap-4 sm:ml-4">
-                                    <div className="flex -space-x-2">
-                                        {["A", "M", "J", "K"].map((i) => (
-                                            <div
-                                                key={i}
-                                                className="flex h-9 w-9 items-center justify-center rounded-full border-2 border-white bg-[var(--color-primary)]/80 text-xs font-bold text-white"
-                                            >
-                                                {i}
-                                            </div>
-                                        ))}
-                                    </div>
-                                    <div className="text-sm">
-                                        <div className="font-semibold text-[var(--color-text)]"><T>500+ happy clients</T></div>
-                                        <div className="text-xs text-[var(--color-gray-500)]"><T>across the region</T></div>
-                                    </div>
-                                </div>
+                                <a
+                                    href="tel:+18883362330"
+                                    className="inline-flex items-center gap-3 text-sm sm:ml-4"
+                                >
+                                    <span className="flex h-9 w-9 items-center justify-center rounded-full bg-[var(--color-primary)]/15 text-[var(--color-primary)]">
+                                        <Phone className="h-4 w-4" />
+                                    </span>
+                                    <span>
+                                        <span className="block font-semibold text-[var(--color-text)]">(888) 336-2330</span>
+                                        <span className="block text-xs text-[var(--color-gray-500)]"><T>Call for a free estimate</T></span>
+                                    </span>
+                                </a>
                             </div>
                         </div>
+                    </div>
+                </div>
+            </section>
+
+            {/* ── SERVICE AREA ── */}
+            <section id="service-area" className="bg-[var(--color-background)] py-20 md:py-28">
+                <div className="mx-auto max-w-7xl px-4 md:px-8">
+                    <div className="grid grid-cols-1 items-center gap-10 lg:grid-cols-2">
+                        <div>
+                            <span className="text-xs font-medium uppercase tracking-widest text-[var(--color-accent)]">
+                                <T>Service Area</T>
+                            </span>
+                            <h2 className="mt-3 font-serif text-4xl font-semibold leading-tight text-[var(--color-primary)] md:text-5xl">
+                                <T>Where We Work</T>
+                            </h2>
+                            <p className="mt-5 text-base leading-relaxed text-[var(--color-gray-500)] md:text-lg">
+                                <T>We install vinyl fences throughout Southern California. Not sure if we cover your address? Give us a call and we will let you know.</T>
+                            </p>
+                            <a
+                                href="tel:+18883362330"
+                                className="mt-8 inline-flex h-12 items-center gap-2 rounded-full bg-[var(--color-primary)] px-8 text-base font-semibold text-white transition-colors hover:bg-[var(--color-primary)]/90"
+                            >
+                                <Phone className="h-4 w-4" /> (888) 336-2330
+                            </a>
+                        </div>
+
+                        <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                            {serviceAreas.map((area) => (
+                                <li
+                                    key={area}
+                                    className="flex items-center gap-3 rounded-xl border border-[var(--color-border)] bg-[var(--color-card-bg)] p-5"
+                                >
+                                    <MapPin className="h-5 w-5 shrink-0 text-[var(--color-accent)]" />
+                                    <span className="font-medium text-[var(--color-text)]">{area}</span>
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+
+                    <div className="mt-12">
+                        <CallbackForm />
                     </div>
                 </div>
             </section>

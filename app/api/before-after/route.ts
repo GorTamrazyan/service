@@ -2,11 +2,20 @@ import { NextResponse } from "next/server";
 import {
     getAllProjects,
     getActiveProjects,
-    createProject,
-    updateProject,
-    deleteProject,
+    getProjectById,
     uploadProjectImage,
+    deleteProjectImage,
 } from "../../lib/firebase/beforeAfter";
+import {
+    requireAdmin,
+    authErrorResponse,
+    createDocumentAsUser,
+    updateDocumentAsUser,
+    deleteDocumentAsUser,
+} from "../../lib/firebase/serverAuth";
+
+const COLLECTION = "beforeAfterProjects";
+const ID_PATTERN = /^[A-Za-z0-9]{1,64}$/;
 
 export async function GET(request: Request) {
     try {
@@ -29,6 +38,7 @@ export async function GET(request: Request) {
 
 export async function POST(request: Request) {
     try {
+        const { token } = await requireAdmin(request);
         const formData = await request.formData();
 
         const beforeFile = formData.get("beforeImage") as File;
@@ -51,14 +61,21 @@ export async function POST(request: Request) {
         const beforeImageUrl = await uploadProjectImage(beforeFile, "before");
         const afterImageUrl = await uploadProjectImage(afterFile, "after");
 
-        const projectId = await createProject({
-            beforeImage: beforeImageUrl,
-            afterImage: afterImageUrl,
-            description,
-            location,
-            order,
-            isActive,
-        });
+        const now = new Date();
+        const projectId = await createDocumentAsUser(
+            COLLECTION,
+            {
+                beforeImage: beforeImageUrl,
+                afterImage: afterImageUrl,
+                description,
+                location,
+                order,
+                isActive,
+                createdAt: now,
+                updatedAt: now,
+            },
+            token
+        );
 
         return NextResponse.json(
             {
@@ -68,6 +85,9 @@ export async function POST(request: Request) {
             { status: 201 }
         );
     } catch (error) {
+        const authResponse = authErrorResponse(error);
+        if (authResponse) return authResponse;
+
         console.error("Error creating project:", error);
         return NextResponse.json(
             { message: "Failed to create project" },
@@ -78,10 +98,11 @@ export async function POST(request: Request) {
 
 export async function PUT(request: Request) {
     try {
+        const { token } = await requireAdmin(request);
         const { searchParams } = new URL(request.url);
         const id = searchParams.get("id");
 
-        if (!id) {
+        if (!id || !ID_PATTERN.test(id)) {
             return NextResponse.json(
                 { message: "Project ID is required" },
                 { status: 400 }
@@ -118,13 +139,17 @@ export async function PUT(request: Request) {
         if (order !== undefined) updates.order = order;
         if (isActive !== undefined) updates.isActive = isActive;
 
-        await updateProject(id, updates);
+        updates.updatedAt = new Date();
+        await updateDocumentAsUser(`${COLLECTION}/${id}`, updates, token);
 
         return NextResponse.json(
             { message: "Project updated successfully" },
             { status: 200 }
         );
     } catch (error) {
+        const authResponse = authErrorResponse(error);
+        if (authResponse) return authResponse;
+
         console.error("Error updating project:", error);
         return NextResponse.json(
             { message: "Failed to update project" },
@@ -135,23 +160,30 @@ export async function PUT(request: Request) {
 
 export async function DELETE(request: Request) {
     try {
+        const { token } = await requireAdmin(request);
         const { searchParams } = new URL(request.url);
         const id = searchParams.get("id");
 
-        if (!id) {
+        if (!id || !ID_PATTERN.test(id)) {
             return NextResponse.json(
                 { message: "Project ID is required" },
                 { status: 400 }
             );
         }
 
-        await deleteProject(id);
+        const project = await getProjectById(id);
+        await deleteDocumentAsUser(`${COLLECTION}/${id}`, token);
+        if (project?.beforeImage) await deleteProjectImage(project.beforeImage);
+        if (project?.afterImage) await deleteProjectImage(project.afterImage);
 
         return NextResponse.json(
             { message: "Project deleted successfully" },
             { status: 200 }
         );
     } catch (error) {
+        const authResponse = authErrorResponse(error);
+        if (authResponse) return authResponse;
+
         console.error("Error deleting project:", error);
         return NextResponse.json(
             { message: "Failed to delete project" },

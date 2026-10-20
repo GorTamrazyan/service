@@ -1,0 +1,136 @@
+rules_version = '2';
+
+// Firestore Security Rules for ONIK'S VINYL.
+// Deploy: npx firebase-tools deploy --only firestore:rules --project mywebsiteauth-c45cd
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(uid) {
+      return isSignedIn() && request.auth.uid == uid;
+    }
+
+    function adminDoc() {
+      return get(/databases/$(database)/documents/admins/$(request.auth.uid));
+    }
+
+    // Mirrors AdminProtection: verified email + active document in /admins
+    function isAdmin() {
+      return isSignedIn()
+        && request.auth.token.email_verified == true
+        && exists(/databases/$(database)/documents/admins/$(request.auth.uid))
+        && adminDoc().data.isActive == true;
+    }
+
+    function hasPermission(permission) {
+      return isAdmin() && permission in adminDoc().data.permissions;
+    }
+
+    // ── Public catalog: anyone can read, only admins can write ──
+    match /products/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    match /categories/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    match /colors/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    match /materials/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    match /typeOfProducts/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    match /typesOfProducts/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    match /images/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    match /services/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    match /consultations/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    match /beforeAfterProjects/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // ── Admin accounts ──
+    match /admins/{uid} {
+      // AdminProtection reads the signed-in user's own document
+      allow get: if isOwner(uid) || isAdmin();
+      allow list: if isAdmin();
+      allow create, delete: if hasPermission('manage_admins');
+      // An admin may only touch lastLoginAt on their own document (login),
+      // so nobody can raise their own role or permissions
+      allow update: if hasPermission('manage_admins')
+        || (isOwner(uid) && isAdmin()
+            && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['lastLoginAt']));
+    }
+
+    // ── Customer profiles ──
+    match /users/{uid} {
+      function emailMatchesAccount() {
+        return !('email' in request.resource.data)
+          || request.resource.data.email.lower() == request.auth.token.email.lower();
+      }
+
+      // Fields managed by admins or the system, never by the customer
+      function protectedFields() {
+        return ['isActive', 'orderCount', 'totalSpent', 'role'];
+      }
+
+      allow get: if isOwner(uid) || isAdmin();
+      allow list: if isAdmin();
+      allow create: if isOwner(uid)
+        && emailMatchesAccount()
+        && !request.resource.data.keys().hasAny(protectedFields());
+      allow update: if isAdmin()
+        || (isOwner(uid)
+            && emailMatchesAccount()
+            && !request.resource.data.diff(resource.data).affectedKeys().hasAny(protectedFields()));
+      allow delete: if isOwner(uid) || isAdmin();
+    }
+
+    // ── Orders ──
+    match /orders/{orderId} {
+      allow read: if isAdmin()
+        || (isSignedIn() && resource.data.userId == request.auth.uid);
+      allow create: if isSignedIn()
+        && request.resource.data.userId == request.auth.uid
+        && request.resource.data.status in ['pending', 'scheduled'];
+      allow update, delete: if isAdmin();
+    }
+
+    // ── Admin notifications (created by customers when they place an order) ──
+    match /notifications/{id} {
+      allow read, update, delete: if isAdmin();
+      allow create: if isSignedIn()
+        && request.resource.data.keys().hasOnly(['type', 'message', 'order_id', 'read', 'created_at'])
+        && request.resource.data.type == 'order'
+        && request.resource.data.read == false
+        && request.resource.data.message is string
+        && request.resource.data.message.size() <= 300
+        && request.resource.data.order_id is string
+        && get(/databases/$(database)/documents/orders/$(request.resource.data.order_id)).data.userId == request.auth.uid;
+    }
+
+    // Everything else is denied by default
+  }
+}

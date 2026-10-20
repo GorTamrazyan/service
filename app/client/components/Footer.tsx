@@ -42,7 +42,7 @@ export default function Footer() {
                             <T>
                                 Quality fences and protection for your home and
                                 business. Professional installation and reliable
-                                service since 2020.
+                                service since 2010.
                             </T>
                         </p>
                         <div className="flex space-x-4">
@@ -121,28 +121,25 @@ export default function Footer() {
                             <div className="flex items-center space-x-3">
                                 <MapPin className="w-5 h-5 text-[var(--color-accent)] flex-shrink-0" />
                                 <span className="text-[var(--color-text)]/70">
-                                    <T>
-                                        8058 Troost Ave, North Hollywood, CA
-                                        91605, United States
-                                    </T>
+                                    8058 Troost Ave, North Hollywood, CA 91605
                                 </span>
                             </div>
                             <div className="flex items-center space-x-3">
                                 <Phone className="w-5 h-5 text-[var(--color-accent)] flex-shrink-0" />
                                 <a
-                                    href="tel:+1234567890"
+                                    href="tel:+18883362330"
                                     className="text-[var(--color-text)]/70 hover:text-[var(--color-accent)] transition-colors duration-200"
                                 >
-                                    (888) 336 - 2330
+                                    (888) 336-2330
                                 </a>
                             </div>
                             <div className="flex items-center space-x-3">
                                 <Mail className="w-5 h-5 text-[var(--color-accent)] flex-shrink-0" />
                                 <a
-                                    href="mailto:info@oniksvinyl.com"
+                                    href="mailto:info@fencegeneral.com"
                                     className="text-[var(--color-text)]/70 hover:text-[var(--color-accent)] transition-colors duration-200"
                                 >
-                                    Info@vinylfencegeneral.com
+                                    info@fencegeneral.com
                                 </a>
                             </div>
                         </div>
@@ -212,10 +209,10 @@ export default function Footer() {
                                 <T>Refund Policy</T>
                             </Link>
                             <Link
-                                href="/support"
+                                href="/client/dashboard/faq"
                                 className="text-[var(--color-text)]/70 hover:text-[var(--color-accent)] transition-colors duration-200"
                             >
-                                <T>Support</T>
+                                <T>FAQ</T>
                             </Link>
                         </div>
                     </div>

@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 
+const SUPPORTED_LANGUAGES = ["ru", "hy", "es"];
+const MAX_TEXT_LENGTH = 2000;
+
 export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const text = searchParams.get("q");
@@ -7,6 +10,10 @@ export async function GET(request: NextRequest) {
 
     if (!text || !lang) {
         return NextResponse.json({ error: "Missing parameters" }, { status: 400 });
+    }
+
+    if (!SUPPORTED_LANGUAGES.includes(lang) || text.length > MAX_TEXT_LENGTH) {
+        return NextResponse.json({ error: "Invalid parameters" }, { status: 400 });
     }
 
     try {

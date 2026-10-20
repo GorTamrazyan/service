@@ -1,3 +1,5 @@
+import { authFetch } from "../firebase/authFetch";
+
 const getApiUrl = () => {
     if (typeof window !== 'undefined') {
         return window.location.origin;
@@ -24,6 +26,7 @@ export interface SendOrderEmailParams {
 }
 
 export interface SendConsultationEmailParams {
+    orderId: string;
     customerEmail: string;
     customerName: string;
     consultationType: string;
@@ -42,7 +45,7 @@ export interface SendOrderStatusEmailParams {
 
 export const sendWelcomeEmailHelper = async (email: string, name: string): Promise<boolean> => {
     try {
-        const response = await fetch(`${getApiUrl()}/api/email/send`, {
+        const response = await authFetch(`${getApiUrl()}/api/email/send`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -73,7 +76,7 @@ export const sendWelcomeEmailHelper = async (email: string, name: string): Promi
 
 export const sendOrderEmail = async (params: SendOrderEmailParams): Promise<boolean> => {
     try {
-        const response = await fetch(`${getApiUrl()}/api/email/send`, {
+        const response = await authFetch(`${getApiUrl()}/api/email/send`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -108,7 +111,7 @@ export const sendOrderEmail = async (params: SendOrderEmailParams): Promise<bool
 
 export const sendConsultationEmail = async (params: SendConsultationEmailParams): Promise<boolean> => {
     try {
-        const response = await fetch(`${getApiUrl()}/api/email/send`, {
+        const response = await authFetch(`${getApiUrl()}/api/email/send`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -116,6 +119,7 @@ export const sendConsultationEmail = async (params: SendConsultationEmailParams)
             body: JSON.stringify({
                 type: 'consultation_booking',
                 data: {
+                    orderId: params.orderId,
                     customerEmail: params.customerEmail,
                     customerName: params.customerName,
                     consultationType: params.consultationType,
@@ -144,7 +148,7 @@ export const sendConsultationEmail = async (params: SendConsultationEmailParams)
 
 export const sendOrderStatusEmail = async (params: SendOrderStatusEmailParams): Promise<boolean> => {
     try {
-        const response = await fetch(`${getApiUrl()}/api/email/send`, {
+        const response = await authFetch(`${getApiUrl()}/api/email/send`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -181,7 +185,7 @@ export const sendPasswordResetEmailHelper = async (
     resetLink: string
 ): Promise<boolean> => {
     try {
-        const response = await fetch(`${getApiUrl()}/api/email/send`, {
+        const response = await authFetch(`${getApiUrl()}/api/email/send`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

@@ -14,6 +14,7 @@ import {
     MoveDown,
 } from "lucide-react";
 import { T } from "../../client/components/T";
+import { authFetch } from "../../lib/firebase/authFetch";
 import Image from "next/image";
 
 interface BeforeAfterProject {
@@ -110,7 +111,7 @@ export default function AdminBeforeAfterPage() {
             formData.append("order", projects.length.toString());
             formData.append("isActive", isActive.toString());
 
-            const response = await fetch("/api/before-after", {
+            const response = await authFetch("/api/before-after", {
                 method: "POST",
                 body: formData,
             });
@@ -147,7 +148,7 @@ export default function AdminBeforeAfterPage() {
             formData.append("location", location);
             formData.append("isActive", isActive.toString());
 
-            const response = await fetch(
+            const response = await authFetch(
                 `/api/before-after?id=${editingProject.id}`,
                 {
                     method: "PUT",
@@ -173,7 +174,7 @@ export default function AdminBeforeAfterPage() {
 
         try {
             setIsLoading(true);
-            const response = await fetch(`/api/before-after?id=${id}`, {
+            const response = await authFetch(`/api/before-after?id=${id}`, {
                 method: "DELETE",
             });
 
@@ -194,7 +195,7 @@ export default function AdminBeforeAfterPage() {
             const formData = new FormData();
             formData.append("isActive", (!project.isActive).toString());
 
-            const response = await fetch(`/api/before-after?id=${project.id}`, {
+            const response = await authFetch(`/api/before-after?id=${project.id}`, {
                 method: "PUT",
                 body: formData,
             });

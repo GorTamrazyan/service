@@ -2,6 +2,12 @@
 
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import { Bell, X, CheckCircle, RefreshCw } from "lucide-react";
+import {
+    getAllNotifications,
+    markNotificationAsRead,
+    markAllNotificationsAsRead,
+    deleteNotification as deleteNotificationDoc,
+} from "../../../lib/firebase/notifications";
 
 export interface Notification {
     id?: string;
@@ -30,20 +36,14 @@ export default function NotificationsDropdown() {
         }
 
         try {
-            const response = await fetch("/api/notifications", {
-                cache: "no-store",
-                headers: {
-                    "Cache-Control": "no-cache",
-                },
-            });
-
-            console.log("📡 API Response status:", response.status);
-
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-
-            const data = await response.json();
+            const list = await getAllNotifications();
+            const data = {
+                notifications: list.map((notif) => ({
+                    ...notif,
+                    created_at:
+                        notif.created_at?.toDate?.()?.toISOString() || notif.created_at,
+                })),
+            };
             console.log("📦 Raw API Response:", data);
             console.log("📋 Notifications array:", data.notifications);
             console.log(
@@ -82,19 +82,7 @@ export default function NotificationsDropdown() {
     const markAsRead = async (notificationId: string) => {
         console.log("👁 Marking notification as read:", notificationId);
         try {
-            const response = await fetch(
-                `/api/notifications/${notificationId}`,
-                {
-                    method: "PUT",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                }
-            );
-
-            console.log("📡 Mark as read response status:", response.status);
-
-            if (!response.ok) throw new Error("Failed to mark as read");
+            await markNotificationAsRead(notificationId);
 
             setNotifications((prev) =>
                 prev.map((n) =>
@@ -117,28 +105,7 @@ export default function NotificationsDropdown() {
         console.log("👁 Marking all notifications as read, count:", unreadCount);
         setMarkingAll(true);
         try {
-            const response = await fetch("/api/notifications", {
-                method: "PUT",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-            });
-
-            console.log(
-                "📡 Mark all as read response status:",
-                response.status
-            );
-
-            if (!response.ok) {
-                const errorData = await response.json();
-                console.error("❌ API Error:", errorData);
-                throw new Error(
-                    errorData.error || "Failed to mark all as read"
-                );
-            }
-
-            const result = await response.json();
-            console.log("✅ API Response:", result);
+            await markAllNotificationsAsRead();
 
             setNotifications((prev) => {
                 const updated = prev.map((n) => ({ ...n, read: true }));
@@ -166,16 +133,7 @@ export default function NotificationsDropdown() {
     const deleteNotification = async (notificationId: string) => {
         console.log("🗑️ Deleting notification:", notificationId);
         try {
-            const response = await fetch(
-                `/api/notifications/${notificationId}`,
-                {
-                    method: "DELETE",
-                }
-            );
-
-            console.log("📡 Delete response status:", response.status);
-
-            if (!response.ok) throw new Error("Failed to delete notification");
+            await deleteNotificationDoc(notificationId);
 
             setNotifications((prev) =>
                 prev.filter((n) => n.id !== notificationId)

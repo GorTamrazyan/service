@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { authFetch } from "../../lib/firebase/authFetch";
 import {
     FaCalendarAlt,
     FaDownload,
@@ -41,7 +42,7 @@ export default function AdminCalendarView() {
         }
 
         try {
-            const response = await fetch(`/api/cancel?eventId=${appointmentId}`, {
+            const response = await authFetch(`/api/cancel?eventId=${appointmentId}`, {
                 method: "DELETE",
             });
 
@@ -66,7 +67,7 @@ export default function AdminCalendarView() {
             const timeMin = new Date().toISOString();
             const timeMax = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
 
-            const response = await fetch(
+            const response = await authFetch(
                 `/api/calendar-events?timeMin=${timeMin}&timeMax=${timeMax}&maxResults=50`
             );
 

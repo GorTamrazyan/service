@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import { createService } from "../../../lib/firebase/service";
 import { X, Plus, Trash2 } from "lucide-react";
 import { T } from "../../../client/components/T";
 
@@ -72,27 +73,16 @@ export default function ServiceModal({
                 price: formData.price,
             };
 
-            const response = await fetch("/api/service", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(payload),
-            });
+            await createService(payload);
 
-            const result = await response.json();
-
-            if (response.ok) {
-                setStatus("success");
-                setMessage(result.message || "Service successfully added!");
-                setFormData(initialFormData);
-                setTimeout(onSuccess, 1500);
-            } else {
-                setStatus("error");
-                setMessage(result.message || "Error: Failed to add service.");
-            }
+            setStatus("success");
+            setMessage("Service successfully added!");
+            setFormData(initialFormData);
+            setTimeout(onSuccess, 1500);
         } catch (error) {
             console.error("Client side error:", error);
             setStatus("error");
-            setMessage("A critical network error occurred.");
+            setMessage("Error: Failed to add service.");
         }
     };
 

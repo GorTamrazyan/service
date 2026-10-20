@@ -2,7 +2,6 @@ import { NextResponse } from "next/server";
 import {
     getAllProducts,
     getFilteredProducts,
-    createProduct,
     getProductById,
     getAllProductsEnriched,
     getFilteredProductsEnriched,
@@ -60,55 +59,6 @@ export async function GET(request: Request) {
         console.error("Ошибка при получении продуктов:", error);
         return NextResponse.json(
             { message: "Не удалось загрузить продукты" },
-            { status: 500 }
-        );
-    }
-}
-
-export async function POST(request: Request) {
-    try {
-        const body = await request.json();
-        const { name, description, colorPrices, categoryId, typeOfProductId, materialId, colorIds, featured, discount } = body;
-
-        if (!name || !colorPrices) {
-            return NextResponse.json(
-                { message: "Имя и цены продукта обязательны" },
-                { status: 400 }
-            );
-        }
-
-        if (
-            typeof colorPrices !== "object" || Array.isArray(colorPrices) ||
-            Object.keys(colorPrices).length === 0 ||
-            !Object.values(colorPrices).every((v) => typeof v === "number" && (v as number) > 0)
-        ) {
-            return NextResponse.json(
-                {
-                    message: "colorPrices должен быть объектом с положительными числами",
-                },
-                { status: 400 }
-            );
-        }
-
-        const newProductId = await createProduct({
-            name,
-            description: description || undefined,
-            colorPrices,
-            categoryId: categoryId || undefined,
-            typeOfProductId: typeOfProductId || undefined,
-            materialId: materialId || undefined,
-            colorIds: colorIds || [],
-            featured: featured || false,
-            discount: discount || 0,
-        });
-
-        const newProduct = await getProductById(newProductId);
-
-        return NextResponse.json(newProduct, { status: 201 });
-    } catch (error) {
-        console.error("Ошибка при создании продукта:", error);
-        return NextResponse.json(
-            { message: "Не удалось создать продукт" },
             { status: 500 }
         );
     }

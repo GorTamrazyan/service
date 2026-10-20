@@ -25,7 +25,7 @@ export default function PrivacyPolicyPage() {
                         <section>
                             <h2 className="text-2xl font-bold text-[var(--color-primary)] mb-4">1. Introduction</h2>
                             <p>
-                                Welcome to ONIK&apos;S VINYL (&quot;Company&quot;, &quot;we&quot;, &quot;our&quot;, &quot;us&quot;), operated by [COMPANY LEGAL NAME], located at [COMPANY ADDRESS]. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you visit [WEBSITE URL] and use our services.
+                                Welcome to ONIK&apos;S VINYL (&quot;Company&quot;, &quot;we&quot;, &quot;our&quot;, &quot;us&quot;), operated by [COMPANY LEGAL NAME], located at 8058 Troost Ave, North Hollywood, CA 91605. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you visit [WEBSITE URL] and use our services.
                             </p>
                             <p className="mt-3">
                                 By using our website, you consent to the data practices described in this policy.
@@ -112,7 +112,7 @@ export default function PrivacyPolicyPage() {
                             </ul>
                             <p className="mb-2 font-semibold">California Residents (CCPA):</p>
                             <p>
-                                You have the right to know what personal information is collected, request its deletion, and opt out of its sale. We do not sell personal data. To exercise these rights, contact us at [CONTACT EMAIL].
+                                You have the right to know what personal information is collected, request its deletion, and opt out of its sale. We do not sell personal data. To exercise these rights, contact us at info@fencegeneral.com.
                             </p>
                         </section>
 
@@ -148,9 +148,9 @@ export default function PrivacyPolicyPage() {
                             <h2 className="text-2xl font-bold text-[var(--color-primary)] mb-4">12. Contact Us</h2>
                             <p>ONIK&apos;S VINYL</p>
                             <p>[COMPANY LEGAL NAME]</p>
-                            <p>[COMPANY ADDRESS]</p>
-                            <p>Email: [CONTACT EMAIL]</p>
-                            <p>Phone: [PHONE NUMBER]</p>
+                            <p>8058 Troost Ave, North Hollywood, CA 91605</p>
+                            <p>Email: info@fencegeneral.com</p>
+                            <p>Phone: (888) 336-2330</p>
                         </section>
 
                     </div>

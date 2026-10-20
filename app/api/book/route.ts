@@ -1,7 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
+import { guardUser } from "../../lib/firebase/serverAuth";
 import { google } from "googleapis";
 
 export async function POST(request: NextRequest) {
+    const denied = await guardUser(request);
+    if (denied) return denied;
+
     try {
         const body = await request.json();
         const { name, email, phone, startTime, duration, consultationType } =

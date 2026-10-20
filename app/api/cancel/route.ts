@@ -1,7 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
+import { guardAdmin } from "../../lib/firebase/serverAuth";
 import { google } from "googleapis";
 
 export async function DELETE(request: NextRequest) {
+    const denied = await guardAdmin(request);
+    if (denied) return denied;
+
     try {
         const { searchParams } = new URL(request.url);
         const eventId = searchParams.get("eventId");

@@ -1,3 +1,5 @@
+import { authFetch } from "../authFetch";
+
 export const uploadProductImages = async (
   files: File[],
   productId: string
@@ -9,7 +11,7 @@ export const uploadProductImages = async (
     });
     formData.append("productId", productId);
 
-    const response = await fetch("/api/upload", {
+    const response = await authFetch("/api/upload", {
       method: "POST",
       body: formData,
     });
@@ -55,7 +57,7 @@ export const deleteProductImage = async (imageUrl: string): Promise<void> => {
     }
     const publicId = parts.join("/").replace(/\.[^/.]+$/, "");
 
-    const response = await fetch("/api/upload", {
+    const response = await authFetch("/api/upload", {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",

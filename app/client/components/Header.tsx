@@ -13,6 +13,7 @@ import {
     FaBox,
     FaTools,
     FaInfoCircle,
+    FaQuestionCircle,
     FaGlobe,
 } from "react-icons/fa";
 import { useCart } from "../context/CartContext";
@@ -65,6 +66,7 @@ export default function Header() {
         { href: "/client/dashboard/products", label: "Products", icon: FaBox },
         { href: "/client/dashboard/service", label: "Service", icon: FaTools },
         { href: "/client/dashboard/about", label: "About us", icon: FaInfoCircle },
+        { href: "/client/dashboard/faq", label: "FAQ", icon: FaQuestionCircle },
     ];
 
     const isActive = (href: string) => {

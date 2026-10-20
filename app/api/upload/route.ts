@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { guardAdmin } from "../../lib/firebase/serverAuth";
 import { v2 as cloudinary } from "cloudinary";
 
 cloudinary.config({
@@ -8,6 +9,9 @@ cloudinary.config({
 });
 
 export async function POST(request: NextRequest) {
+    const denied = await guardAdmin(request);
+    if (denied) return denied;
+
     try {
         
         if (!process.env.CLOUDINARY_CLOUD_NAME || !process.env.CLOUDINARY_API_KEY || !process.env.CLOUDINARY_API_SECRET) {
@@ -77,6 +81,9 @@ export async function POST(request: NextRequest) {
 }
 
 export async function DELETE(request: NextRequest) {
+    const denied = await guardAdmin(request);
+    if (denied) return denied;
+
     try {
         const { publicId } = await request.json();
 

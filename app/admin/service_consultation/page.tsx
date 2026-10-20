@@ -3,6 +3,12 @@
 import React, { useState, useEffect } from "react";
 import AdminProtection from "../components/AdminProtection";
 import { Service, Consultation } from "../../lib/firebase/products/types";
+import {
+    deleteService as deleteServiceDoc,
+    deleteConsultation as deleteConsultationDoc,
+    updateService as updateServiceDoc,
+    updateConsultation as updateConsultationDoc,
+} from "../../lib/firebase/service";
 import ServiceModal from "../components/modals/ServiceModal";
 import ConsultationModal from "../components/modals/ConsultationModal";
 import EditServiceModal from "../components/modals/EditServiceModal";
@@ -21,63 +27,28 @@ const fetchApiData = async <T,>(endpoint: string): Promise<T[]> => {
     return response.json();
 };
 
-const deleteService = async (serviceId: string): Promise<void> => {
-    const response = await fetch(`/api/service?id=${serviceId}`, {
-        method: "DELETE",
-    });
+const definedOnly = <T extends object>(data: T): Partial<T> =>
+    Object.fromEntries(Object.entries(data).filter(([, v]) => v !== undefined)) as Partial<T>;
 
-    if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || "Failed to delete service");
-    }
-};
+const deleteService = (serviceId: string): Promise<void> => deleteServiceDoc(serviceId);
 
-const deleteConsultation = async (consultationId: string): Promise<void> => {
-    const response = await fetch(`/api/consultations?id=${consultationId}`, {
-        method: "DELETE",
-    });
+const deleteConsultation = (consultationId: string): Promise<void> =>
+    deleteConsultationDoc(consultationId);
 
-    if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || "Failed to delete consultation");
-    }
-};
-
-const updateService = async (
+const updateService = (
     serviceId: string,
-    serviceData: Partial<Service>
-): Promise<void> => {
-    const response = await fetch(`/api/service?id=${serviceId}`, {
-        method: "PUT",
-        headers: {
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify(serviceData),
-    });
+    { icon, title, description, features, price }: Partial<Service>
+): Promise<void> =>
+    updateServiceDoc(serviceId, definedOnly({ icon, title, description, features, price }));
 
-    if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || "Failed to update service");
-    }
-};
-
-const updateConsultation = async (
+const updateConsultation = (
     consultationId: string,
-    consultationData: Partial<Consultation>
-): Promise<void> => {
-    const response = await fetch(`/api/consultations?id=${consultationId}`, {
-        method: "PUT",
-        headers: {
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify(consultationData),
-    });
-
-    if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || "Failed to update consultation");
-    }
-};
+    { title, description, features, price, duration }: Partial<Consultation>
+): Promise<void> =>
+    updateConsultationDoc(
+        consultationId,
+        definedOnly({ title, description, features, price, duration })
+    );
 
 export default function AdminCombinedServicesPage() {
     const [services, setServices] = useState<Service[]>([]);

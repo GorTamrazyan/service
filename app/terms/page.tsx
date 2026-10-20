@@ -152,7 +152,7 @@ export default function TermsOfServicePage() {
                         <section>
                             <h2 className="text-2xl font-bold text-[var(--color-primary)] mb-4">15. Governing Law</h2>
                             <p>
-                                These Terms are governed by the laws of the State of [STATE], United States. Disputes shall be resolved in the courts of [STATE/COUNTY], [STATE].
+                                These Terms are governed by the laws of the State of California, United States. Disputes shall be resolved in the courts of Los Angeles County, California.
                             </p>
                         </section>
 
@@ -167,9 +167,9 @@ export default function TermsOfServicePage() {
                             <h2 className="text-2xl font-bold text-[var(--color-primary)] mb-4">17. Contact Us</h2>
                             <p>ONIK&apos;S VINYL</p>
                             <p>[COMPANY LEGAL NAME]</p>
-                            <p>[COMPANY ADDRESS]</p>
-                            <p>Email: [CONTACT EMAIL]</p>
-                            <p>Phone: [PHONE NUMBER]</p>
+                            <p>8058 Troost Ave, North Hollywood, CA 91605</p>
+                            <p>Email: info@fencegeneral.com</p>
+                            <p>Phone: (888) 336-2330</p>
                         </section>
 
                     </div>

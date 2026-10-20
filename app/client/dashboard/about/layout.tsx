@@ -3,11 +3,11 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
     title: "About Us",
     description:
-        "Learn about ONIK'S VINYL — 15+ years of excellence in vinyl fencing, 10,000+ completed projects, 98% customer satisfaction.",
+        "Learn about ONIK'S VINYL — family-owned vinyl fence company serving Southern California since 2010. Made in USA materials, 15-year warranty.",
     alternates: { canonical: "https://oniksvinyl.com/client/dashboard/about" },
     openGraph: {
         title: "About ONIK'S VINYL",
-        description: "15+ years of excellence in vinyl fencing. 10,000+ completed projects, 98% customer satisfaction.",
+        description: "Family-owned vinyl fence company serving Southern California since 2010.",
         url: "https://oniksvinyl.com/client/dashboard/about",
     },
 };

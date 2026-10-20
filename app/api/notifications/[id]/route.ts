@@ -1,38 +1,8 @@
-import { NextRequest, NextResponse } from "next/server";
-import {
-    markNotificationAsRead,
-    deleteNotification,
-} from "../../../lib/firebase/notifications"; 
+import { NextResponse } from "next/server";
 
-export async function PUT(
-    request: NextRequest,
-    { params }: { params: Promise<{ id: string }> }
-) {
-    try {
-        const { id } = await params;
-        await markNotificationAsRead(id);
-        return NextResponse.json({ success: true });
-    } catch (error) {
-        return NextResponse.json(
-            { error: "Failed to mark notification as read" },
-            { status: 500 }
-        );
-    }
-}
+// Removed: the admin panel now updates notifications directly in Firestore,
+// where Security Rules restrict access to admins. This file can be deleted.
+const gone = () => NextResponse.json({ error: "Gone" }, { status: 410 });
 
-export async function DELETE(
-    request: NextRequest,
-    { params }: { params: Promise<{ id: string }> }
-) {
-    try {
-        const { id } = await params;
-        await deleteNotification(id); 
-        return NextResponse.json({ success: true });
-    } catch (error) {
-        console.error("Error deleting notification:", error);
-        return NextResponse.json(
-            { error: "Failed to delete notification" },
-            { status: 500 }
-        );
-    }
-}
+export const PUT = gone;
+export const DELETE = gone;

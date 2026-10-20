@@ -53,7 +53,7 @@ export default function RefundPolicyPage() {
 
                         <section>
                             <h2 className="text-2xl font-bold text-[var(--color-primary)] mb-4">4. How to Request a Return</h2>
-                            <p className="mb-3">Contact us at [CONTACT EMAIL] with:</p>
+                            <p className="mb-3">Contact us at info@fencegeneral.com with:</p>
                             <ul className="list-disc pl-6 space-y-2 mb-3">
                                 <li>Your order number</li>
                                 <li>Product(s) you wish to return</li>
@@ -72,7 +72,7 @@ export default function RefundPolicyPage() {
 
                         <section>
                             <h2 className="text-2xl font-bold text-[var(--color-primary)] mb-4">6. Damaged or Defective Products</h2>
-                            <p className="mb-3">If you receive a damaged or defective product, contact us within 7 days of delivery at [CONTACT EMAIL] with:</p>
+                            <p className="mb-3">If you receive a damaged or defective product, contact us within 7 days of delivery at info@fencegeneral.com with:</p>
                             <ul className="list-disc pl-6 space-y-2 mb-3">
                                 <li>Your order number</li>
                                 <li>Photos of the damaged/defective product</li>
@@ -124,7 +124,7 @@ export default function RefundPolicyPage() {
                             <ul className="list-disc pl-6 space-y-2">
                                 <li>Orders can be cancelled for a full refund before shipping</li>
                                 <li>Once shipped, orders cannot be cancelled — follow the return process</li>
-                                <li>Contact us at [CONTACT EMAIL] with your order number to cancel</li>
+                                <li>Contact us at info@fencegeneral.com with your order number to cancel</li>
                             </ul>
                         </section>
 
@@ -134,7 +134,7 @@ export default function RefundPolicyPage() {
                             <ul className="list-disc pl-6 space-y-2">
                                 <li>Check your bank/credit card statement again</li>
                                 <li>Contact your bank or card company</li>
-                                <li>If still missing, contact us at [CONTACT EMAIL]</li>
+                                <li>If still missing, contact us at info@fencegeneral.com</li>
                             </ul>
                         </section>
 
@@ -142,9 +142,9 @@ export default function RefundPolicyPage() {
                             <h2 className="text-2xl font-bold text-[var(--color-primary)] mb-4">13. Contact Us</h2>
                             <p>ONIK&apos;S VINYL</p>
                             <p>[COMPANY LEGAL NAME]</p>
-                            <p>[COMPANY ADDRESS]</p>
-                            <p>Email: [CONTACT EMAIL]</p>
-                            <p>Phone: [PHONE NUMBER]</p>
+                            <p>8058 Troost Ave, North Hollywood, CA 91605</p>
+                            <p>Email: info@fencegeneral.com</p>
+                            <p>Phone: (888) 336-2330</p>
                         </section>
 
                     </div>

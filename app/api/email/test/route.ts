@@ -1,7 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { guardAdmin } from "../../../lib/firebase/serverAuth";
 import { verifyEmailConnection, transporter, defaultSender } from '../../../lib/email/config';
 
-export async function GET() {
+export async function GET(request: NextRequest) {
+    const denied = await guardAdmin(request);
+    if (denied) return denied;
+
     try {
         
         const emailUser = process.env.EMAIL_USER;
@@ -63,6 +67,9 @@ export async function GET() {
 }
 
 export async function POST(request: NextRequest) {
+    const denied = await guardAdmin(request);
+    if (denied) return denied;
+
     try {
         const body = await request.json();
         const { testEmail } = body;

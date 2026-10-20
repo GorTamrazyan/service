@@ -14,6 +14,7 @@ import {
 import { T } from "./T";
 import { createConsultationOrder } from "../../lib/firebase/orders";
 import { useAuthState } from "../../hooks/useAuthState";
+import { authFetch } from "../../lib/firebase/authFetch";
 import { useProfile } from "../../hooks/useProfile";
 import { sendConsultationEmail } from "../../lib/email/helpers";
 
@@ -306,7 +307,7 @@ export default function AppointmentBookingModal({
 
             console.log("📝 Step 2: Creating Google Calendar event...");
 
-            const response = await fetch("/api/book", {
+            const response = await authFetch("/api/book", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -340,6 +341,7 @@ export default function AppointmentBookingModal({
 
                 try {
                     await sendConsultationEmail({
+                        orderId,
                         customerEmail: customerInfo.email,
                         customerName: customerInfo.name,
                         consultationType: consultationType,

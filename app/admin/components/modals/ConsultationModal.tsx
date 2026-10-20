@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import { createConsultation } from "../../../lib/firebase/service";
 import { X } from "lucide-react";
 import { T } from "../../../client/components/T";
 import { Consultation } from "../../../lib/firebase/products/types";
@@ -63,27 +64,16 @@ export default function ConsultationModal({
                 features: featuresArray,
             };
 
-            const response = await fetch("/api/consultations", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(payload),
-            });
+            await createConsultation(payload);
 
-            const result = await response.json();
-
-            if (response.ok) {
-                setStatus("success");
-                setMessage(result.message || "Tariff successfully added!");
-                setFormData(initialFormData);
-                setTimeout(onSuccess, 1500);
-            } else {
-                setStatus("error");
-                setMessage(result.message || "Error: Failed to add tariff.");
-            }
+            setStatus("success");
+            setMessage("Tariff successfully added!");
+            setFormData(initialFormData);
+            setTimeout(onSuccess, 1500);
         } catch (error) {
             console.error("Client side error:", error);
             setStatus("error");
-            setMessage("A critical network error occurred.");
+            setMessage("Error: Failed to add tariff.");
         }
     };
 

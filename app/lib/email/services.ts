@@ -222,3 +222,35 @@ export const sendBulkEmails = async (
 
     return results;
 };
+
+export interface CallbackRequestEmailParams {
+    name: string;
+    phone: string;
+    page?: string;
+}
+
+export const escapeHtml = (value: string) =>
+    value.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]!));
+
+export const sendCallbackRequestEmail = async (params: CallbackRequestEmailParams) => {
+    const to = process.env.CALLBACK_EMAIL || process.env.EMAIL_USER;
+    if (!to) {
+        return { success: false, error: 'Callback recipient is not configured' };
+    }
+
+    const name = escapeHtml(params.name);
+    const phone = escapeHtml(params.phone);
+    const page = params.page ? escapeHtml(params.page) : null;
+
+    return sendEmail({
+        to,
+        subject: `Callback request: ${params.name}`,
+        html: `
+            <h2>New callback request</h2>
+            <p><strong>Name:</strong> ${name}</p>
+            <p><strong>Phone:</strong> <a href="tel:${phone}">${phone}</a></p>
+            ${page ? `<p><strong>Page:</strong> ${page}</p>` : ''}
+            <p><strong>Received:</strong> ${new Date().toLocaleString('en-US', { timeZone: 'America/Los_Angeles' })}</p>
+        `,
+    });
+};

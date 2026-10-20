@@ -28,14 +28,24 @@ const organizationJsonLd = {
   url: SITE_URL,
   logo: `${SITE_URL}/images/oniks_vinyl_text.png`,
   description:
-    "ONIK'S VINYL — premium custom vinyl fencing, gates, and installation services. 15+ years of experience, 10,000+ projects completed.",
-  email: "info@oniksvinyl.com",
-  telephone: "+1-234-567-890",
+    "ONIK'S VINYL — premium custom vinyl fencing, gates, and installation services. Serving Southern California since 2010.",
+  email: "info@fencegeneral.com",
+  telephone: "+1-888-336-2330",
+  foundingDate: "2010",
+  address: {
+    "@type": "PostalAddress",
+    streetAddress: "8058 Troost Ave",
+    addressLocality: "North Hollywood",
+    addressRegion: "CA",
+    postalCode: "91605",
+    addressCountry: "US",
+  },
+  areaServed: ["San Fernando Valley", "Los Angeles", "Orange County", "Ventura County"],
   contactPoint: {
     "@type": "ContactPoint",
     contactType: "customer service",
-    email: "info@oniksvinyl.com",
-    telephone: "+1-234-567-890",
+    email: "info@fencegeneral.com",
+    telephone: "+1-888-336-2330",
   },
   sameAs: [
     "https://facebook.com",
@@ -52,7 +62,7 @@ export const metadata: Metadata = {
     template: "ONIK'S VINYL",
   },
   description:
-    "ONIK'S VINYL — premium custom vinyl fencing, gates, and installation services. 15+ years of experience, 10,000+ projects completed. Free quotes available.",
+    "ONIK'S VINYL — premium custom vinyl fencing, gates, and installation services. Serving Southern California since 2010. Free quotes available.",
   keywords: ["vinyl fence", "vinyl fencing", "custom fence", "fence installation", "vinyl gates", "ONIK'S VINYL"],
   authors: [{ name: "ONIK'S VINYL", url: SITE_URL }],
   openGraph: {

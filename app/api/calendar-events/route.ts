@@ -1,7 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
+import { guardAdmin } from "../../lib/firebase/serverAuth";
 import { google } from "googleapis";
 
 export async function GET(request: NextRequest) {
+    const denied = await guardAdmin(request);
+    if (denied) return denied;
+
     try {
         const privateKey = process.env.GOOGLE_PRIVATE_KEY?.replace(
             /\\n/g,
