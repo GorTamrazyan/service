@@ -1,5 +1,5 @@
 import { collection, doc, getDoc, getDocs, setDoc, query, where, addDoc } from "firebase/firestore";
-import { signInWithEmailAndPassword, signOut } from "firebase/auth";
+import { signInWithEmailAndPassword, signOut, setPersistence, browserSessionPersistence, User } from "firebase/auth";
 import { db, auth } from "./firebase";
 
 export interface AdminUser {
@@ -15,8 +15,20 @@ export interface AdminUser {
 
 const ADMIN_COLLECTION = "admins";
 
+// Admin sessions end this long after the password was entered.
+// Keep in sync with ADMIN_SESSION_SECONDS in firestore.rules and serverAuth.ts.
+export const ADMIN_SESSION_MS = 8 * 60 * 60 * 1000;
+
+// Returns the timestamp (ms) when the current admin session expires
+export const getAdminSessionExpiry = async (user: User): Promise<number> => {
+    const { claims } = await user.getIdTokenResult();
+    return Number(claims.auth_time) * 1000 + ADMIN_SESSION_MS;
+};
+
 export const loginAdmin = async (email: string, password: string): Promise<{ admin: AdminUser }> => {
     try {
+        // Admin login lasts only until the browser is closed
+        await setPersistence(auth, browserSessionPersistence);
         const userCred = await signInWithEmailAndPassword(auth, email, password);
         const user = userCred.user;
 

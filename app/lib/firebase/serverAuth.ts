@@ -36,10 +36,16 @@ export const requireUser = async (request: Request): Promise<AuthContext> => {
     }
 };
 
+// Keep in sync with ADMIN_SESSION_MS in admin.ts and firestore.rules
+const ADMIN_SESSION_SECONDS = 8 * 60 * 60;
+
 export const requireAdmin = async (request: Request): Promise<AuthContext> => {
     const ctx = await requireUser(request);
     if (!ctx.user.email_verified) {
         throw new AuthError("Admin access required", 403);
+    }
+    if (Date.now() / 1000 - ctx.user.auth_time > ADMIN_SESSION_SECONDS) {
+        throw new AuthError("Admin session expired, please sign in again", 401);
     }
     const admin = await getDocumentAsUser(`admins/${ctx.user.uid}`, ctx.token);
     if (!admin || admin.isActive !== true) {

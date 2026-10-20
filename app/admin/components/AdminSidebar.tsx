@@ -186,10 +186,11 @@ export default function AdminSidebar() {
                             try {
                                 await logoutAdmin();
                                 localStorage.removeItem("adminUser");
-                                window.location.href = "/admin/login";
+                                // replace() drops the admin page from history, so Back can't return to it
+                                window.location.replace("/admin/login");
                             } catch (error) {
                                 console.error("Logout error:", error);
-                                window.location.href = "/admin/login";
+                                window.location.replace("/admin/login");
                             }
                         }}
                         className={`flex items-center gap-3 px-4 py-3 rounded-xl w-full transition-colors hover:bg-red-500/10 text-red-500 hover:text-red-600 ${

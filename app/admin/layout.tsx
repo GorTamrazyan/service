@@ -10,6 +10,13 @@ import { LanguageProvider } from "../contexts/LanguageContext";
 import { onAuthStateChanged } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
 import { auth, db } from "../lib/firebase/firebase";
+import { getAdminSessionExpiry, logoutAdmin } from "../lib/firebase/admin";
+
+const endAdminSession = async () => {
+    await logoutAdmin();
+    localStorage.removeItem("adminUser");
+    window.location.replace("/admin/login");
+};
 
 export default function AdminLayout({
     children,
@@ -26,10 +33,19 @@ export default function AdminLayout({
             return;
         }
 
+        let expiryTimer: ReturnType<typeof setTimeout> | undefined;
+
         const unsubscribe = onAuthStateChanged(auth, async (user) => {
+            clearTimeout(expiryTimer);
             if (user && user.emailVerified) {
+                const msLeft = (await getAdminSessionExpiry(user)) - Date.now();
+                if (msLeft <= 0) {
+                    await endAdminSession();
+                    return;
+                }
                 const adminDoc = await getDoc(doc(db, "admins", user.uid));
                 if (adminDoc.exists() && adminDoc.data().isActive) {
+                    expiryTimer = setTimeout(endAdminSession, msLeft);
                     setIsAuthenticated(true);
                 } else {
                     setIsAuthenticated(false);
@@ -41,7 +57,17 @@ export default function AdminLayout({
             }
         });
 
-        return () => unsubscribe();
+        // A page restored from the back/forward cache skips the auth check above, so reload it
+        const handlePageShow = (e: PageTransitionEvent) => {
+            if (e.persisted) window.location.reload();
+        };
+        window.addEventListener("pageshow", handlePageShow);
+
+        return () => {
+            unsubscribe();
+            clearTimeout(expiryTimer);
+            window.removeEventListener("pageshow", handlePageShow);
+        };
     }, [pathname, router]);
 
     if (isAuthenticated === null) {

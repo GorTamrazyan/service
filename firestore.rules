@@ -17,10 +17,17 @@ service cloud.firestore {
       return get(/databases/$(database)/documents/admins/$(request.auth.uid));
     }
 
-    // Mirrors AdminProtection: verified email + active document in /admins
+    // Admin sessions expire 8 hours after the password was entered.
+    // Keep in sync with ADMIN_SESSION_MS in app/lib/firebase/admin.ts and serverAuth.ts.
+    function adminSessionActive() {
+      return request.time < timestamp.value(request.auth.token.auth_time * 1000) + duration.value(8, 'h');
+    }
+
+    // Mirrors AdminProtection: verified email + active document in /admins + fresh login
     function isAdmin() {
       return isSignedIn()
         && request.auth.token.email_verified == true
+        && adminSessionActive()
         && exists(/databases/$(database)/documents/admins/$(request.auth.uid))
         && adminDoc().data.isActive == true;
     }
